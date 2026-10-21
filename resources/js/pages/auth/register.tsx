@@ -45,15 +45,78 @@ export default function Register({ passwordRules }: Props) {
                             </div>
 
                             <div className="grid gap-2">
+                                <Label htmlFor="registration_number">
+                                    Registration number
+                                </Label>
+                                <Input
+                                    id="registration_number"
+                                    type="text"
+                                    required
+                                    tabIndex={2}
+                                    inputMode="numeric"
+                                    autoComplete="off"
+                                    name="registration_number"
+                                    placeholder="2023000001"
+                                    maxLength={10}
+                                />
+                                <InputError
+                                    message={errors.registration_number}
+                                />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="department">Department</Label>
+                                <Input
+                                    id="department"
+                                    type="text"
+                                    required
+                                    tabIndex={3}
+                                    autoComplete="organization"
+                                    name="department"
+                                    placeholder="English"
+                                />
+                                <InputError message={errors.department} />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="session">Session</Label>
+                                <Input
+                                    id="session"
+                                    type="text"
+                                    required
+                                    tabIndex={4}
+                                    autoComplete="off"
+                                    name="session"
+                                    placeholder="2023-24"
+                                />
+                                <InputError message={errors.session} />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="phone">Phone</Label>
+                                <Input
+                                    id="phone"
+                                    type="tel"
+                                    required
+                                    tabIndex={5}
+                                    inputMode="tel"
+                                    autoComplete="tel-national"
+                                    name="phone"
+                                    placeholder="01712345678"
+                                />
+                                <InputError message={errors.phone} />
+                            </div>
+
+                            <div className="grid gap-2">
                                 <Label htmlFor="email">Email address</Label>
                                 <Input
                                     id="email"
                                     type="email"
                                     required
-                                    tabIndex={2}
+                                    tabIndex={6}
                                     autoComplete="email"
                                     name="email"
-                                    placeholder="email@example.com"
+                                    placeholder="you@student.du.test"
                                 />
                                 <InputError message={errors.email} />
                             </div>
@@ -63,7 +126,7 @@ export default function Register({ passwordRules }: Props) {
                                 <PasswordInput
                                     id="password"
                                     required
-                                    tabIndex={3}
+                                    tabIndex={7}
                                     autoComplete="new-password"
                                     name="password"
                                     placeholder="Password"
@@ -79,7 +142,7 @@ export default function Register({ passwordRules }: Props) {
                                 <PasswordInput
                                     id="password_confirmation"
                                     required
-                                    tabIndex={4}
+                                    tabIndex={8}
                                     autoComplete="new-password"
                                     name="password_confirmation"
                                     placeholder="Confirm password"
@@ -93,7 +156,7 @@ export default function Register({ passwordRules }: Props) {
                             <Button
                                 type="submit"
                                 className="mt-2 w-full"
-                                tabIndex={5}
+                                tabIndex={9}
                                 data-test="register-user-button"
                             >
                                 {processing && <Spinner />}
@@ -103,7 +166,7 @@ export default function Register({ passwordRules }: Props) {
 
                         <div className="text-center text-sm text-muted-foreground">
                             Already have an account?{' '}
-                            <TextLink href={login()} tabIndex={6}>
+                            <TextLink href={login()} tabIndex={10}>
                                 Log in
                             </TextLink>
                         </div>
