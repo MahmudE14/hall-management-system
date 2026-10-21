@@ -84,22 +84,59 @@ Alternative considered: a versioned API plus client query library. Rejected beca
 
 Implement identity and approval first; hall structure before allocation; tutor scope before complaint assignment; domain modules before dashboard aggregation; and final seed/documentation work after behavior stabilizes. Each slice includes its own regression tests before the next begins.
 
+### 11. Gate implementation by explicit phase authorization
+
+`docs/PROJECT_STATUS.md` is the authorization ledger for this change. An implementation session may execute tasks only from the single phase named as authorized there. `NONE` authorizes no implementation, even when tasks are visible or OpenSpec reports that planning is complete.
+
+Completing a phase does not authorize another phase. The implementer MUST stop after the authorized phase exit criteria pass, update `docs/PROJECT_STATUS.md`, and wait for explicit user approval. `/openspec-apply-change` MUST read the authorization ledger before changing application code and MUST never implement a future phase or a task blocked by an unresolved clarification.
+
+Alternative considered: treating approval of the whole OpenSpec change as approval of every task. Rejected because it permits accidental scope expansion and prevents deliberate review between independently testable slices.
+
+## Implementation Phases
+
+| Phase | Scope | Entry criteria | Exit criteria |
+|---|---|---|---|
+| Phase 0 | Planning approval | Client sources and current starter are available | Strict OpenSpec validation passes; requirements remain traceable; tasks are interruption-safe; authorization remains `NONE`; explicit final Phase 0 approval is received |
+| Phase 1 | Identity and Registration | Phase 0 approved; Phase 1 explicitly authorized; blockers needed by the selected task are resolved | All Phase 1 tasks complete; six demo identities authenticate with documented roles; registration and authorization tests pass; status updated; work stops |
+| Phase 2 | Hall Structure and Student Records | Phase 1 complete; Phase 2 explicitly authorized | All Phase 2 tasks complete; structure, occupancy, directory, profile, and access tests pass; status updated; work stops |
+| Phase 3 | Seat Allocation and Vacancy | Phase 2 complete; Phase 3 explicitly authorized | All Phase 3 tasks complete; allocation, vacancy, history, capacity, and concurrency checks pass; status updated; work stops |
+| Phase 4 | House Tutors | Phase 3 complete; Phase 4 explicitly authorized; C8 resolved before account onboarding | All Phase 4 tasks complete; tutor administration and scoping tests pass; status updated; work stops |
+| Phase 5 | Complaints | Phases 1, 3, and 4 complete; Phase 5 explicitly authorized; C1-C5 and C11 resolved before affected tasks | All Phase 5 tasks complete; submission, privacy, assignment, comments, transitions, audit, and UI checks pass; status updated; work stops |
+| Phase 6 | Notice Board | Phase 1 complete; Phase 6 explicitly authorized | All Phase 6 tasks complete; authoring, public discovery, draft isolation, and download tests pass; status updated; work stops |
+| Phase 7 | Clubs and Memberships | Phases 1 and 2 complete; Phase 7 explicitly authorized | All Phase 7 tasks complete; directory, request, administration, upload, and scope tests pass; status updated; work stops |
+| Phase 8 | Operations Dashboard | Phases 3-7 complete; Phase 8 explicitly authorized; C10-C11 resolved | All Phase 8 tasks complete; leadership and tutor-scoped metrics match deterministic records; status updated; work stops |
+| Phase 9 | Assessment Data and Delivery | Phases 1-8 complete; Phase 9 explicitly authorized; C12 resolved for final submission | All Phase 9 tasks complete; seed minima, responsive review, documentation, evidence, and quality pipeline are verified; status updated; work stops |
+
+## Requirement Traceability
+
+| Assessment area | Capability | Implementation phase |
+|---|---|---|
+| M1 authentication and registration | `identity-access` | Phase 1 |
+| M2 students, rooms, and allocation | `student-accommodation` | Phases 2-3 |
+| M3 house tutors | `tutor-oversight` | Phase 4 |
+| M4 complaint management and BR-06-BR-10 | `complaint-management` | Phase 5 |
+| M5 notice board and BR-11/BR-13 | `notice-board` | Phase 6 |
+| M6 clubs and BR-12/BR-13 | `club-membership` | Phase 7 |
+| M7 dashboard | `operations-dashboard` | Phase 8 |
+| BR-01-BR-05 | `identity-access`, `student-accommodation` | Phases 1-3 |
+| Track A quality, seed data, and submission deliverables | All capabilities | Embedded per phase and finalized in Phase 9 |
+
 ## Clarifications Required Before Affected Implementation
 
-These source-document ambiguities are not confirmed requirements. The affected policy or transition task remains blocked until clarified:
+These source-document ambiguities are not confirmed requirements. The affected task remains blocked until its referenced decision is approved:
 
-- Whether Super Admin may close complaints despite closure being explicitly limited to Provost or Hall Office Staff.
-- How to reconcile M4 naming Office Staff or Provost as complaint assigners with the mandatory permission matrix also granting assignment to Super Admin.
-- Which roles may reject complaints and which transitions an assigned House Tutor may perform.
-- Whether the seven-day reopening boundary includes the exact seventh-day instant and which timezone governs it.
-- Which roles qualify as a complaint-assignment target described as a "staff member," and which staff roles may add complaint comments.
-- Whether and how a rejected registration may be reconsidered, edited, or resubmitted.
-- Which student profile fields remain editable after registration.
-- How a newly created tutor receives an authenticated account or initial credential.
-- Which user-management operations are required beyond Super Admin user listing and role assignment.
-- How an Attached student's free-form complaint location contributes to a House Tutor's block-scoped dashboard.
-- Which Resolved timestamp is used for resolution time when a complaint is reopened and resolved again.
-- Whether using the preserved Laravel 13 starter is accepted despite Track A naming Laravel 11 or 12.
+- **C1:** Whether Super Admin may close complaints despite closure being explicitly limited to Provost or Hall Office Staff.
+- **C2:** How to reconcile M4 naming Office Staff or Provost as complaint assigners with the mandatory permission matrix also granting assignment to Super Admin.
+- **C3:** Which roles may reject complaints and which transitions an assigned House Tutor may perform.
+- **C4:** Whether the seven-day reopening boundary includes the exact seventh-day instant and which timezone governs it.
+- **C5:** Which roles qualify as a complaint-assignment target described as a "staff member," and which staff roles may add complaint comments.
+- **C6:** Whether and how a rejected registration may be reconsidered, edited, or resubmitted.
+- **C7:** Which student profile fields remain editable after registration.
+- **C8:** How a newly created tutor receives an authenticated account or initial credential.
+- **C9:** Which user-management operations are required beyond Super Admin user listing and role assignment.
+- **C10:** How an Attached student's free-form complaint location contributes to a House Tutor's block-scoped dashboard.
+- **C11:** Which Resolved timestamp is used for resolution time when a complaint is reopened and resolved again.
+- **C12:** Whether using the preserved Laravel 13 starter is accepted despite Track A naming Laravel 11 or 12.
 
 Bengali localization remains deferred because it is a PRD requirement but not a mandatory assessment requirement. This is a scope classification, not a rejection of the longer-term requirement.
 
