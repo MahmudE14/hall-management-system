@@ -25,7 +25,7 @@ There are no implementation tasks in Phase 0.
 
 **Entry:** Phase 0 is approved and `docs/PROJECT_STATUS.md` explicitly authorizes Phase 1.
 
-- [ ] 1.1 Add roles and multi-role assignments with model factories; verify focused Pest tests cover role relationships and duplicate-role prevention.
+- [x] 1.1 Add roles and multi-role assignments with model factories; verify focused Pest tests cover role relationships and duplicate-role prevention.
 - [ ] 1.2 Add student profiles and approval states with model factories; verify profile relationships, status defaults, and hashed passwords.
 - [ ] 1.3 Change student self-registration to validate all required fields and create a Pending student; verify valid, invalid-domain, invalid-phone, duplicate-email, and duplicate-registration feature tests pass.
 - [ ] 1.4 Enforce approval-gated protected capabilities and server-side role authorization; verify Pending access denial and at least one explicit `403` feature test pass.

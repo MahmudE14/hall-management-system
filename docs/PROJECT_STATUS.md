@@ -1,15 +1,15 @@
 # Project Status
 
-- Current phase: Phase 0 planning approved; approved identity clarifications are recorded and Phase 1 authorization is pending.
-- Implementation authorization: NONE. No application code, migrations, seeders, or business feature tests may be implemented.
-- Phase branch creation authorization: NONE.
-- Task-commit authorization: NONE.
+- Current phase: Phase 1 - Identity and Registration is authorized for implementation on `phase/01-identity-registration`.
+- Implementation authorization: Phase 1 tasks 1.1-1.14 only. Phase 2 and later implementation remains unauthorized.
+- Phase branch creation authorization: The user authorized use of the existing `phase/01-identity-registration` branch; no other phase branch may be created.
+- Task-commit authorization: Phase 1 task commits are authorized after each task's focused verification passes. Each commit must reference its OpenSpec task ID.
 - Push/PR authorization: NONE.
 - Merge authorization: NONE.
-- Next proposed phase: Phase 1 - Identity and Registration. It is not authorized until explicitly approved.
+- Next proposed phase: NONE. Phase 1 is active; Phase 2 requires separate authorization after Phase 1 is integrated.
 - Integration branch: `main` (local branch is two commits ahead of `origin/main` at this checkpoint). No feature implementation is permitted on this branch.
-- Active phase branch: NONE.
-- Pending phase PR: NONE recorded locally. Remote PR state is unverified because GitHub CLI is unavailable in this environment.
+- Active phase branch: `phase/01-identity-registration`, created at local `main` commit `1228647`.
+- Pending phase PR: NONE recorded locally. Remote PR state remains unverified because GitHub CLI is unavailable and an unauthenticated GitHub API `404` is not proof that no PR exists. Remote refs currently expose `main` at `2b83972` and no `phase/01-identity-registration` branch.
 - Planning commit authorization: NONE. Authorization for the latest planning checkpoint was consumed; future commits require new explicit approval.
 - Active specification/change: `deliver-assessment-core` (proposal, seven capability specs, gated design, and dependency-ordered tasks complete).
 - Completed planning: Phase 0 approved; C6 registration reconsideration, C7 profile editing, C9 scoped Super Admin user management, and C12 Laravel 13 authority approval are resolved; client sources reconciled; mandatory assessment scope separated from optional PRD scope; capability acceptance scenarios preserved; phases 0-9 have entry/exit criteria; Phase 1 work is split into focused acceptance tasks; six demo accounts remain explicit; phase branch, task-commit, PR, merge, and post-merge authorization rules are documented.
@@ -17,7 +17,8 @@
 - Framework decision: Laravel 13 is approved by the assessment authority according to user-confirmed communication. Approval evidence is user-reported; no written evidence is claimed. No framework downgrade is required or authorized.
 - Additional blocker: Local MySQL credentials are not configured for MySQL-specific migration and concurrency verification.
 - Last verified planning state: 2026-10-21 - `openspec validate deliver-assessment-core --strict` and `git diff --check` passed; 10 phase headings, 10 entry/exit pairs, and 81 implementation tasks remain present; an independent documentation review reported no remaining findings after workflow corrections.
-- Application verification: Not rerun because this refinement changes planning documentation only. Previous recorded results remain `composer ci:check`, `php artisan test` (40 passing), `npm run types:check`, `npm run check`, `composer lint:check`, `composer types:check`, and `npm run build` passed, with the previously recorded non-fatal warnings.
+- Phase 1 task progress: Task 1.1 implementation and focused verification are complete; its task commit is pending. Tasks 1.2-1.14 remain pending.
+- Application verification: 2026-10-21 task 1.1 - `vendor/bin/pint --dirty --format agent` passed; `php artisan test --compact tests/Feature/Models/RoleTest.php` passed (5 tests, 8 assertions); `composer types:check` passed with zero errors and the known non-fatal PHP turbo-extension startup warning; `php artisan test --compact` passed (45 tests, 146 assertions); `git diff --check` passed.
 - Last committed planning checkpoint: `docs(workflow): establish phase-based Git and PR process` (identity clarifications and phase-based Git workflow; no application implementation).
-- Uncommitted work at checkpoint: NONE.
-- Next recommended action: Verify remote branch/PR state, then separately authorize or withhold Phase 1 and creation of `phase/01-identity-registration` from the latest verified `main`. Implementation authorization remains `NONE` until that explicit decision.
+- Uncommitted work at checkpoint: Task 1.1 implementation, tests, task checkbox, verification evidence, and Phase 1 authorization ledger are ready for their authorized task commit.
+- Next recommended action: Create the verified task 1.1 Conventional Commit, record its hash, then begin task 1.2 with TDD.
