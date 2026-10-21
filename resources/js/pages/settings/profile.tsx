@@ -23,6 +23,7 @@ export default function Profile({
     status?: string;
 }) {
     const { auth } = usePage<PageProps>().props;
+    const isStudent = auth.user.roles.includes('student');
 
     return (
         <>
@@ -34,7 +35,11 @@ export default function Profile({
                 <Heading
                     variant="small"
                     title="Profile"
-                    description="Update your name and email address"
+                    description={
+                        isStudent
+                            ? 'Update your name, student email, and phone number'
+                            : 'Update your name and email address'
+                    }
                 />
 
                 <Form
@@ -84,6 +89,30 @@ export default function Profile({
                                     message={errors.email}
                                 />
                             </div>
+
+                            {isStudent && (
+                                <div className="grid gap-2">
+                                    <Label htmlFor="phone">Phone number</Label>
+
+                                    <Input
+                                        id="phone"
+                                        type="tel"
+                                        className="mt-1 block w-full"
+                                        defaultValue={
+                                            auth.user.student_profile?.phone
+                                        }
+                                        name="phone"
+                                        required
+                                        autoComplete="tel"
+                                        placeholder="01XXXXXXXXX"
+                                    />
+
+                                    <InputError
+                                        className="mt-2"
+                                        message={errors.phone}
+                                    />
+                                </div>
+                            )}
 
                             {mustVerifyEmail &&
                                 auth.user.email_verified_at === null && (
