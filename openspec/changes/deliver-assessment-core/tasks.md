@@ -28,7 +28,7 @@ There are no implementation tasks in Phase 0.
 - [x] 1.1 Add roles and multi-role assignments with model factories; verify focused Pest tests cover role relationships and duplicate-role prevention.
 - [x] 1.2 Add student profiles and approval states with model factories; verify profile relationships, status defaults, and hashed passwords.
 - [x] 1.3 Change student self-registration to validate all required fields and create a Pending student; verify valid, invalid-domain, invalid-phone, duplicate-email, and duplicate-registration feature tests pass.
-- [ ] 1.4 Enforce approval-gated protected capabilities and server-side role authorization; verify Pending access denial and at least one explicit `403` feature test pass.
+- [x] 1.4 Enforce approval-gated protected capabilities and server-side role authorization; verify Pending access denial and at least one explicit `403` feature test pass.
 - [ ] 1.5 Add the Pending registration list and initial approval/rejection workflow with required rejection reason; verify Hall Office Staff/Provost/Super Admin permissions, validation, and retained decision records.
 - [ ] 1.6 Add authorized Rejected-to-Pending reconsideration; verify the original rejection reason/actor/time and reconsideration actor/time remain in history, no new role receives permission, and student self-resubmission is refused.
 - [ ] 1.7 Add role-aware shared props and navigation using the existing Inertia shell and Wayfinder; verify each role receives only documented navigation while direct unauthorized requests return `403`.
