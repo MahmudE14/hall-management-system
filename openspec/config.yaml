@@ -1,0 +1,17 @@
+schema: spec-driven
+
+context: |
+  This is a Laravel 13 modular monolith using Inertia React, TypeScript, Tailwind CSS,
+  and MySQL. Preserve the starter architecture and existing authentication.
+
+rules:
+  proposal:
+    - State scope, acceptance criteria, and explicit out-of-scope items.
+    - Do not propose speculative abstractions, infrastructure, or packages.
+  tasks:
+    - Keep tasks small, ordered, and independently verifiable.
+
+operations:
+  apply:
+    guidance:
+      - Implement only approved tasks. Superpowers may guide TDD, debugging, review, and verification, but OpenSpec remains the sole task source.
