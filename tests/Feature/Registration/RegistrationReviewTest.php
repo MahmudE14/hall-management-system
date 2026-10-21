@@ -99,3 +99,60 @@ function userWithRole(string $role): User
 
     return $user;
 }
+
+test('a reviewer can reconsider a rejected registration without losing history', function () {
+    $reviewer = userWithRole('hall_office_staff');
+    $profile = StudentProfile::factory()->create([
+        'registration_status' => RegistrationStatus::Rejected,
+    ]);
+    $originalRejection = $profile->registrationDecisions()->create([
+        'actor_id' => userWithRole('provost')->id,
+        'status' => RegistrationStatus::Rejected,
+        'reason' => 'Original rejection reason.',
+    ]);
+
+    $this->actingAs($reviewer)
+        ->post(route('registrations.reconsider', $profile))
+        ->assertRedirect(route('registrations.index', ['status' => 'rejected']));
+
+    expect($profile->refresh()->registration_status)->toBe(RegistrationStatus::Pending);
+
+    $decisions = $profile->registrationDecisions()->get()->sortBy('id')->values();
+
+    expect($decisions)->toHaveCount(2)
+        ->and($decisions[0]->is($originalRejection))->toBeTrue()
+        ->and($decisions[0]->status)->toBe(RegistrationStatus::Rejected)
+        ->and($decisions[0]->reason)->toBe('Original rejection reason.')
+        ->and($decisions[1]->status)->toBe(RegistrationStatus::Pending)
+        ->and($decisions[1]->actor_id)->toBe($reviewer->id);
+});
+
+test('only pending registrations can be considered for approval or rejection', function () {
+    $reviewer = userWithRole('super_admin');
+    $profile = StudentProfile::factory()->create([
+        'registration_status' => RegistrationStatus::Rejected,
+    ]);
+
+    $this->actingAs($reviewer)
+        ->post(route('registrations.approve', $profile))
+        ->assertStatus(422);
+});
+
+test('students cannot reconsider their own rejected registration', function () {
+    $profile = StudentProfile::factory()->create([
+        'registration_status' => RegistrationStatus::Rejected,
+    ]);
+
+    $this->actingAs($profile->user)
+        ->post(route('registrations.reconsider', $profile))
+        ->assertForbidden();
+});
+
+test('only rejected registrations can be reconsidered', function () {
+    $reviewer = userWithRole('provost');
+    $profile = StudentProfile::factory()->create();
+
+    $this->actingAs($reviewer)
+        ->post(route('registrations.reconsider', $profile))
+        ->assertStatus(422);
+});

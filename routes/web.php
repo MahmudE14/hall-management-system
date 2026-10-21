@@ -13,6 +13,7 @@ Route::middleware(['auth', 'verified', 'role:super_admin,provost,hall_office_sta
     Route::get('registrations', [RegistrationController::class, 'index'])->name('registrations.index');
     Route::post('registrations/{studentProfile}/approve', [RegistrationController::class, 'approve'])->name('registrations.approve');
     Route::post('registrations/{studentProfile}/reject', [RegistrationController::class, 'reject'])->name('registrations.reject');
+    Route::post('registrations/{studentProfile}/reconsider', [RegistrationController::class, 'reconsider'])->name('registrations.reconsider');
 });
 
 require __DIR__.'/settings.php';

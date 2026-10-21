@@ -158,6 +158,20 @@ function RegistrationCard({
                         </Button>
                     </>
                 )}
+
+                {status === 'rejected' && (
+                    <Button
+                        onClick={() =>
+                            router.post(
+                                RegistrationController.reconsider.url(profile),
+                                {},
+                                { preserveScroll: true },
+                            )
+                        }
+                    >
+                        Return to pending
+                    </Button>
+                )}
             </div>
 
             {showReject && status === 'pending' && (

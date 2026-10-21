@@ -68,4 +68,16 @@ class RegistrationController extends Controller
 
         return to_route('registrations.index');
     }
+
+    public function reconsider(
+        Request $request,
+        StudentProfile $studentProfile,
+        DecideRegistration $decideRegistration,
+    ): RedirectResponse {
+        $decideRegistration->reconsider($studentProfile, $request->user());
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Registration returned to pending.')]);
+
+        return to_route('registrations.index', ['status' => RegistrationStatus::Rejected->value]);
+    }
 }
