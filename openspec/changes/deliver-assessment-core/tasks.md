@@ -31,7 +31,7 @@ There are no implementation tasks in Phase 0.
 - [x] 1.4 Enforce approval-gated protected capabilities and server-side role authorization; verify Pending access denial and at least one explicit `403` feature test pass.
 - [x] 1.5 Add the Pending registration list and initial approval/rejection workflow with required rejection reason; verify Hall Office Staff/Provost/Super Admin permissions, validation, and retained decision records.
 - [x] 1.6 Add authorized Rejected-to-Pending reconsideration; verify the original rejection reason/actor/time and reconsideration actor/time remain in history, no new role receives permission, and student self-resubmission is refused.
-- [ ] 1.7 Add role-aware shared props and navigation using the existing Inertia shell and Wayfinder; verify each role receives only documented navigation while direct unauthorized requests return `403`.
+- [x] 1.7 Add role-aware shared props and navigation using the existing Inertia shell and Wayfinder; verify each role receives only documented navigation while direct unauthorized requests return `403`.
 - [ ] 1.8 Seed and authenticate the six exact fictional accounts: `admin@kjh.test`, `provost@kjh.test`, `office@kjh.test`, `tutor@kjh.test`, `clubadmin@student.du.test`, and `student@student.du.test`; verify documented roles and that Club Admin also has Student.
 - [ ] 1.9 Add Super Admin user listing and search; verify supported identity filters, returned roles/status, pagination, and other-role `403` responses.
 - [ ] 1.10 Add Super Admin role assignment and update; verify multi-role changes, retained identity, invalid-role validation, and other-role `403` responses.
