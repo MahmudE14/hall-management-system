@@ -17,8 +17,8 @@
 - Framework decision: Laravel 13 is approved by the assessment authority according to user-confirmed communication. Approval evidence is user-reported; no written evidence is claimed. No framework downgrade is required or authorized.
 - Additional blocker: Local MySQL credentials are not configured for MySQL-specific migration and concurrency verification.
 - Last verified planning state: 2026-10-21 - `openspec validate deliver-assessment-core --strict` and `git diff --check` passed; 10 phase headings, 10 entry/exit pairs, and 81 implementation tasks remain present; an independent documentation review reported no remaining findings after workflow corrections.
-- Phase 1 task progress: Task 1.1 is complete in commit `758ba3e`; task 1.2 is complete in commit `127e2fc` (`feat(identity): add student profiles (task 1.2)`); task 1.3 implementation, focused verification, and register UI are complete with its task commit pending. Tasks 1.4-1.14 remain pending.
+- Phase 1 task progress: Task 1.1 is complete in commit `758ba3e`; task 1.2 is complete in commit `127e2fc` (`feat(identity): add student profiles (task 1.2)`); task 1.3 is complete in commit `671d43f` (`feat(identity): validate student registration (task 1.3)`). Tasks 1.4-1.14 remain pending.
 - Application verification: 2026-10-21 task 1.3 - `vendor/bin/pint --dirty --format agent` passed; `php artisan test --compact tests/Feature/Auth/RegistrationTest.php` passed (15 tests, 71 assertions); `composer types:check` passed with zero errors and the known non-fatal PHP turbo-extension startup warning; `npm run types:check` passed; `npm run build` passed; targeted `npx vp check resources/js/pages/auth/register.tsx` passed; `php artisan test --compact` passed (64 tests, 223 assertions); `git diff --check` passed. `npm run check` reported formatting issues only in pre-existing `docs/references/*.md` files, which this task does not modify. Tasks 1.1 and 1.2 evidence remains recorded in their task commits.
-- Last committed task checkpoint: `127e2fc` (`feat(identity): add student profiles (task 1.2)`).
-- Uncommitted work at checkpoint: Task 1.3 implementation, tests, register form fields, task checkbox, and verification evidence are ready for their authorized task commit.
-- Next recommended action: Create the verified task 1.3 Conventional Commit, record its hash, then begin task 1.4 with TDD.
+- Last committed task checkpoint: `671d43f` (`feat(identity): validate student registration (task 1.3)`).
+- Uncommitted work at checkpoint: NONE.
+- Next recommended action: Begin task 1.4 with TDD.
