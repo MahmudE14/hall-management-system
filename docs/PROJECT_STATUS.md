@@ -17,8 +17,8 @@
 - Framework decision: Laravel 13 is approved by the assessment authority according to user-confirmed communication. Approval evidence is user-reported; no written evidence is claimed. No framework downgrade is required or authorized.
 - Additional blocker: Local MySQL credentials are not configured for MySQL-specific migration and concurrency verification.
 - Last verified planning state: 2026-10-21 - `openspec validate deliver-assessment-core --strict` and `git diff --check` passed; 10 phase headings, 10 entry/exit pairs, and 81 implementation tasks remain present; an independent documentation review reported no remaining findings after workflow corrections.
-- Phase 1 task progress: Task 1.1 implementation and focused verification are complete; its task commit is pending. Tasks 1.2-1.14 remain pending.
+- Phase 1 task progress: Task 1.1 is complete in commit `758ba3e` (`feat(identity): add role assignments (task 1.1)`). Tasks 1.2-1.14 remain pending.
 - Application verification: 2026-10-21 task 1.1 - `vendor/bin/pint --dirty --format agent` passed; `php artisan test --compact tests/Feature/Models/RoleTest.php` passed (5 tests, 8 assertions); `composer types:check` passed with zero errors and the known non-fatal PHP turbo-extension startup warning; `php artisan test --compact` passed (45 tests, 146 assertions); `git diff --check` passed.
-- Last committed planning checkpoint: `docs(workflow): establish phase-based Git and PR process` (identity clarifications and phase-based Git workflow; no application implementation).
-- Uncommitted work at checkpoint: Task 1.1 implementation, tests, task checkbox, verification evidence, and Phase 1 authorization ledger are ready for their authorized task commit.
-- Next recommended action: Create the verified task 1.1 Conventional Commit, record its hash, then begin task 1.2 with TDD.
+- Last committed task checkpoint: `758ba3e` (`feat(identity): add role assignments (task 1.1)`).
+- Uncommitted work at checkpoint: Task 1.1 commit mapping update in progress.
+- Next recommended action: Commit the task 1.1 mapping update, then begin task 1.2 with TDD.
