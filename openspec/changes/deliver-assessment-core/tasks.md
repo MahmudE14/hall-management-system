@@ -5,8 +5,13 @@
 - `docs/PROJECT_STATUS.md` names the only implementation phase currently authorized for this change.
 - Authorization `NONE` permits no application-code, migration, seeder, or business-test implementation.
 - Visible tasks are planned work, not blanket authorization. `/openspec-apply-change` MUST execute only the authorized phase.
-- A completed phase does not authorize the next phase. Stop, update `docs/PROJECT_STATUS.md`, and wait for explicit user approval.
-- A task referencing C1-C12 MUST remain untouched until that clarification is approved and captured in the planning artifacts.
+- Implement an authorized phase only on its `phase/NN-short-description` branch created from the latest verified `main`; never implement feature tasks directly on `main`, and keep only one phase branch active.
+- Complete each task with its focused verification and one or more cohesive Conventional Commits that reference the task ID. Do not mark a task complete without traceable commit history or create commits without explicit authorization.
+- A phase section's Exit statement defines implementation-complete only. Run full quality gates, capability acceptance review, and complete diff review before its branch is pushed and a PR to `main` is opened with explicit authorization.
+- Wait for configured CI checks and review before marking the phase review-complete. If CI is not configured, record that fact and use full local quality-gate evidence; unverified remote state blocks review completion unless the user explicitly confirms it.
+- Obtain separate explicit user approval before merge. Prefer a merge commit, synchronize local `main`, update `docs/PROJECT_STATUS.md`, and reset authorization to `NONE`; only then is the phase integrated.
+- Later-phase prerequisites require earlier phases to be integrated. An implementation-complete, review-complete, or integrated phase does not authorize the next phase; stop and wait for explicit user approval.
+- A task referencing an outstanding clarification MUST remain untouched until that clarification is approved and captured in the planning artifacts.
 
 ## Phase 0: Planning Approval
 
@@ -18,19 +23,24 @@ There are no implementation tasks in Phase 0.
 
 ## Phase 1: Identity And Registration
 
-**Entry:** Phase 0 is approved and `docs/PROJECT_STATUS.md` explicitly authorizes Phase 1. Resolve C6, C7, or C9 before their dependent tasks.
+**Entry:** Phase 0 is approved and `docs/PROJECT_STATUS.md` explicitly authorizes Phase 1.
 
 - [ ] 1.1 Add roles and multi-role assignments with model factories; verify focused Pest tests cover role relationships and duplicate-role prevention.
 - [ ] 1.2 Add student profiles and approval states with model factories; verify profile relationships, status defaults, and hashed passwords.
 - [ ] 1.3 Change student self-registration to validate all required fields and create a Pending student; verify valid, invalid-domain, invalid-phone, duplicate-email, and duplicate-registration feature tests pass.
 - [ ] 1.4 Enforce approval-gated protected capabilities and server-side role authorization; verify Pending access denial and at least one explicit `403` feature test pass.
-- [ ] 1.5 Add the Pending registration list and initial approval/rejection workflow with required rejection reason; verify decision permissions and validation. Do not add reconsideration behavior until C6 is resolved.
-- [ ] 1.6 Add role-aware shared props and navigation using the existing Inertia shell and Wayfinder; verify each role receives only documented navigation while direct unauthorized requests return `403`.
-- [ ] 1.7 Seed and authenticate the six exact fictional accounts: `admin@kjh.test`, `provost@kjh.test`, `office@kjh.test`, `tutor@kjh.test`, `clubadmin@student.du.test`, and `student@student.du.test`; verify documented roles and that Club Admin also has Student.
-- [ ] 1.8 Add Super Admin user listing and role assignment/removal; verify every other role receives `403`. Add no further user-management behavior until C9 is resolved.
-- [ ] 1.9 Extend profile settings only with student fields approved through C7; verify a Student can update only that student's permitted fields while uniqueness and format validation remain enforced.
+- [ ] 1.5 Add the Pending registration list and initial approval/rejection workflow with required rejection reason; verify Hall Office Staff/Provost/Super Admin permissions, validation, and retained decision records.
+- [ ] 1.6 Add authorized Rejected-to-Pending reconsideration; verify the original rejection reason/actor/time and reconsideration actor/time remain in history, no new role receives permission, and student self-resubmission is refused.
+- [ ] 1.7 Add role-aware shared props and navigation using the existing Inertia shell and Wayfinder; verify each role receives only documented navigation while direct unauthorized requests return `403`.
+- [ ] 1.8 Seed and authenticate the six exact fictional accounts: `admin@kjh.test`, `provost@kjh.test`, `office@kjh.test`, `tutor@kjh.test`, `clubadmin@student.du.test`, and `student@student.du.test`; verify documented roles and that Club Admin also has Student.
+- [ ] 1.9 Add Super Admin user listing and search; verify supported identity filters, returned roles/status, pagination, and other-role `403` responses.
+- [ ] 1.10 Add Super Admin role assignment and update; verify multi-role changes, retained identity, invalid-role validation, and other-role `403` responses.
+- [ ] 1.11 Add Super Admin account activation and deactivation independent from registration approval; verify roles and decision history remain unchanged and every non-Super-Admin receives `403` for both operations.
+- [ ] 1.12 Enforce Inactive restrictions server-side; verify otherwise valid login is refused and a previously authenticated session loses protected access after deactivation.
+- [ ] 1.13 Keep administrative user deletion, administrative password reset, and unspecified user mutations unavailable; verify Super Admin cannot invoke any excluded operation and existing Fortify self-service recovery remains unchanged.
+- [ ] 1.14 Extend the existing Fortify/profile workflow for authenticated Student name, email, and phone changes; verify email uniqueness/domain and phone validation, email-change verification safeguards, own-profile scope, and read-only registration/academic fields.
 
-**Exit:** Tasks 1.1-1.9 are complete or their clarification-dependent portions are explicitly resolved and completed; all six demo identities authenticate with documented roles; registration and authorization tests pass; `docs/PROJECT_STATUS.md` is updated; implementation stops.
+**Exit:** Tasks 1.1-1.14 are complete; all six demo identities authenticate with documented roles; registration, reconsideration history, profile, scoped user management, inactive-account, and authorization tests pass; `docs/PROJECT_STATUS.md` is updated; implementation stops.
 
 ## Phase 2: Hall Structure And Student Records
 
@@ -137,7 +147,7 @@ There are no implementation tasks in Phase 0.
 
 ## Phase 9: Assessment Data And Delivery
 
-**Entry:** Phases 1-8 are complete and `docs/PROJECT_STATUS.md` explicitly authorizes Phase 9. Resolve C12 before final submission.
+**Entry:** Phases 1-8 are complete and `docs/PROJECT_STATUS.md` explicitly authorizes Phase 9.
 
 - [ ] 9.1 Add deterministic Hall, Block, Room, Seat, Student, and allocation seeders for 1 hall, 3 blocks, at least 30 rooms with capacities 2-4, about 40 Resident, 15 Attached, and 5 Pending students; verify counts and distributions.
 - [ ] 9.2 Add deterministic tutor and club seeders for 5 tutors across all blocks and 4 clubs with active and Pending members; verify relationships and distributions.
@@ -149,14 +159,15 @@ There are no implementation tasks in Phase 0.
 - [ ] 9.8 Review House Tutor screens at 375 px with keyboard navigation; correct only assessment-scope usability and record results.
 - [ ] 9.9 Review Complaint and Notice screens at 375 px with keyboard navigation; correct only assessment-scope usability and record results.
 - [ ] 9.10 Review Club and Dashboard screens at 375 px with keyboard navigation; correct only assessment-scope usability and record results.
-- [ ] 9.11 Update `README.md` and `.env.example` using C12 with track, versions, setup, migration/seeding, run/test commands, demo accounts, completion status, assumptions, trade-offs, time spent, and AI use; verify documented commands and absence of secrets.
+- [ ] 9.11 Update `README.md` and `.env.example` with track, Laravel 13 approved deviation, user-reported authority-approval source, versions, setup, migration/seeding, run/test commands, demo accounts, completion status, assumptions, trade-offs, time spent, and AI use; verify no written approval evidence is claimed and documented commands contain no secrets.
 - [ ] 9.12 Produce either a 3-5 minute demonstration recording or 6-10 assessment screenshots covering mandatory workflows; verify all evidence uses fictional data.
 - [ ] 9.13 Run `vendor/bin/pint --dirty --format agent`, focused Pest tests, `php artisan test --compact`, static analysis, frontend checks, type checks, and production build; record exact results and resolve assessment-scope failures.
 
-**Exit:** Tasks 9.1-9.13 are complete; C12 is recorded; seed minima, all six accounts, responsive reviews, documentation, evidence, and quality checks are verified; `docs/PROJECT_STATUS.md` is updated; implementation stops pending archive approval.
+**Exit:** Tasks 9.1-9.13 are complete; the authority-approved Laravel 13 deviation is accurately documented as user-reported; seed minima, all six accounts, responsive reviews, documentation, evidence, and quality checks are verified; `docs/PROJECT_STATUS.md` is updated; implementation stops pending archive approval.
 
 ## Workflow Follow-up
 
-- Build a meaningful commit history only when the user explicitly authorizes commits; do not squash all implementation into one commit.
+- Include an OpenSpec task-to-commit map and exact quality-gate evidence in every phase PR.
+- Preserve task-level commit history and the phase boundary; do not squash the entire implementation into one opaque commit.
 - Review the completed implementation against every capability scenario before synchronizing or archiving the change.
 - Archive the change only after implementation, verification, and explicit approval.

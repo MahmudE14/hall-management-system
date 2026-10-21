@@ -92,12 +92,48 @@ Completing a phase does not authorize another phase. The implementer MUST stop a
 
 Alternative considered: treating approval of the whole OpenSpec change as approval of every task. Rejected because it permits accidental scope expansion and prevents deliberate review between independently testable slices.
 
+### 12. Preserve registration decision history during reconsideration
+
+An authorized registration reviewer may transition Rejected to Pending. Store registration decisions as retained history so reconsideration never overwrites the original rejection reason, actor, or time. Students receive no self-resubmission action, and reconsideration introduces no new role privilege.
+
+Alternative considered: making rejection terminal or allowing student resubmission. Rejected because the approved decision requires staff reconsideration while excluding student-controlled lifecycle changes.
+
+### 13. Reuse Fortify profile and verification behavior
+
+Extend the existing profile workflow so Students can update name, email, and phone. Keep registration number, department, session, approval state, and residency state read-only. Email changes retain uniqueness and `@student.du.test` validation and use the starter's existing email-verification safeguards rather than a parallel workflow.
+
+Alternative considered: a separate student-profile editor or editing every registration field. Rejected because it duplicates Fortify behavior and weakens academic identity integrity.
+
+### 14. Separate account activity from registration approval
+
+Super Admin can list/search users, manage role assignments, and activate/deactivate accounts. Account activity is independent from the student's Pending, Approved, or Rejected registration decision so temporary deactivation does not erase approval history. Inactive accounts are denied at authentication and on protected server requests; reactivation retains roles and restores only the access allowed by the registration state.
+
+Administrative deletion, password reset, and unrestricted CRUD remain unavailable. Existing Fortify self-service recovery remains unchanged.
+
+Alternative considered: reusing one status for both approval and activity or adding full user CRUD. Rejected because it loses lifecycle meaning and exceeds the approved scope.
+
+### 15. Continue with authority-approved Laravel 13
+
+Continue planning and implementation against the existing Laravel 13 application. This is an approved deviation from the assessment's Laravel 11/12 wording, based on user-reported communication with the assessment authority. No written approval evidence has been provided or claimed. No framework downgrade or migration is permitted without separate explicit authorization.
+
+### 16. Integrate each phase through a reviewable Git branch and pull request
+
+Keep `main` as the stable integration branch and never implement assessment features directly on it. Each explicitly authorized phase uses one branch named `phase/NN-short-description`, created from the latest verified `main`; no later phase branch begins while the current phase branch or pull request remains active.
+
+Keep completed tasks traceable through cohesive Conventional Commits that reference their OpenSpec task IDs and include the corresponding tests. When a phase is implementation-complete, run the full phase quality gates, review capability acceptance and the complete diff against `main`, then push and open a pull request only with explicit authorization. The pull request maps tasks to commits and records acceptance and verification evidence. Existing CI checks and review must be satisfactory before the phase is review-complete and the user is asked for separate merge approval. Adding CI remains out of scope; when no CI exists, record that state and rely on the complete local quality-gate evidence. Unverified remote review state blocks review completion unless the user explicitly confirms it.
+
+Prefer a merge commit so the phase boundary and its task history remain visible. After an approved merge, synchronize local `main`, update `docs/PROJECT_STATUS.md`, clear the active branch and pull request, and reset implementation authorization to `NONE`. The phase is then integrated. Only an integrated prerequisite satisfies a later phase entry, and integration never authorizes the next phase.
+
+Alternative considered: implementing on `main` or squashing an entire phase into an opaque commit. Rejected because both approaches weaken task-level traceability, review, rollback boundaries, and phase authorization controls.
+
 ## Implementation Phases
 
-| Phase | Scope | Entry criteria | Exit criteria |
+The table's exit criteria define **implementation-complete**, not review-complete or integrated. References to a prior phase being complete in an entry criterion mean that phase is integrated into `main` through the branch and pull-request workflow above.
+
+| Phase | Scope | Entry criteria | Implementation exit criteria |
 |---|---|---|---|
 | Phase 0 | Planning approval | Client sources and current starter are available | Strict OpenSpec validation passes; requirements remain traceable; tasks are interruption-safe; authorization remains `NONE`; explicit final Phase 0 approval is received |
-| Phase 1 | Identity and Registration | Phase 0 approved; Phase 1 explicitly authorized; blockers needed by the selected task are resolved | All Phase 1 tasks complete; six demo identities authenticate with documented roles; registration and authorization tests pass; status updated; work stops |
+| Phase 1 | Identity and Registration | Phase 0 approved; Phase 1 explicitly authorized | All Phase 1 tasks complete; six demo identities authenticate with documented roles; registration, profile, activity, and authorization tests pass; status updated; work stops |
 | Phase 2 | Hall Structure and Student Records | Phase 1 complete; Phase 2 explicitly authorized | All Phase 2 tasks complete; structure, occupancy, directory, profile, and access tests pass; status updated; work stops |
 | Phase 3 | Seat Allocation and Vacancy | Phase 2 complete; Phase 3 explicitly authorized | All Phase 3 tasks complete; allocation, vacancy, history, capacity, and concurrency checks pass; status updated; work stops |
 | Phase 4 | House Tutors | Phase 3 complete; Phase 4 explicitly authorized; C8 resolved before account onboarding | All Phase 4 tasks complete; tutor administration and scoping tests pass; status updated; work stops |
@@ -105,7 +141,7 @@ Alternative considered: treating approval of the whole OpenSpec change as approv
 | Phase 6 | Notice Board | Phase 1 complete; Phase 6 explicitly authorized | All Phase 6 tasks complete; authoring, public discovery, draft isolation, and download tests pass; status updated; work stops |
 | Phase 7 | Clubs and Memberships | Phases 1 and 2 complete; Phase 7 explicitly authorized | All Phase 7 tasks complete; directory, request, administration, upload, and scope tests pass; status updated; work stops |
 | Phase 8 | Operations Dashboard | Phases 3-7 complete; Phase 8 explicitly authorized; C10-C11 resolved | All Phase 8 tasks complete; leadership and tutor-scoped metrics match deterministic records; status updated; work stops |
-| Phase 9 | Assessment Data and Delivery | Phases 1-8 complete; Phase 9 explicitly authorized; C12 resolved for final submission | All Phase 9 tasks complete; seed minima, responsive review, documentation, evidence, and quality pipeline are verified; status updated; work stops |
+| Phase 9 | Assessment Data and Delivery | Phases 1-8 complete; Phase 9 explicitly authorized | All Phase 9 tasks complete; the approved Laravel 13 deviation, seed minima, responsive review, documentation, evidence, and quality pipeline are verified; status updated; work stops |
 
 ## Requirement Traceability
 
@@ -121,7 +157,7 @@ Alternative considered: treating approval of the whole OpenSpec change as approv
 | BR-01-BR-05 | `identity-access`, `student-accommodation` | Phases 1-3 |
 | Track A quality, seed data, and submission deliverables | All capabilities | Embedded per phase and finalized in Phase 9 |
 
-## Clarifications Required Before Affected Implementation
+## Outstanding Clarifications
 
 These source-document ambiguities are not confirmed requirements. The affected task remains blocked until its referenced decision is approved:
 
@@ -130,13 +166,16 @@ These source-document ambiguities are not confirmed requirements. The affected t
 - **C3:** Which roles may reject complaints and which transitions an assigned House Tutor may perform.
 - **C4:** Whether the seven-day reopening boundary includes the exact seventh-day instant and which timezone governs it.
 - **C5:** Which roles qualify as a complaint-assignment target described as a "staff member," and which staff roles may add complaint comments.
-- **C6:** Whether and how a rejected registration may be reconsidered, edited, or resubmitted.
-- **C7:** Which student profile fields remain editable after registration.
 - **C8:** How a newly created tutor receives an authenticated account or initial credential.
-- **C9:** Which user-management operations are required beyond Super Admin user listing and role assignment.
 - **C10:** How an Attached student's free-form complaint location contributes to a House Tutor's block-scoped dashboard.
 - **C11:** Which Resolved timestamp is used for resolution time when a complaint is reopened and resolved again.
-- **C12:** Whether using the preserved Laravel 13 starter is accepted despite Track A naming Laravel 11 or 12.
+
+## Resolved Clarifications
+
+- **C6 — Resolved:** Authorized registration-decision roles may transition Rejected to Pending with original rejection reason and complete decision history retained. Student self-resubmission is excluded.
+- **C7 — Resolved:** Students may edit name, email, and phone. Email uniqueness, institutional domain, and verification safeguards remain; all other registration and academic identity fields are read-only.
+- **C9 — Resolved:** Super Admin may list/search users, manage roles, and activate/deactivate accounts. Inactive access is blocked server-side. Administrative deletion, password resets, and unrestricted CRUD are excluded.
+- **C12 — Resolved, authority approved:** Continue with Laravel 13; no downgrade is required. Approval source is user-confirmed communication with the authority. Evidence is recorded as user-reported, not written evidence.
 
 Bengali localization remains deferred because it is a PRD requirement but not a mandatory assessment requirement. This is a scope classification, not a rejection of the longer-term requirement.
 
@@ -158,5 +197,7 @@ The assessment requires size validation for every upload but does not give a clu
 3. Replace the placeholder dashboard only after its source modules exist.
 4. Complete the deterministic assessment seeder, documentation, and responsive review after all mandatory slices pass focused tests.
 5. Run the complete quality pipeline and verify a fresh migrate-and-seed flow before assessment delivery.
+
+The implementation baseline remains Laravel 13. A framework downgrade or migration is outside this change unless separately authorized.
 
 Before production use, back up existing data and run migrations normally. Rollback uses each migration's down path during development; after real allocation, complaint, or membership history exists, prefer corrective forward migrations rather than destructive rollback.

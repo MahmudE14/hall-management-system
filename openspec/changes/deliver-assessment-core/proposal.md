@@ -54,4 +54,4 @@ None. The project has no existing capability specifications.
 - Extends the existing Fortify-backed user model and registration behavior without replacing the web guard or authentication stack.
 - Adds private complaint media and controlled public notice attachments using Laravel Storage.
 - Adds Pest feature coverage and updates assessment-facing project documentation.
-- Keeps Laravel 13 despite the assessment naming Laravel 11/12; external acceptance of that compatibility deviation remains required.
+- Keeps Laravel 13 as an authority-approved deviation from the assessment's Laravel 11/12 wording; the approval source is user-reported communication and no written evidence is claimed.

@@ -8,6 +8,9 @@
 - OpenSpec owns requirements, acceptance criteria, and tasks. Use Superpowers for TDD, debugging, verification, and code review only; do not create duplicate plans.
 - Ask before architectural decisions not covered by an approved specification. Do not silently expand scope.
 - At session start and end, follow `docs/DEVELOPMENT_WORKFLOW.md` and update `docs/PROJECT_STATUS.md`.
+- Treat `main` as the stable integration branch. Never implement features directly on `main`; use one authorized phase branch at a time, named `phase/NN-short-description`, created from the latest verified `main`.
+- Keep every completed OpenSpec task traceable to one or more cohesive Conventional Commits that include its tests and reference the task ID. Do not mix unrelated tasks or create commits without explicit authorization.
+- A phase is not complete until its quality gates and acceptance review pass and its pull request is reviewed. Never merge without explicit user approval; prefer a merge commit, synchronize local `main`, update project status, and return implementation authorization to `NONE` after merge.
 
 <laravel-boost-guidelines>
 === foundation rules ===
