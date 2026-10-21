@@ -19,6 +19,8 @@ Route::middleware(['auth', 'verified', 'role:super_admin,provost,hall_office_sta
 
 Route::middleware(['auth', 'verified', 'role:super_admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('users', [UserController::class, 'index'])->name('users.index');
+    Route::get('users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+    Route::put('users/{user}/roles', [UserController::class, 'updateRoles'])->name('users.roles.update');
 });
 
 require __DIR__.'/settings.php';

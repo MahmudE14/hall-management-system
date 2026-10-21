@@ -12,7 +12,7 @@ uses(RefreshDatabase::class);
 test('super admins can view users with roles and registration status', function () {
     $superAdmin = managedUserWithRole('super_admin');
     $student = User::factory()->create(['name' => 'Searchable Student']);
-    $student->roles()->attach(Role::factory()->create(['name' => 'student']));
+    $student->roles()->attach(Role::query()->where('name', 'student')->firstOrFail());
     StudentProfile::factory()->for($student)->create([
         'registration_number' => '2023000099',
         'registration_status' => RegistrationStatus::Approved,
@@ -104,3 +104,76 @@ function managedUserWithRole(string $role): User
 
     return $user;
 }
+
+beforeEach(function () {
+    collect(Role::DOCUMENTED)->each(
+        fn (string $role) => Role::query()->firstOrCreate(['name' => $role]),
+    );
+});
+
+test('super admins can view a user role management page', function () {
+    $superAdmin = managedUserWithRole('super_admin');
+    $target = managedUserWithRole('student');
+
+    $this->actingAs($superAdmin)
+        ->get(route('admin.users.edit', $target))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('admin/users/edit')
+            ->where('user.id', $target->id)
+            ->where('user.roles', ['student'])
+            ->has('roles', count(Role::DOCUMENTED))
+        );
+});
+
+test('super admins can update multiple roles without changing identity', function () {
+    $superAdmin = managedUserWithRole('super_admin');
+    $target = managedUserWithRole('student');
+    $target->update(['name' => 'Role Target', 'email' => 'role-target@student.du.test']);
+    $targetId = $target->id;
+
+    $this->actingAs($superAdmin)
+        ->put(route('admin.users.roles.update', $target), [
+            'roles' => ['club_admin', 'student'],
+        ])
+        ->assertRedirect(route('admin.users.edit', $target));
+
+    $target->refresh();
+
+    expect($target->id)->toBe($targetId)
+        ->and($target->name)->toBe('Role Target')
+        ->and($target->email)->toBe('role-target@student.du.test')
+        ->and($target->roles()->pluck('name')->all())->toEqualCanonicalizing(['club_admin', 'student']);
+});
+
+test('role updates reject undocumented roles', function (string $role) {
+    $superAdmin = managedUserWithRole('super_admin');
+    $target = managedUserWithRole('student');
+
+    $this->actingAs($superAdmin)
+        ->put(route('admin.users.roles.update', $target), ['roles' => [$role]])
+        ->assertSessionHasErrors('roles.0');
+
+    expect($target->refresh()->roles()->pluck('name')->all())->toBe(['student']);
+})->with(['not_a_role', 'ghost_role']);
+
+test('role updates require at least one role', function () {
+    $superAdmin = managedUserWithRole('super_admin');
+    $target = managedUserWithRole('student');
+
+    $this->actingAs($superAdmin)
+        ->put(route('admin.users.roles.update', $target), ['roles' => []])
+        ->assertSessionHasErrors('roles');
+});
+
+test('other roles cannot manage user roles', function (string $role) {
+    $target = managedUserWithRole('student');
+
+    $this->actingAs(managedUserWithRole($role))
+        ->get(route('admin.users.edit', $target))
+        ->assertForbidden();
+
+    $this->actingAs(managedUserWithRole($role))
+        ->put(route('admin.users.roles.update', $target), ['roles' => ['student']])
+        ->assertForbidden();
+})->with(['provost', 'hall_office_staff', 'house_tutor', 'club_admin', 'student']);

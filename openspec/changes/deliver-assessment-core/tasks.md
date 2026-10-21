@@ -34,7 +34,7 @@ There are no implementation tasks in Phase 0.
 - [x] 1.7 Add role-aware shared props and navigation using the existing Inertia shell and Wayfinder; verify each role receives only documented navigation while direct unauthorized requests return `403`.
 - [x] 1.8 Seed and authenticate the six exact fictional accounts: `admin@kjh.test`, `provost@kjh.test`, `office@kjh.test`, `tutor@kjh.test`, `clubadmin@student.du.test`, and `student@student.du.test`; verify documented roles and that Club Admin also has Student.
 - [x] 1.9 Add Super Admin user listing and search; verify supported identity filters, returned roles/status, pagination, and other-role `403` responses.
-- [ ] 1.10 Add Super Admin role assignment and update; verify multi-role changes, retained identity, invalid-role validation, and other-role `403` responses.
+- [x] 1.10 Add Super Admin role assignment and update; verify multi-role changes, retained identity, invalid-role validation, and other-role `403` responses.
 - [ ] 1.11 Add Super Admin account activation and deactivation independent from registration approval; verify roles and decision history remain unchanged and every non-Super-Admin receives `403` for both operations.
 - [ ] 1.12 Enforce Inactive restrictions server-side; verify otherwise valid login is refused and a previously authenticated session loses protected access after deactivation.
 - [ ] 1.13 Keep administrative user deletion, administrative password reset, and unspecified user mutations unavailable; verify Super Admin cannot invoke any excluded operation and existing Fortify self-service recovery remains unchanged.

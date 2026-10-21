@@ -11,6 +11,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 #[Fillable(['name'])]
 class Role extends Model
 {
+    /** @var array<int, string> */
+    public const array DOCUMENTED = [
+        'super_admin',
+        'provost',
+        'hall_office_staff',
+        'house_tutor',
+        'club_admin',
+        'student',
+    ];
+
     /** @use HasFactory<RoleFactory> */
     use HasFactory;
 

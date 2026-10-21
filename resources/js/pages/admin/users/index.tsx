@@ -152,6 +152,9 @@ export default function UsersIndex({
                                     <th className="px-4 py-3 font-medium">
                                         Registration
                                     </th>
+                                    <th className="px-4 py-3 font-medium">
+                                        Actions
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -206,6 +209,17 @@ export default function UsersIndex({
                                                     Staff account
                                                 </span>
                                             )}
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            <Button asChild variant="outline">
+                                                <Link
+                                                    href={UserController.edit.url(
+                                                        user,
+                                                    )}
+                                                >
+                                                    Manage
+                                                </Link>
+                                            </Button>
                                         </td>
                                     </tr>
                                 ))}

@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\RegistrationStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\UpdateUserRolesRequest;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -53,21 +55,7 @@ class UserController extends Controller
             ->orderBy('name')
             ->paginate(20)
             ->withQueryString()
-            ->through(fn (User $user) => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'email_verified_at' => $user->email_verified_at,
-                'roles' => $user->roles->pluck('name')->values()->all(),
-                'student_profile' => $user->studentProfile?->only([
-                    'registration_number',
-                    'department',
-                    'session',
-                    'phone',
-                    'registration_status',
-                    'residency_status',
-                ]),
-            ]);
+            ->through(fn (User $user) => $this->serializeUser($user));
 
         return Inertia::render('admin/users/index', [
             'users' => $users,
@@ -75,5 +63,54 @@ class UserController extends Controller
             'roles' => Role::query()->orderBy('name')->pluck('name')->all(),
             'registrationStatuses' => array_column(RegistrationStatus::cases(), 'value'),
         ]);
+    }
+
+    public function edit(User $user): Response
+    {
+        $user->load(['roles:id,name', 'studentProfile']);
+
+        return Inertia::render('admin/users/edit', [
+            'user' => $this->serializeUser($user),
+            'roles' => Role::query()
+                ->whereIn('name', Role::DOCUMENTED)
+                ->orderBy('name')
+                ->pluck('name')
+                ->all(),
+        ]);
+    }
+
+    public function updateRoles(UpdateUserRolesRequest $request, User $user): RedirectResponse
+    {
+        $roleIds = Role::query()
+            ->whereIn('name', $request->validated('roles'))
+            ->pluck('id');
+
+        $user->roles()->sync($roleIds);
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Roles updated.')]);
+
+        return to_route('admin.users.edit', $user);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function serializeUser(User $user): array
+    {
+        return [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'email_verified_at' => $user->email_verified_at,
+            'roles' => $user->roles->pluck('name')->values()->all(),
+            'student_profile' => $user->studentProfile?->only([
+                'registration_number',
+                'department',
+                'session',
+                'phone',
+                'registration_status',
+                'residency_status',
+            ]),
+        ];
     }
 }
