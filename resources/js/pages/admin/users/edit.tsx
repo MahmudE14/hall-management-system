@@ -1,4 +1,4 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import UserController from '@/actions/App/Http/Controllers/Admin/UserController';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
@@ -12,6 +12,7 @@ type ManagedUser = {
     id: number;
     name: string;
     email: string;
+    is_active: boolean;
     roles: string[];
     student_profile: {
         registration_number: string;
@@ -57,7 +58,14 @@ export default function EditUser({
                 />
 
                 <div className="rounded-xl border border-sidebar-border/70 p-4 dark:border-sidebar-border">
-                    <p className="font-medium">{user.email}</p>
+                    <div className="flex flex-wrap items-center gap-2">
+                        <p className="font-medium">{user.email}</p>
+                        <Badge
+                            variant={user.is_active ? 'outline' : 'destructive'}
+                        >
+                            {user.is_active ? 'Active' : 'Inactive'}
+                        </Badge>
+                    </div>
                     {user.student_profile && (
                         <p className="mt-1 text-sm text-muted-foreground">
                             {user.student_profile.registration_number} ·{' '}
@@ -66,6 +74,24 @@ export default function EditUser({
                             {user.student_profile.registration_status}
                         </p>
                     )}
+                </div>
+
+                <div className="flex flex-wrap gap-3">
+                    <Button
+                        type="button"
+                        variant={user.is_active ? 'destructive' : 'default'}
+                        onClick={() =>
+                            router.patch(
+                                user.is_active
+                                    ? UserController.deactivate.url(user)
+                                    : UserController.activate.url(user),
+                                {},
+                                { preserveScroll: true },
+                            )
+                        }
+                    >
+                        {user.is_active ? 'Deactivate account' : 'Activate account'}
+                    </Button>
                 </div>
 
                 <form onSubmit={submit} className="space-y-4">

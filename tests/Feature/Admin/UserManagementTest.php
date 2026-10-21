@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\RegistrationStatus;
+use App\Models\RegistrationDecision;
 use App\Models\Role;
 use App\Models\StudentProfile;
 use App\Models\User;
@@ -176,4 +177,52 @@ test('other roles cannot manage user roles', function (string $role) {
     $this->actingAs(managedUserWithRole($role))
         ->put(route('admin.users.roles.update', $target), ['roles' => ['student']])
         ->assertForbidden();
+})->with(['provost', 'hall_office_staff', 'house_tutor', 'club_admin', 'student']);
+
+test('super admins can activate and deactivate accounts without touching identity, roles, or decisions', function () {
+    $superAdmin = managedUserWithRole('super_admin');
+    $target = managedUserWithRole('student');
+    $profile = StudentProfile::factory()->for($target)->create([
+        'registration_status' => RegistrationStatus::Approved,
+    ]);
+    $decision = RegistrationDecision::factory()->for($profile)->create([
+        'actor_id' => $superAdmin->id,
+        'status' => RegistrationStatus::Approved,
+    ]);
+    $targetName = $target->name;
+
+    $this->actingAs($superAdmin)
+        ->patch(route('admin.users.deactivate', $target))
+        ->assertRedirect(route('admin.users.edit', $target));
+
+    $target->refresh();
+
+    expect($target->is_active)->toBeFalse()
+        ->and($target->name)->toBe($targetName)
+        ->and($target->roles()->pluck('name')->all())->toBe(['student'])
+        ->and($profile->refresh()->registration_status)->toBe(RegistrationStatus::Approved)
+        ->and($decision->fresh())->not->toBeNull();
+
+    $this->actingAs($superAdmin)
+        ->patch(route('admin.users.activate', $target))
+        ->assertRedirect(route('admin.users.edit', $target));
+
+    expect($target->refresh()->is_active)->toBeTrue()
+        ->and($target->roles()->pluck('name')->all())->toBe(['student'])
+        ->and($profile->refresh()->registration_status)->toBe(RegistrationStatus::Approved);
+});
+
+test('other roles cannot activate or deactivate accounts', function (string $role) {
+    $target = managedUserWithRole('student');
+    $actor = managedUserWithRole($role);
+
+    $this->actingAs($actor)
+        ->patch(route('admin.users.deactivate', $target))
+        ->assertForbidden();
+
+    $this->actingAs($actor)
+        ->patch(route('admin.users.activate', $target))
+        ->assertForbidden();
+
+    expect($target->refresh()->is_active)->toBeTrue();
 })->with(['provost', 'hall_office_staff', 'house_tutor', 'club_admin', 'student']);

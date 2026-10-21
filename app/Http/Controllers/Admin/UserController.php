@@ -65,6 +65,24 @@ class UserController extends Controller
         ]);
     }
 
+    public function activate(User $user): RedirectResponse
+    {
+        $user->update(['is_active' => true]);
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Account activated.')]);
+
+        return to_route('admin.users.edit', $user);
+    }
+
+    public function deactivate(User $user): RedirectResponse
+    {
+        $user->update(['is_active' => false]);
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Account deactivated.')]);
+
+        return to_route('admin.users.edit', $user);
+    }
+
     public function edit(User $user): Response
     {
         $user->load(['roles:id,name', 'studentProfile']);
@@ -102,6 +120,7 @@ class UserController extends Controller
             'name' => $user->name,
             'email' => $user->email,
             'email_verified_at' => $user->email_verified_at,
+            'is_active' => $user->is_active,
             'roles' => $user->roles->pluck('name')->values()->all(),
             'student_profile' => $user->studentProfile?->only([
                 'registration_number',

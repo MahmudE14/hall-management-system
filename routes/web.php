@@ -21,6 +21,8 @@ Route::middleware(['auth', 'verified', 'role:super_admin'])->prefix('admin')->na
     Route::get('users', [UserController::class, 'index'])->name('users.index');
     Route::get('users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
     Route::put('users/{user}/roles', [UserController::class, 'updateRoles'])->name('users.roles.update');
+    Route::patch('users/{user}/activate', [UserController::class, 'activate'])->name('users.activate');
+    Route::patch('users/{user}/deactivate', [UserController::class, 'deactivate'])->name('users.deactivate');
 });
 
 require __DIR__.'/settings.php';

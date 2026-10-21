@@ -21,6 +21,7 @@ type ManagedUser = {
     name: string;
     email: string;
     email_verified_at: string | null;
+    is_active: boolean;
     roles: string[];
     student_profile: StudentProfile | null;
 };
@@ -170,6 +171,17 @@ export default function UsersIndex({
                                             <p className="text-muted-foreground">
                                                 {user.email}
                                             </p>
+                                            <Badge
+                                                variant={
+                                                    user.is_active
+                                                        ? 'outline'
+                                                        : 'destructive'
+                                                }
+                                            >
+                                                {user.is_active
+                                                    ? 'Active'
+                                                    : 'Inactive'}
+                                            </Badge>
                                         </td>
                                         <td className="px-4 py-3">
                                             <div className="flex flex-wrap gap-1">
