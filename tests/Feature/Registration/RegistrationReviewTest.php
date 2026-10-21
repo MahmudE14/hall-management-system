@@ -15,7 +15,7 @@ test('registration reviewers can view pending registrations', function (string $
         'registration_status' => RegistrationStatus::Approved,
     ]);
 
-    $this->actingAs(userWithRole($role))
+    $this->actingAs(reviewerWithRole($role))
         ->get(route('registrations.index'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
@@ -27,13 +27,13 @@ test('registration reviewers can view pending registrations', function (string $
 })->with(['super_admin', 'provost', 'hall_office_staff']);
 
 test('other roles cannot view pending registrations', function () {
-    $this->actingAs(userWithRole('student'))
+    $this->actingAs(reviewerWithRole('student'))
         ->get(route('registrations.index'))
         ->assertForbidden();
 });
 
 test('a reviewer can approve a pending registration and history is retained', function () {
-    $reviewer = userWithRole('hall_office_staff');
+    $reviewer = reviewerWithRole('hall_office_staff');
     $profile = StudentProfile::factory()->create();
 
     $this->actingAs($reviewer)
@@ -50,7 +50,7 @@ test('a reviewer can approve a pending registration and history is retained', fu
 });
 
 test('a reviewer can reject a pending registration with a reason', function () {
-    $reviewer = userWithRole('provost');
+    $reviewer = reviewerWithRole('provost');
     $profile = StudentProfile::factory()->create();
 
     $this->actingAs($reviewer)
@@ -68,7 +68,7 @@ test('a reviewer can reject a pending registration with a reason', function () {
 });
 
 test('rejection requires a reason', function () {
-    $reviewer = userWithRole('super_admin');
+    $reviewer = reviewerWithRole('super_admin');
     $profile = StudentProfile::factory()->create();
 
     $this->actingAs($reviewer)
@@ -80,7 +80,7 @@ test('rejection requires a reason', function () {
 });
 
 test('a decided registration cannot be decided again', function () {
-    $reviewer = userWithRole('hall_office_staff');
+    $reviewer = reviewerWithRole('hall_office_staff');
     $profile = StudentProfile::factory()->create([
         'registration_status' => RegistrationStatus::Approved,
     ]);
@@ -92,7 +92,7 @@ test('a decided registration cannot be decided again', function () {
     expect($profile->registrationDecisions()->count())->toBe(0);
 });
 
-function userWithRole(string $role): User
+function reviewerWithRole(string $role): User
 {
     $user = User::factory()->create();
     $user->roles()->attach(Role::factory()->create(['name' => $role]));
@@ -101,12 +101,12 @@ function userWithRole(string $role): User
 }
 
 test('a reviewer can reconsider a rejected registration without losing history', function () {
-    $reviewer = userWithRole('hall_office_staff');
+    $reviewer = reviewerWithRole('hall_office_staff');
     $profile = StudentProfile::factory()->create([
         'registration_status' => RegistrationStatus::Rejected,
     ]);
     $originalRejection = $profile->registrationDecisions()->create([
-        'actor_id' => userWithRole('provost')->id,
+        'actor_id' => reviewerWithRole('provost')->id,
         'status' => RegistrationStatus::Rejected,
         'reason' => 'Original rejection reason.',
     ]);
@@ -128,7 +128,7 @@ test('a reviewer can reconsider a rejected registration without losing history',
 });
 
 test('only pending registrations can be considered for approval or rejection', function () {
-    $reviewer = userWithRole('super_admin');
+    $reviewer = reviewerWithRole('super_admin');
     $profile = StudentProfile::factory()->create([
         'registration_status' => RegistrationStatus::Rejected,
     ]);
@@ -149,7 +149,7 @@ test('students cannot reconsider their own rejected registration', function () {
 });
 
 test('only rejected registrations can be reconsidered', function () {
-    $reviewer = userWithRole('provost');
+    $reviewer = reviewerWithRole('provost');
     $profile = StudentProfile::factory()->create();
 
     $this->actingAs($reviewer)

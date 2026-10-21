@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, ClipboardCheck, FolderGit2, LayoutGrid } from 'lucide-react';
+import { BookOpen, ClipboardCheck, FolderGit2, LayoutGrid, Users } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { index as registrations } from '@/routes/registrations';
+import { index as users } from '@/routes/admin/users';
 import type { Auth, NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
@@ -28,6 +29,12 @@ const mainNavItems: NavItem[] = [
         href: registrations(),
         icon: ClipboardCheck,
         roles: ['super_admin', 'provost', 'hall_office_staff'],
+    },
+    {
+        title: 'Users',
+        href: users(),
+        icon: Users,
+        roles: ['super_admin'],
     },
 ];
 
