@@ -6,9 +6,11 @@ use App\Enums\NoticeCategory;
 use App\Models\Notice;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PublicNoticeController extends Controller
 {
@@ -59,6 +61,21 @@ class PublicNoticeController extends Controller
         ]);
     }
 
+    public function attachment(Notice $notice): StreamedResponse
+    {
+        $notice = Notice::query()
+            ->published()
+            ->findOrFail($notice->getKey());
+
+        $path = $notice->attachment_path;
+
+        abort_if($path === null || ! Storage::disk('local')->exists($path), 404);
+
+        return Storage::disk('local')->download($path, "notice-{$notice->id}.pdf", [
+            'Content-Type' => 'application/pdf',
+        ]);
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -71,6 +88,9 @@ class PublicNoticeController extends Controller
             'is_pinned' => $notice->is_pinned,
             'published_at' => $notice->published_at?->toIso8601String(),
             'has_attachment' => $notice->attachment_path !== null,
+            'attachment_url' => $notice->attachment_path === null
+                ? null
+                : route('notices.attachment', $notice),
             'creator' => [
                 'id' => $notice->creator->id,
                 'name' => $notice->creator->name,

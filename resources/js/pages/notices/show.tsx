@@ -14,6 +14,7 @@ type PublicNotice = {
     published_at: string | null;
     created_at: string;
     has_attachment: boolean;
+    attachment_url: string | null;
     creator: {
         id: number;
         name: string;
@@ -65,6 +66,15 @@ export default function PublicNoticeShow({ notice }: { notice: PublicNotice }) {
                     <div className="mt-6 text-sm leading-relaxed whitespace-pre-wrap">
                         {notice.body}
                     </div>
+
+                    {notice.attachment_url && (
+                        <Button asChild variant="outline" className="mt-6">
+                            <a href={notice.attachment_url}>
+                                <Paperclip />
+                                Download PDF attachment
+                            </a>
+                        </Button>
+                    )}
                 </article>
             </div>
         </>

@@ -19,6 +19,9 @@ Route::get('notices', [PublicNoticeController::class, 'index'])->name('notices.i
 Route::get('notices/{notice}', [PublicNoticeController::class, 'show'])
     ->whereNumber('notice')
     ->name('notices.show');
+Route::get('notices/{notice}/attachment', [PublicNoticeController::class, 'attachment'])
+    ->whereNumber('notice')
+    ->name('notices.attachment');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
