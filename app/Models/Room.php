@@ -55,6 +55,12 @@ class Room extends Model
         return $this->hasManyThrough(SeatAllocation::class, Seat::class);
     }
 
+    /** @return HasMany<Complaint, $this> */
+    public function complaints(): HasMany
+    {
+        return $this->hasMany(Complaint::class);
+    }
+
     /** @return array<string, string> */
     protected function casts(): array
     {

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -53,6 +54,18 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
     public function tutorProfile(): HasOne
     {
         return $this->hasOne(TutorProfile::class);
+    }
+
+    /** @return HasMany<Complaint, $this> */
+    public function assignedComplaints(): HasMany
+    {
+        return $this->hasMany(Complaint::class, 'assignee_id');
+    }
+
+    /** @return HasMany<ComplaintComment, $this> */
+    public function complaintComments(): HasMany
+    {
+        return $this->hasMany(ComplaintComment::class, 'author_id');
     }
 
     public function hasRole(string $role): bool
