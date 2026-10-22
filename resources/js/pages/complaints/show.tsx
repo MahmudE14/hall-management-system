@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import {
     ArrowLeft,
     Clock,
@@ -8,9 +8,15 @@ import {
     UserRound,
 } from 'lucide-react';
 import Heading from '@/components/heading';
+import InputError from '@/components/input-error';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { index as complaintsIndex } from '@/routes/complaints';
+import { Label } from '@/components/ui/label';
+import {
+    assign as assignComplaint,
+    index as complaintsIndex,
+} from '@/routes/complaints';
+import { store as storeComment } from '@/routes/complaints/comments';
 
 type Assignee = {
     id: number;
@@ -60,6 +66,12 @@ type Complaint = {
     comments: Comment[];
 };
 
+type EligibleAssignee = {
+    id: number;
+    name: string;
+    type: string;
+};
+
 type TimelineItem =
     | {
           key: string;
@@ -74,7 +86,17 @@ type TimelineItem =
           entry: Comment;
       };
 
-export default function ComplaintShow({ complaint }: { complaint: Complaint }) {
+export default function ComplaintShow({
+    complaint,
+    can_assign: canAssign,
+    can_comment: canComment,
+    eligible_assignees: eligibleAssignees = [],
+}: {
+    complaint: Complaint;
+    can_assign: boolean;
+    can_comment: boolean;
+    eligible_assignees?: EligibleAssignee[];
+}) {
     const timeline: TimelineItem[] = [
         ...complaint.status_history.map((entry) => ({
             key: `status-${entry.id}`,
@@ -221,6 +243,14 @@ export default function ComplaintShow({ complaint }: { complaint: Complaint }) {
                                 </p>
                             )}
                         </div>
+
+                        {canAssign && (
+                            <AssignComplaintForm
+                                complaintId={complaint.id}
+                                assignees={eligibleAssignees}
+                                currentAssigneeId={complaint.assignee?.id ?? null}
+                            />
+                        )}
                     </section>
                 </div>
 
@@ -284,6 +314,10 @@ export default function ComplaintShow({ complaint }: { complaint: Complaint }) {
                             ))}
                         </ol>
                     )}
+
+                    {canComment && (
+                        <CommentForm complaintId={complaint.id} />
+                    )}
                 </section>
             </div>
         </>
@@ -327,6 +361,116 @@ function CommentTimelineEntry({ entry }: { entry: Comment }) {
             </div>
             <p className="mt-2 whitespace-pre-wrap">{entry.body}</p>
         </div>
+    );
+}
+
+function AssignComplaintForm({
+    complaintId,
+    assignees,
+    currentAssigneeId,
+}: {
+    complaintId: number;
+    assignees: EligibleAssignee[];
+    currentAssigneeId: number | null;
+}) {
+    const canKeepCurrent =
+        currentAssigneeId !== null &&
+        assignees.some((assignee) => assignee.id === currentAssigneeId);
+    const form = useForm({
+        assignee_id:
+            canKeepCurrent && currentAssigneeId !== null
+                ? String(currentAssigneeId)
+                : assignees[0]
+                  ? String(assignees[0].id)
+                  : '',
+    });
+
+    function submit(event: React.FormEvent) {
+        event.preventDefault();
+
+        form.post(assignComplaint.url(complaintId), {
+            preserveScroll: true,
+        });
+    }
+
+    return (
+        <form onSubmit={submit} className="mt-4 space-y-3 border-t pt-4">
+            <div className="grid gap-2">
+                <Label htmlFor="assignee_id">Assign complaint</Label>
+                <select
+                    id="assignee_id"
+                    value={form.data.assignee_id}
+                    onChange={(event) =>
+                        form.setData('assignee_id', event.target.value)
+                    }
+                    aria-invalid={Boolean(form.errors.assignee_id)}
+                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive"
+                >
+                    <option value="" disabled>
+                        Select an assignee
+                    </option>
+                    {assignees.map((assignee) => (
+                        <option key={assignee.id} value={assignee.id}>
+                            {assignee.name} ({formatValue(assignee.type)})
+                        </option>
+                    ))}
+                </select>
+                <p className="text-xs text-muted-foreground">
+                    Only active House Tutors and Hall Office Staff can be
+                    assigned.
+                </p>
+                <InputError message={form.errors.assignee_id} />
+            </div>
+
+            <Button
+                type="submit"
+                size="sm"
+                disabled={form.processing || !form.data.assignee_id}
+            >
+                {form.processing ? 'Assigning...' : 'Assign'}
+            </Button>
+        </form>
+    );
+}
+
+function CommentForm({ complaintId }: { complaintId: number }) {
+    const form = useForm({ body: '' });
+
+    function submit(event: React.FormEvent) {
+        event.preventDefault();
+
+        form.post(storeComment.url(complaintId), {
+            preserveScroll: true,
+            onSuccess: () => form.reset('body'),
+        });
+    }
+
+    return (
+        <form onSubmit={submit} className="mt-4 space-y-3 border-t pt-4">
+            <div className="grid gap-2">
+                <Label htmlFor="body">Add a comment</Label>
+                <textarea
+                    id="body"
+                    rows={3}
+                    value={form.data.body}
+                    onChange={(event) =>
+                        form.setData('body', event.target.value)
+                    }
+                    aria-invalid={Boolean(form.errors.body)}
+                    placeholder="Share an update with the people handling this complaint."
+                    className="flex min-h-24 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40"
+                />
+                <InputError message={form.errors.body} />
+            </div>
+
+            <Button
+                type="submit"
+                size="sm"
+                disabled={form.processing || form.data.body.trim() === ''}
+            >
+                {form.processing ? 'Posting...' : 'Post comment'}
+            </Button>
+        </form>
     );
 }
 

@@ -73,6 +73,8 @@ class ComplaintController extends Controller
     {
         Gate::authorize('view', $complaint);
 
+        $canAssign = Gate::allows('assign', $complaint);
+
         return Inertia::render('complaints/show', [
             'complaint' => $this->serializeComplaint(
                 $complaint,
@@ -80,6 +82,9 @@ class ComplaintController extends Controller
                 includeComments: true,
                 includeTimeline: true,
             ),
+            'can_assign' => $canAssign,
+            'can_comment' => Gate::allows('comment', $complaint),
+            ...($canAssign ? ['eligible_assignees' => $this->eligibleAssignees()] : []),
         ]);
     }
 
@@ -190,6 +195,45 @@ class ComplaintController extends Controller
         ]);
 
         return to_route('dashboard');
+    }
+
+    /**
+     * @return array<int, array{id: int, name: string, type: string}>
+     */
+    private function eligibleAssignees(): array
+    {
+        return User::query()
+            ->with('roles')
+            ->where('is_active', true)
+            ->where(function (Builder $query): void {
+                $query
+                    ->whereHas(
+                        'roles',
+                        fn (Builder $query) => $query->where('name', 'hall_office_staff'),
+                    )
+                    ->orWhere(function (Builder $query): void {
+                        $query
+                            ->whereHas(
+                                'roles',
+                                fn (Builder $query) => $query->where('name', 'house_tutor'),
+                            )
+                            ->whereHas(
+                                'tutorProfile',
+                                fn (Builder $query) => $query->where('is_active', true),
+                            );
+                    });
+            })
+            ->orderBy('name')
+            ->get()
+            ->map(fn (User $user): array => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'type' => $user->roles->contains('name', 'hall_office_staff')
+                    ? 'hall_office_staff'
+                    : 'house_tutor',
+            ])
+            ->values()
+            ->all();
     }
 
     /**
