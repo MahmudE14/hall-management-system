@@ -20,7 +20,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['from_status', 'status', 'note'])]
+#[Fillable(['actor_id', 'from_status', 'status', 'note'])]
 class ComplaintStatusLog extends Model
 {
     /** @use HasFactory<ComplaintStatusLogFactory> */

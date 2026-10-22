@@ -95,7 +95,7 @@ There are no implementation tasks in Phase 0.
 - [x] 5.7 Add complaint detail and authorized private-image delivery; verify another student cannot view the complaint or download its image.
 - [ ] 5.8 Add complaint assignment using only roles and assignee types confirmed by C2 and C5; verify assignment authorization and tutor scope.
 - [ ] 5.9 Add chronological comments using only staff roles confirmed by C5; verify participant authorization, ordering, and cross-record denial.
-- [ ] 5.10 Add the transactional transition engine and audit-log write for the documented state graph; verify allowed edges, forbidden edges, and atomic logging independent of actor permissions.
+- [x] 5.10 Add the transactional transition engine and audit-log write for the documented state graph; verify allowed edges, forbidden edges, and atomic logging independent of actor permissions.
 - [ ] 5.11 Add transition authorization, rejection reason, resolution note, closure authority, and tutor scope using C1 and C3; verify each role boundary and failure mode.
 - [ ] 5.12 Add student reopening and resolution-time behavior using C4 and C11; verify exact boundary, timezone, repeated resolution, and unauthorized reopening.
 - [x] 5.13 Add the student complaint-submission page; verify room/location behavior, file validation, field errors, and success feedback.
