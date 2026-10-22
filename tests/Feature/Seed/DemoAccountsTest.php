@@ -42,6 +42,24 @@ test('demo accounts have their documented roles', function (string $email, array
     ['student@student.du.test', ['student']],
 ]);
 
+test('the seeded house tutor has an active profile assigned to at least one block', function () {
+    $tutor = User::query()->where('email', 'tutor@kjh.test')->firstOrFail();
+
+    expect($tutor->tutorProfile)->not->toBeNull()
+        ->and($tutor->tutorProfile->is_active)->toBeTrue()
+        ->and($tutor->tutorProfile->blocks()->count())->toBeGreaterThanOrEqual(1);
+});
+
+test('the seeded house tutor can access the tutor-scoped student directory', function () {
+    $this->withoutVite();
+
+    $tutor = User::query()->where('email', 'tutor@kjh.test')->firstOrFail();
+
+    $this->actingAs($tutor)
+        ->get(route('students.index'))
+        ->assertOk();
+});
+
 test('demo passwords are hashed', function () {
     $user = User::query()->where('email', 'admin@kjh.test')->firstOrFail();
 

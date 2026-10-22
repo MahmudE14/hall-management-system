@@ -49,6 +49,12 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
         return $this->hasOne(StudentProfile::class);
     }
 
+    /** @return HasOne<TutorProfile, $this> */
+    public function tutorProfile(): HasOne
+    {
+        return $this->hasOne(TutorProfile::class);
+    }
+
     public function hasRole(string $role): bool
     {
         return $this->hasAnyRole($role);

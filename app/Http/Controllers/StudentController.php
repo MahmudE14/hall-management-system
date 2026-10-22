@@ -33,12 +33,25 @@ class StudentController extends Controller
         ]);
 
         $user = $request->user();
+        $tutorBlockIds = $user->hasAnyRole(...self::DIRECTORY_ROLES)
+            ? []
+            : $this->activeTutorBlockIds($user);
 
         $students = StudentProfile::query()
             ->with(['user', 'activeSeatAllocation.seat.room.block'])
             ->when(
                 ! $user->hasAnyRole(...self::DIRECTORY_ROLES),
-                fn (Builder $query) => $query->where('user_id', $user->id),
+                fn (Builder $query) => $query->where(
+                    fn (Builder $query) => $query
+                        ->where('user_id', $user->id)
+                        ->when(
+                            $tutorBlockIds !== [],
+                            fn (Builder $query) => $query->orWhereHas(
+                                'activeSeatAllocation.seat.room',
+                                fn (Builder $query) => $query->whereIn('block_id', $tutorBlockIds),
+                            ),
+                        ),
+                ),
             )
             ->when(
                 isset($filters['block']),
@@ -85,6 +98,10 @@ class StudentController extends Controller
                 'status' => $filters['status'] ?? null,
             ],
             'blocks' => Block::query()
+                ->when(
+                    $tutorBlockIds !== [],
+                    fn (Builder $query) => $query->whereKey($tutorBlockIds),
+                )
                 ->orderBy('name')
                 ->get(['id', 'name', 'code'])
                 ->all(),
@@ -156,6 +173,20 @@ class StudentController extends Controller
                 'block' => $activeAllocation->seat->room->block?->only(['id', 'name', 'code']),
             ],
         ]);
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    private function activeTutorBlockIds(User $user): array
+    {
+        $tutorProfile = $user->tutorProfile;
+
+        if ($tutorProfile?->is_active !== true) {
+            return [];
+        }
+
+        return $tutorProfile->blocks()->pluck('blocks.id')->all();
     }
 
     /**

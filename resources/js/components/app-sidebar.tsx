@@ -4,6 +4,7 @@ import {
     Building2,
     ClipboardCheck,
     FolderGit2,
+    GraduationCap,
     LayoutGrid,
     Users,
 } from 'lucide-react';
@@ -22,6 +23,7 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { index as blocks } from '@/routes/blocks';
+import { index as houseTutors } from '@/routes/house-tutors';
 import { index as registrations } from '@/routes/registrations';
 import { index as students } from '@/routes/students';
 import { index as users } from '@/routes/admin/users';
@@ -47,6 +49,7 @@ const mainNavItems: NavItem[] = [
             'super_admin',
             'provost',
             'hall_office_staff',
+            'house_tutor',
             'student',
             'club_admin',
         ],
@@ -56,6 +59,12 @@ const mainNavItems: NavItem[] = [
         href: blocks(),
         icon: Building2,
         roles: ['super_admin', 'provost', 'hall_office_staff'],
+    },
+    {
+        title: 'House tutors',
+        href: houseTutors(),
+        icon: GraduationCap,
+        roles: ['super_admin', 'provost'],
     },
     {
         title: 'Users',

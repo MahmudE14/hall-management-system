@@ -168,7 +168,6 @@ These source-document ambiguities are not confirmed requirements. The affected t
 - **C3:** Which roles may reject complaints and which transitions an assigned House Tutor may perform.
 - **C4:** Whether the seven-day reopening boundary includes the exact seventh-day instant and which timezone governs it.
 - **C5:** Which roles qualify as a complaint-assignment target described as a "staff member," and which staff roles may add complaint comments.
-- **C8:** How a newly created tutor receives an authenticated account or initial credential.
 - **C10:** How an Attached student's free-form complaint location contributes to a House Tutor's block-scoped dashboard.
 - **C11:** Which Resolved timestamp is used for resolution time when a complaint is reopened and resolved again.
 
@@ -176,6 +175,7 @@ These source-document ambiguities are not confirmed requirements. The affected t
 
 - **C6 — Resolved:** Authorized registration-decision roles may transition Rejected to Pending with original rejection reason and complete decision history retained. Student self-resubmission is excluded.
 - **C7 — Resolved:** Students may edit name, email, and phone. Email uniqueness, institutional domain, and verification safeguards remain; all other registration and academic identity fields are read-only.
+- **C8 — Resolved for the assessment:** Tutor onboarding uses the existing seeded-account credential setup only. The fictional `tutor@kjh.test` identity authenticates with the shared demo credential and has an active tutor profile assigned to at least one seeded block. Tutor identities created through administration receive an authenticated user account with an internal random password but no delivered credential. No email invitation, credential-emailing workflow, separate onboarding subsystem, password exposure, or credential logging is introduced. Newly created tutors therefore have no assessment-supported initial credential beyond the seeded demo identity.
 - **C9 — Resolved:** Super Admin may list/search users, manage roles, and activate/deactivate accounts. Inactive access is blocked server-side. Administrative deletion, password resets, and unrestricted CRUD are excluded.
 - **C12 — Resolved, authority approved:** Continue with Laravel 13; no downgrade is required. Approval source is user-confirmed communication with the authority. Evidence is recorded as user-reported, not written evidence.
 

@@ -15,10 +15,17 @@ class StudentProfilePolicy
 
     public function viewAny(User $user): bool
     {
-        return $user->hasAnyRole(
+        if ($user->hasAnyRole(
             ...self::STAFF_VIEW_ROLES,
             ...self::SELF_VIEW_ROLES,
-        );
+        )) {
+            return true;
+        }
+
+        $tutorProfile = $user->tutorProfile;
+
+        return $tutorProfile?->is_active === true
+            && $tutorProfile->blocks()->exists();
     }
 
     public function view(User $user, StudentProfile $studentProfile): bool
@@ -27,7 +34,20 @@ class StudentProfilePolicy
             return true;
         }
 
-        return $user->hasAnyRole(...self::SELF_VIEW_ROLES)
-            && $studentProfile->user_id === $user->id;
+        if ($user->hasAnyRole(...self::SELF_VIEW_ROLES)
+            && $studentProfile->user_id === $user->id) {
+            return true;
+        }
+
+        $tutorProfile = $user->tutorProfile;
+
+        if ($tutorProfile?->is_active !== true) {
+            return false;
+        }
+
+        $blockId = $studentProfile->activeSeatAllocation?->seat?->room?->block_id;
+
+        return $blockId !== null
+            && $tutorProfile->blocks()->whereKey($blockId)->exists();
     }
 }
