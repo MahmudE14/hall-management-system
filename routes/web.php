@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\BlockController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\SeatAllocationController;
 use App\Http\Controllers\SeatController;
 use App\Http\Controllers\StudentController;
 use Illuminate\Support\Facades\Route;
@@ -17,6 +18,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('rooms', RoomController::class)->only(['index', 'create', 'store', 'edit', 'update']);
     Route::get('students', [StudentController::class, 'index'])->name('students.index');
     Route::get('students/{studentProfile}', [StudentController::class, 'show'])->name('students.show');
+    Route::post('students/{studentProfile}/allocation', [SeatAllocationController::class, 'store'])->name('allocations.store');
     Route::post('rooms/{room}/seats', [SeatController::class, 'store'])->name('seats.store');
     Route::put('seats/{seat}', [SeatController::class, 'update'])->name('seats.update');
 });

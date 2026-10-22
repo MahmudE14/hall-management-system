@@ -62,7 +62,7 @@ There are no implementation tasks in Phase 0.
 **Entry:** Phase 2 is complete and `docs/PROJECT_STATUS.md` explicitly authorizes Phase 3.
 
 - [x] 3.1 Add allocation-history persistence and active student/seat uniqueness safeguards; verify database constraints and model relationships.
-- [ ] 3.2 Add the transactional allocation action; verify Office Staff/Provost/Super Admin authorization, approved allocation, duplicate student allocation, occupied seat, and Pending-student refusal.
+- [x] 3.2 Add the transactional allocation action; verify Office Staff/Provost/Super Admin authorization, approved allocation, duplicate student allocation, occupied seat, and Pending-student refusal.
 - [ ] 3.3 Add allocation controls to the student/room workflow; verify allocation changes Attached to Resident and updates occupancy.
 - [ ] 3.4 Add transactional vacancy with required date and reason; verify the student returns to Attached, the seat becomes free, and history remains intact.
 - [ ] 3.5 Protect room-capacity changes from current occupancy and retained history; verify capacity cannot fall below occupancy and no history is deleted.

@@ -6,7 +6,7 @@
 - Task-commit authorization: Granted for tasks 3.1-3.2. Push/PR/merge authorization: NONE.
 - Integration branch: `main` at `52d1468`, the Phase 2 integration merge.
 - Active phase branch: `phase/03-seat-allocation-vacancy`; no remote tracking is configured and remote PR state is unverified because GitHub CLI/API authentication is unavailable.
-- Active specification/change: `deliver-assessment-core` (20/81 tasks complete; Phase 1 tasks 1.1-1.14, Phase 2 tasks 2.1-2.5, and Phase 3 task 3.1 complete).
+- Active specification/change: `deliver-assessment-core` (21/81 tasks complete; Phase 1 tasks 1.1-1.14, Phase 2 tasks 2.1-2.5, and Phase 3 tasks 3.1-3.2 complete).
 - Phase 2 lifecycle: Integrated into `main` at `52d1468` with tasks 2.6-2.7 deliberately deferred at their named Phase 3 and task 4.4 checkpoints.
 - Phase 3 authorization: The user explicitly authorized tasks 3.1-3.2. The Phase 3 entry condition in the OpenSpec tasks file still reads "Phase 2 is complete"; the Phase 2 deferrals remain recorded and must not be marked complete as part of this phase.
 - Phase 2 documented deferrals: (a) Task 2.6 block filtering → Phase 3 seat-allocation implementation; (b) Task 2.7 current room and allocation history → Phase 3 seat-allocation implementation; (c) House Tutor block-scoped access → task 4.4. Tasks 2.6-2.7 remain unchecked until their named checkpoints complete. The existing occupancy and capacity connections remain at their recorded Phase 3 checkpoint (task 3.5).
@@ -28,7 +28,10 @@
 - Phase 2 task 2.7 verification: Focused `StudentRecordTest` passes (8 tests, 123 assertions).
 - Phase 3 task 3.1 implementation: Added the `seat_allocations` migration with active-marker uniqueness for student and seat, the `SeatAllocation` model and factory, and `StudentProfile`/`Seat` allocation relationships. Completed allocations clear the nullable active marker so history may retain the same student and seat.
 - Phase 3 task 3.1 verification: Focused `SeatAllocationTest` passes (8 tests, 20 assertions).
+- Phase 3 task 3.2 implementation: Added the transactional `AllocateSeat` action, `SeatAllocationPolicy`, allocation Form Request, controller, and `allocations.store` route. Allocation locks the student and seat, requires an approved registration, refuses duplicate active student allocations and occupied seats, records the active allocation, and marks the student Resident. Hall Office Staff, Provost, and Super Admin may allocate; all other roles are forbidden.
+- Phase 3 task 3.2 verification: Focused `SeatAllocationTest` passes (10 tests, 42 assertions).
 - Task 3.1 commit mapping: The task 3.1 Conventional Commit contains its implementation, focused tests, task checkbox, and status update.
+- Task 3.2 commit mapping: The task 3.2 Conventional Commit contains its implementation, focused tests, task checkbox, and status update.
 - Task 2.1 commit mapping: The task 2.1 Conventional Commit contains its implementation, focused test, task checkbox, and status update.
 - Task 2.2 commit mapping: The task 2.2 Conventional Commit contains its implementation, focused test, task checkbox, and status update.
 - Task 2.3 commit mapping: The task 2.3 Conventional Commit contains its implementation, focused test, task checkbox, and status update.

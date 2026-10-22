@@ -20,7 +20,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['allocated_at', 'vacated_at', 'vacancy_reason', 'active'])]
+#[Fillable(['seat_id', 'allocated_at', 'vacated_at', 'vacancy_reason', 'active'])]
 class SeatAllocation extends Model
 {
     /** @use HasFactory<SeatAllocationFactory> */
