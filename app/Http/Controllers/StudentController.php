@@ -89,6 +89,17 @@ class StudentController extends Controller
         ]);
     }
 
+    public function show(StudentProfile $studentProfile): Response
+    {
+        Gate::authorize('view', $studentProfile);
+
+        $studentProfile->load('user');
+
+        return Inertia::render('students/show', [
+            'student' => $this->serializeStudent($studentProfile),
+        ]);
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -110,6 +121,8 @@ class StudentController extends Controller
             'residency_status' => $studentProfile->residency_status->value,
             'block' => null,
             'current_room' => null,
+            'allocation_history' => [],
+            'allocation_history_available' => false,
         ];
     }
 }
