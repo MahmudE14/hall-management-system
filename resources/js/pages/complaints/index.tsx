@@ -261,15 +261,37 @@ export default function ComplaintsIndex({
                                             {complaint.days_open}
                                         </td>
                                         <td className="px-4 py-3 align-top">
-                                            <Button asChild variant="outline">
-                                                <Link
-                                                    href={showComplaint(
-                                                        complaint.id,
-                                                    )}
+                                            <div className="flex flex-wrap gap-2">
+                                                <Button
+                                                    asChild
+                                                    variant="outline"
                                                 >
-                                                    View
-                                                </Link>
-                                            </Button>
+                                                    <Link
+                                                        href={showComplaint(
+                                                            complaint.id,
+                                                        )}
+                                                    >
+                                                        View
+                                                    </Link>
+                                                </Button>
+                                                {complaint.image_url && (
+                                                    <Button
+                                                        asChild
+                                                        variant="outline"
+                                                    >
+                                                        <a
+                                                            href={
+                                                                complaint.image_url
+                                                            }
+                                                            target="_blank"
+                                                            rel="noreferrer"
+                                                            aria-label={`Open attachment for ${complaint.tracking_id}`}
+                                                        >
+                                                            Attachment
+                                                        </a>
+                                                    </Button>
+                                                )}
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
