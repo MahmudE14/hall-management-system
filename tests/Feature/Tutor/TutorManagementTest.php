@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Block;
 use App\Models\Role;
 use App\Models\TutorProfile;
 use App\Models\User;
@@ -57,6 +58,85 @@ test('authorized users can edit tutors', function (string $role) {
         ->name->toBe('Dr. New Name')
         ->email->toBe('new@du.test');
 })->with(['provost', 'super_admin']);
+
+test('authorized users can assign multiple blocks when creating a tutor', function (string $role) {
+    $actor = tutorUserWithRole($role);
+    Role::factory()->create(['name' => 'house_tutor']);
+    $blocks = Block::factory()->count(2)->create();
+
+    $this->actingAs($actor)
+        ->post(route('house-tutors.store'), [
+            'name' => 'Dr. Ayesha Rahman',
+            'email' => 'ayesha.rahman@du.test',
+            'designation' => 'Assistant Professor',
+            'department' => 'Physics',
+            'phone' => '01712345678',
+            'block_ids' => $blocks->modelKeys(),
+        ])
+        ->assertRedirect(route('dashboard'))
+        ->assertSessionHasNoErrors();
+
+    $tutor = User::query()->where('email', 'ayesha.rahman@du.test')->firstOrFail()->tutorProfile;
+
+    expect($tutor->blocks()->pluck('blocks.id')->all())
+        ->toEqualCanonicalizing($blocks->modelKeys());
+})->with(['provost', 'super_admin']);
+
+test('authorized users can assign multiple blocks per tutor and multiple tutors per block', function () {
+    $actor = tutorUserWithRole('provost');
+    $blockA = Block::factory()->create();
+    $blockB = Block::factory()->create();
+    $first = TutorProfile::factory()->create();
+    $second = TutorProfile::factory()->create();
+
+    $this->actingAs($actor)
+        ->put(route('house-tutors.update', $first), [
+            'name' => 'Dr. First Tutor',
+            'email' => 'first.tutor@du.test',
+            'designation' => 'Assistant Professor',
+            'department' => 'Physics',
+            'phone' => '01712345678',
+            'block_ids' => [$blockA->id, $blockB->id],
+        ])
+        ->assertRedirect(route('dashboard'))
+        ->assertSessionHasNoErrors();
+
+    $this->actingAs($actor)
+        ->put(route('house-tutors.update', $second), [
+            'name' => 'Dr. Second Tutor',
+            'email' => 'second.tutor@du.test',
+            'designation' => 'Associate Professor',
+            'department' => 'History',
+            'phone' => '01812345678',
+            'block_ids' => [$blockA->id],
+        ])
+        ->assertRedirect(route('dashboard'))
+        ->assertSessionHasNoErrors();
+
+    expect($first->blocks()->pluck('blocks.id')->all())
+        ->toEqualCanonicalizing([$blockA->id, $blockB->id])
+        ->and($second->blocks()->pluck('blocks.id')->all())
+        ->toBe([$blockA->id])
+        ->and($blockA->tutorProfiles()->pluck('tutor_profiles.id')->all())
+        ->toEqualCanonicalizing([$first->id, $second->id]);
+});
+
+test('tutor block assignments reject blocks that do not exist', function () {
+    $tutor = TutorProfile::factory()->create();
+
+    $this->actingAs(tutorUserWithRole('provost'))
+        ->put(route('house-tutors.update', $tutor), [
+            'name' => 'Dr. Ayesha Rahman',
+            'email' => 'ayesha.rahman@du.test',
+            'designation' => 'Assistant Professor',
+            'department' => 'Physics',
+            'phone' => '01712345678',
+            'block_ids' => [999999],
+        ])
+        ->assertSessionHasErrors(['block_ids.0']);
+
+    expect($tutor->blocks()->count())->toBe(0);
+});
 
 test('authorized users can deactivate tutors', function (string $role) {
     $tutor = TutorProfile::factory()->create(['is_active' => true]);

@@ -29,12 +29,14 @@ class TutorController extends Controller
                 'is_active' => true,
             ]);
 
-            $user->tutorProfile()->create([
+            $tutorProfile = $user->tutorProfile()->create([
                 'designation' => $data['designation'],
                 'department' => $data['department'],
                 'phone' => $data['phone'],
                 'is_active' => true,
             ]);
+
+            $tutorProfile->blocks()->sync($data['block_ids'] ?? []);
 
             $user->roles()->attach($tutorRole);
         });
@@ -59,6 +61,10 @@ class TutorController extends Controller
                 'department' => $data['department'],
                 'phone' => $data['phone'],
             ]);
+
+            if (array_key_exists('block_ids', $data)) {
+                $tutorProfile->blocks()->sync($data['block_ids']);
+            }
         });
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Tutor updated.')]);

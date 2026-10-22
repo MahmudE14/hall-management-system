@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Tutor;
 
+use App\Models\Block;
 use App\Models\TutorProfile;
 use App\Models\User;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -28,6 +29,8 @@ class StoreTutorRequest extends FormRequest
             'designation' => ['required', 'string', 'max:255'],
             'department' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string', 'regex:/^01[3-9]\d{8}$/'],
+            'block_ids' => ['sometimes', 'array'],
+            'block_ids.*' => ['integer', Rule::exists(Block::class, 'id')],
         ];
     }
 }
