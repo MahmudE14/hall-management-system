@@ -1,14 +1,14 @@
 # Project Status
 
 - Current phase: Phase 3 - Seat Allocation and Vacancy on `phase/03-seat-allocation-vacancy`.
-- Implementation authorization: Deferred Phase 2 tasks 2.6-2.7 (now complete); task 3.6 and House Tutor scoped access (task 4.4) are not authorized.
+- Implementation authorization: Deferred Phase 2 tasks 2.6-2.7 and Phase 3 tasks 3.1-3.6 (now complete); House Tutor scoped access (task 4.4) is not authorized.
 - Phase branch creation authorization: Granted for `phase/03-seat-allocation-vacancy`, created from the Phase 2 integration merge.
-- Task-commit authorization: Granted for tasks 2.6-2.7. Push/PR/merge authorization: NONE.
+- Task-commit authorization: Granted for tasks 2.6-2.7 and 3.1-3.6. Push/PR/merge authorization: NONE.
 - Integration branch: `main` at `52d1468`, the Phase 2 integration merge.
 - Active phase branch: `phase/03-seat-allocation-vacancy`; no remote tracking is configured and remote PR state is unverified because GitHub CLI/API authentication is unavailable.
-- Active specification/change: `deliver-assessment-core` (26/81 tasks complete; Phase 1 tasks 1.1-1.14, Phase 2 tasks 2.1-2.7, and Phase 3 tasks 3.1-3.5 complete).
+- Active specification/change: `deliver-assessment-core` (27/81 tasks complete; Phase 1 tasks 1.1-1.14, Phase 2 tasks 2.1-2.7, and Phase 3 tasks 3.1-3.6 complete).
 - Phase 2 lifecycle: Integrated into `main` at `52d1468` with task 2.7 and House Tutor block-scoped access deliberately deferred to their named checkpoints; tasks 2.6-2.7 are now completed on the Phase 3 branch.
-- Phase 3 authorization: The user explicitly authorized Phase 3 tasks 3.1-3.5 and the deferred Phase 2 checkpoints 2.6-2.7. Task 3.6 remains unauthorized.
+- Phase 3 authorization: The user explicitly authorized Phase 3 tasks 3.1-3.6 and the deferred Phase 2 checkpoints 2.6-2.7. Task 3.6 is complete.
 - Phase 2 documented deferrals: House Tutor block-scoped access → task 4.4. The task 2.6 block-filter and task 2.7 current-room/allocation-history checkpoints are completed. The existing occupancy and capacity connections remain at their recorded Phase 3 checkpoint (task 3.5).
 - Phase 2 task 2.1 implementation: Added `halls` and `blocks` migrations, `Hall` and `Block` Eloquent models with `Hall hasMany Block` / `Block belongsTo Hall` relationships, and factories. Blocks reference their hall with a cascading foreign key.
 - Phase 2 task 2.2 implementation: Added `rooms` and `seats` migrations, `Room` and `Seat` Eloquent models with `Block hasMany Room`, `Room belongsTo Block`, `Room hasMany Seat`, and `Seat belongsTo Room` relationships, plus factories. Room numbers are unique within a block and seat labels within a room; both use cascading foreign keys. Room capacity is guarded as a positive integer on SQLite and MySQL.
@@ -36,12 +36,14 @@
 - Phase 3 task 3.4 verification: Focused `SeatVacancyTest` passes (9 tests, 82 assertions). `vendor/bin/pint --dirty --format agent` and `npm run types:check` pass.
 - Phase 3 task 3.5 implementation: Room capacity updates now refuse a capacity below the greater of defined seats or active occupants. The guard reads active allocations through `Room::seatAllocations`, and verified capacity reductions leave seat records and allocation history untouched. The room edit page describes the combined constraint.
 - Phase 3 task 3.5 verification: Focused `SeatVacancyTest` and `AccommodationManagementTest` pass (39 tests, 500 assertions).
+- Phase 3 task 3.6 verification: Verified against a disposable isolated MySQL 8.0.46 instance in `/tmp` (port 3307), never the configured development database. `php artisan migrate:fresh`, a full `migrate:rollback`, and reapplication all succeeded. MySQL created both composite unique indexes (`student_profile_id, active` and `seat_id, active`) and rejected duplicate active allocations with error 1062. Eight concurrent workers per race tested the same seat with different students, the same student with different seats, and the same student and seat together; each race produced exactly one `ValidationException`-free success and seven clean `ValidationException` refusals, with no partial or inactive rows and only the winners marked Resident. Retained SQLite coverage passes via `SeatAllocationTest`, `SeatVacancyTest`, `AccommodationManagementTest`, and `Models/SeatAllocationTest` (58 tests, 608 assertions). `vendor/bin/pint --dirty --format agent` and `git diff --check` pass.
 - Phase 3 tasks 3.3-3.5 batch verification: `composer ci:check` passes (268 tests, 1675 assertions; npm formatting/lint, TypeScript, Pint, and PHPStan with 0 errors). `npm run build`, `openspec validate deliver-assessment-core --strict`, and `git diff --check` pass. The known non-fatal PHPStan turbo-extension warning remains.
 - Task 3.1 commit mapping: The task 3.1 Conventional Commit contains its implementation, focused tests, task checkbox, and status update.
 - Task 3.2 commit mapping: The task 3.2 Conventional Commit contains its implementation, focused tests, task checkbox, and status update.
 - Task 3.3 commit mapping: The task 3.3 Conventional Commit contains its implementation, focused tests, task checkbox, authorization-ledger update, and status update.
 - Task 3.4 commit mapping: The task 3.4 Conventional Commit contains its implementation, focused tests, task checkbox, and status update.
 - Task 3.5 commit mapping: The task 3.5 Conventional Commit contains its implementation, focused tests, task checkbox, and status update.
+- Task 3.6 commit mapping: The task 3.6 Conventional Commit contains its task checkbox and verification status update.
 - Task 2.1 commit mapping: The task 2.1 Conventional Commit contains its implementation, focused test, task checkbox, and status update.
 - Task 2.2 commit mapping: The task 2.2 Conventional Commit contains its implementation, focused test, task checkbox, and status update.
 - Task 2.3 commit mapping: The task 2.3 Conventional Commit contains its implementation, focused test, task checkbox, and status update.
@@ -53,6 +55,6 @@
 - Unresolved clarifications: C1 Super Admin complaint closure; C2 Super Admin complaint assignment; C3 rejection and tutor transition permissions; C4 reopening boundary/timezone; C5 eligible assignees and commenters; C8 tutor onboarding; C10 Attached complaint block association; C11 repeated-resolution timing.
 - Framework decision: Laravel 13 is approved by the assessment authority according to user-confirmed communication. Approval evidence is user-reported; no written evidence is claimed.
 - Phase 3 tasks 3.1-3.2 batch verification: `composer ci:check` passes (257 tests, 1536 assertions; npm formatting/lint, TypeScript, Pint, and PHPStan with 0 errors). `npm run build`, `openspec validate deliver-assessment-core --strict`, and `git diff --check` pass. The known non-fatal PHPStan turbo-extension warning remains.
-- Last committed checkpoint: tasks 2.6-2.7 are committed on `phase/03-seat-allocation-vacancy` with this status update.
-- Uncommitted work: Expected to be none after the task 2.7 commit. Do not push, open a PR, or merge without explicit authorization.
-- Next recommended action: Stop after task 2.7. Task 3.6 (MySQL concurrency and migration verification) and House Tutor scoped access (task 4.4) require explicit authorization.
+- Last committed checkpoint: tasks 3.1-3.5 are committed on `phase/03-seat-allocation-vacancy`; task 3.6 is completed in its task commit with this status update.
+- Uncommitted work: None expected after the task 3.6 commit. Do not push, open a PR, or merge without explicit authorization.
+- Next recommended action: Phase 3 implementation tasks 3.1-3.6 are complete. Stop for explicit authorization before the full phase quality gate, push, PR, review, or merge; Phase 4 is not authorized.

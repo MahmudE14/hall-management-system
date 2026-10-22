@@ -66,7 +66,7 @@ There are no implementation tasks in Phase 0.
 - [x] 3.3 Add allocation controls to the student/room workflow; verify allocation changes Attached to Resident and updates occupancy.
 - [x] 3.4 Add transactional vacancy with required date and reason; verify the student returns to Attached, the seat becomes free, and history remains intact.
 - [x] 3.5 Protect room-capacity changes from current occupancy and retained history; verify capacity cannot fall below occupancy and no history is deleted.
-- [ ] 3.6 Verify allocation concurrency and migrations against configured MySQL while retaining SQLite feature coverage.
+- [x] 3.6 Verify allocation concurrency and migrations against configured MySQL while retaining SQLite feature coverage.
 
 **Exit:** Tasks 3.1-3.6 are complete; allocation, vacancy, history, capacity, authorization, and concurrency checks pass; `docs/PROJECT_STATUS.md` is updated; implementation stops.
 
