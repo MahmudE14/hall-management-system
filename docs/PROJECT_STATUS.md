@@ -1,24 +1,19 @@
 # Project Status
 
-- Current phase: Phase 1 - Identity and Registration is functionally implementation-complete on `phase/01-identity-registration`.
-- Implementation authorization: NONE. Phase 1 tasks 1.1-1.14 are complete; no Phase 2 or later implementation is authorized.
-- Phase branch creation authorization: No new phase branch. The existing `phase/01-identity-registration` branch remains the only active phase branch until Phase 1 is integrated.
-- Task-commit authorization: NONE. Phase 1 task-commit authorization was consumed; future commits, including these documentation updates, require explicit approval.
-- Push/PR authorization: NONE.
-- Merge authorization: NONE.
-- Next proposed phase: Phase 2 - Hall Structure and Student Records, only after Phase 1 is integrated and Phase 2 is explicitly authorized.
-- Integration branch: `main` at `1228647`, matching `origin/main`. No feature implementation is permitted on `main`.
-- Active phase branch: `phase/01-identity-registration` at `034c8a6`, 9 commits ahead of `origin/phase/01-identity-registration` (`9993c6f`).
-- Pending phase PR: NONE recorded locally. Remote PR state is unverified because GitHub CLI/API authentication is unavailable. A CI workflow exists at `.github/workflows/tests.yml`; remote checks are unobserved.
-- Planning commit authorization: NONE.
-- Active specification/change: `deliver-assessment-core` (planning complete; 14/81 tasks complete; Phase 1 tasks 1.1-1.14 complete).
-- Completed planning: Phase 0 approved; C6 registration reconsideration, C7 profile editing, C9 scoped Super Admin user management, and C12 Laravel 13 authority approval are resolved; client sources reconciled; mandatory assessment scope separated from optional PRD scope; capability acceptance scenarios preserved; phases 0-9 have entry/exit criteria; Phase 1 work is split into focused acceptance tasks; six demo accounts remain explicit; phase branch, task-commit, PR, merge, and post-merge authorization rules are documented.
+- Current phase: Phase 2 - Hall Structure and Student Records on `phase/02-hall-structure-student-records`.
+- Implementation authorization: Phase 2, task 2.1 only. Tasks 2.2-2.7 are not authorized in this session.
+- Phase branch creation authorization: Granted for `phase/02-hall-structure-student-records`, created from the Phase 1 integration merge.
+- Task-commit authorization: Granted for task 2.1. Push/PR/merge authorization: NONE.
+- Integration branch: `main` at `f9ba7c2`, the Phase 1 integration merge.
+- Active phase branch: `phase/02-hall-structure-student-records`; no remote tracking is configured and remote PR state is unverified because GitHub CLI/API authentication is unavailable.
+- Active specification/change: `deliver-assessment-core` (15/81 tasks complete; Phase 1 tasks 1.1-1.14 and Phase 2 task 2.1 complete).
+- Phase 2 readiness: Task 2.1 is complete. Tasks 2.2-2.7 remain pending and unchecked. Cross-phase dependencies remain: tasks 2.4, 2.5, and 2.7 depend on allocation history introduced in Phase 3; task 2.6's tutor block scope is completed in task 4.4.
+- Phase 2 task 2.1 implementation: Added `halls` and `blocks` migrations, `Hall` and `Block` Eloquent models with `Hall hasMany Block` / `Block belongsTo Hall` relationships, and factories. Blocks reference their hall with a cascading foreign key.
+- Phase 2 task 2.1 verification: Focused `HallStructureTest` passes (5 tests, 11 assertions). Full `php artisan test --compact` passes (176 tests, 760 assertions). `vendor/bin/pint --dirty --format agent` passes. `composer types:check` passes with 0 errors; the known non-fatal PHPStan turbo-extension warning remains. `git diff --check` passes.
+- Task 2.1 commit mapping: The phase branch checkpoint is the task 2.1 Conventional Commit containing the implementation, focused test, task checkbox, and this status update.
+- Phase 1 lifecycle: Integrated into `main` by merge commit `f9ba7c2`. Deferred non-functional findings remain recorded in `docs/AUDIT_BACKLOG.md` and are not addressed.
 - Unresolved clarifications: C1 Super Admin complaint closure; C2 Super Admin complaint assignment; C3 rejection and tutor transition permissions; C4 reopening boundary/timezone; C5 eligible assignees and commenters; C8 tutor onboarding; C10 Attached complaint block association; C11 repeated-resolution timing.
-- Framework decision: Laravel 13 is approved by the assessment authority according to user-confirmed communication. Approval evidence is user-reported; no written evidence is claimed. No framework downgrade is required or authorized.
-- Phase 1 implementation: Tasks 1.1-1.14 are implemented with traceable commits and checked in OpenSpec. All six demo accounts authenticate with documented roles; registration, reconsideration history, profile, scoped user management, inactive-account, and authorization behavior are present. Residual and deferred audit findings are recorded in `docs/AUDIT_BACKLOG.md`; no audit finding was dismissed.
-- Phase 1 verification: Latest full-suite result: 171 tests, 749 assertions passing. Fresh Phase 1 focused rerun: 138 tests, 636 assertions passing. `npm run check`, `vendor/bin/pint --parallel --test --format agent`, `composer types:check` (0 errors; known non-fatal turbo-extension warning), `npm run types:check`, `npm run build`, `openspec validate deliver-assessment-core --strict`, and `git diff --check` passed. MySQL-specific verification remains unavailable because local credentials are not configured.
-- Phase 1 lifecycle: implementation-complete only. It is not review-complete or integrated: no PR, no remote CI/review evidence, and deferred findings remain. Do not push, open a PR, merge, or start Phase 2 without explicit authorization.
-- Phase 2 readiness: Tasks 2.1-2.7 remain unchecked and no Phase 2 task references an unresolved clarification. Entry is blocked by Phase 1 integration and explicit authorization. Cross-phase dependencies: tasks 2.4, 2.5, and 2.7 depend on allocation history introduced in Phase 3; task 2.6's tutor block scope is completed in task 4.4.
-- Last committed checkpoint: `034c8a6` (`fix(auth): preserve active session after registration`).
-- Uncommitted work: `docs/PROJECT_STATUS.md` and new `docs/AUDIT_BACKLOG.md` only. Preserve them; commit only with explicit approval.
-- Next recommended action: Review the Phase 1 implementation diff and this closeout, authorize the documentation commit, then authorize push/PR review. Do not implement Phase 2 yet.
+- Framework decision: Laravel 13 is approved by the assessment authority according to user-confirmed communication. Approval evidence is user-reported; no written evidence is claimed.
+- Last committed checkpoint: task 2.1 commit on `phase/02-hall-structure-student-records` (see branch history).
+- Uncommitted work: Expected to be none after the task 2.1 commit. Do not push, open a PR, merge, or start task 2.2 without explicit authorization.
+- Next recommended action: Stop after task 2.1 and await authorization for the next Phase 2 task.
