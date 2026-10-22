@@ -25,6 +25,7 @@ class StoreComplaintRequest extends FormRequest
             'category' => ['required', Rule::enum(ComplaintCategory::class)],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
             'location' => [
                 'nullable',
                 'string',

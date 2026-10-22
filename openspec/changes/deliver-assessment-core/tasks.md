@@ -90,7 +90,7 @@ There are no implementation tasks in Phase 0.
 - [x] 5.2 Add complaint models, relationships, factories, supported categories, and derived aging behavior; verify model and days-open/overdue tests.
 - [x] 5.3 Add the annual tracking-counter persistence and transactional `KJH-YYYY-NNNN` generator; verify yearly reset and simultaneous-submission uniqueness.
 - [x] 5.4 Add approved-student complaint creation with Resident room autofill and Attached location input; verify Pending refusal and location behavior.
-- [ ] 5.5 Add private JPG/PNG upload validation, generated filenames, 2 MB limit, and cleanup on failed creation; verify unsafe and oversized files are rejected.
+- [x] 5.5 Add private JPG/PNG upload validation, generated filenames, 2 MB limit, and cleanup on failed creation; verify unsafe and oversized files are rejected.
 - [ ] 5.6 Add policy-scoped complaint lists with status/category filters and days-open/overdue values; verify students list only their own complaints and leadership receives documented scope.
 - [ ] 5.7 Add complaint detail and authorized private-image delivery; verify another student cannot view the complaint or download its image.
 - [ ] 5.8 Add complaint assignment using only roles and assignee types confirmed by C2 and C5; verify assignment authorization and tutor scope.

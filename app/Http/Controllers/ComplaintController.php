@@ -6,6 +6,7 @@ use App\Actions\Complaints\CreateComplaint;
 use App\Http\Requests\Complaints\StoreComplaintRequest;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\UploadedFile;
 use Inertia\Inertia;
 
 class ComplaintController extends Controller
@@ -22,7 +23,13 @@ class ComplaintController extends Controller
             abort(403);
         }
 
-        $complaint = $createComplaint->handle($studentProfile, $request->validated());
+        $image = $request->file('image');
+
+        $complaint = $createComplaint->handle(
+            $studentProfile,
+            $request->validated(),
+            $image instanceof UploadedFile ? $image : null,
+        );
 
         Inertia::flash('toast', [
             'type' => 'success',
