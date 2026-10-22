@@ -278,7 +278,10 @@ function AllocationForm({
     }
 
     return (
-        <form onSubmit={submit} className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
+        <form
+            onSubmit={submit}
+            className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end"
+        >
             <div className="grid gap-2">
                 <Label htmlFor="seat_id">Available seat</Label>
                 <Select

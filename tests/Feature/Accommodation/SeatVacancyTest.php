@@ -100,6 +100,49 @@ test('an already closed allocation cannot be vacated again', function () {
         ->vacancy_reason->toBe('Completed studies');
 });
 
+test('room capacity cannot fall below current occupancy and retains allocation history', function () {
+    $actor = vacancyUserWithRole('hall_office_staff');
+    $room = Room::factory()->create(['capacity' => 3]);
+    $seats = Seat::factory()->for($room)->count(2)->sequence(
+        ['label' => 'A'],
+        ['label' => 'B'],
+    )->create();
+    $allocations = $seats->map(fn (Seat $seat) => SeatAllocation::factory()
+        ->for(StudentProfile::factory()->create([
+            'registration_status' => RegistrationStatus::Approved,
+            'residency_status' => ResidencyStatus::Resident,
+        ]))
+        ->for($seat)
+        ->create());
+
+    $this->actingAs($actor)
+        ->put(route('rooms.update', $room), [
+            'room_no' => $room->room_no,
+            'floor' => $room->floor,
+            'capacity' => 1,
+        ])
+        ->assertSessionHasErrors([
+            'capacity' => 'Capacity cannot be lower than the seats already defined or currently occupied (2).',
+        ]);
+
+    expect($room->refresh()->capacity)->toBe(3)
+        ->and(Seat::query()->where('room_id', $room->id)->count())->toBe(2)
+        ->and(SeatAllocation::query()->whereKey($allocations->modelKeys())->count())->toBe(2);
+
+    $this->actingAs($actor)
+        ->put(route('rooms.update', $room), [
+            'room_no' => $room->room_no,
+            'floor' => $room->floor,
+            'capacity' => 2,
+        ])
+        ->assertRedirect(route('rooms.index'))
+        ->assertSessionHasNoErrors();
+
+    expect($room->refresh()->capacity)->toBe(2)
+        ->and(SeatAllocation::query()->whereKey($allocations->modelKeys())->where('active', true)->count())->toBe(2)
+        ->and(Seat::query()->where('room_id', $room->id)->count())->toBe(2);
+});
+
 test('a vacated seat can be reallocated without deleting the retained history', function () {
     $actor = vacancyUserWithRole('hall_office_staff');
     $seat = Seat::factory()->create();

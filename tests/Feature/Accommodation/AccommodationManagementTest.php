@@ -404,7 +404,7 @@ test('room capacity cannot be reduced below the seats already defined', function
             'capacity' => 1,
         ])
         ->assertSessionHasErrors([
-            'capacity' => 'Capacity cannot be lower than the number of seats already defined (2).',
+            'capacity' => 'Capacity cannot be lower than the seats already defined or currently occupied (2).',
         ]);
 
     expect($room->refresh()->capacity)->toBe(3);

@@ -1,7 +1,7 @@
 # Project Status
 
 - Current phase: Phase 3 - Seat Allocation and Vacancy on `phase/03-seat-allocation-vacancy`.
-- Implementation authorization: Phase 3 tasks 3.3-3.5 only (tasks 3.1-3.2 complete).
+- Implementation authorization: Phase 3 tasks 3.3-3.5 for this batch (now complete); task 3.6 is not authorized.
 - Phase branch creation authorization: Granted for `phase/03-seat-allocation-vacancy`, created from the Phase 2 integration merge.
 - Task-commit authorization: Granted for tasks 3.3-3.5. Push/PR/merge authorization: NONE.
 - Integration branch: `main` at `52d1468`, the Phase 2 integration merge.
@@ -34,10 +34,14 @@
 - Phase 3 task 3.3 verification: Focused `SeatAllocationTest` and `AccommodationManagementTest` pass (40 tests, 495 assertions). `vendor/bin/pint --dirty --format agent` and `npm run types:check` pass.
 - Phase 3 task 3.4 implementation: Added the transactional `VacateSeat` action, vacancy Form Request, `allocations.vacate` route, controller action, and a student-profile vacancy control with required date and reason. Vacancy locks the allocation and student, closes the allocation with a null active marker, records the date and reason, and returns the student to Attached. Allocation history is retained and the freed seat can be allocated again.
 - Phase 3 task 3.4 verification: Focused `SeatVacancyTest` passes (9 tests, 82 assertions). `vendor/bin/pint --dirty --format agent` and `npm run types:check` pass.
+- Phase 3 task 3.5 implementation: Room capacity updates now refuse a capacity below the greater of defined seats or active occupants. The guard reads active allocations through `Room::seatAllocations`, and verified capacity reductions leave seat records and allocation history untouched. The room edit page describes the combined constraint.
+- Phase 3 task 3.5 verification: Focused `SeatVacancyTest` and `AccommodationManagementTest` pass (39 tests, 500 assertions).
+- Phase 3 tasks 3.3-3.5 batch verification: `composer ci:check` passes (268 tests, 1675 assertions; npm formatting/lint, TypeScript, Pint, and PHPStan with 0 errors). `npm run build`, `openspec validate deliver-assessment-core --strict`, and `git diff --check` pass. The known non-fatal PHPStan turbo-extension warning remains.
 - Task 3.1 commit mapping: The task 3.1 Conventional Commit contains its implementation, focused tests, task checkbox, and status update.
 - Task 3.2 commit mapping: The task 3.2 Conventional Commit contains its implementation, focused tests, task checkbox, and status update.
 - Task 3.3 commit mapping: The task 3.3 Conventional Commit contains its implementation, focused tests, task checkbox, authorization-ledger update, and status update.
 - Task 3.4 commit mapping: The task 3.4 Conventional Commit contains its implementation, focused tests, task checkbox, and status update.
+- Task 3.5 commit mapping: The task 3.5 Conventional Commit contains its implementation, focused tests, task checkbox, and status update.
 - Task 2.1 commit mapping: The task 2.1 Conventional Commit contains its implementation, focused test, task checkbox, and status update.
 - Task 2.2 commit mapping: The task 2.2 Conventional Commit contains its implementation, focused test, task checkbox, and status update.
 - Task 2.3 commit mapping: The task 2.3 Conventional Commit contains its implementation, focused test, task checkbox, and status update.
@@ -49,6 +53,6 @@
 - Unresolved clarifications: C1 Super Admin complaint closure; C2 Super Admin complaint assignment; C3 rejection and tutor transition permissions; C4 reopening boundary/timezone; C5 eligible assignees and commenters; C8 tutor onboarding; C10 Attached complaint block association; C11 repeated-resolution timing.
 - Framework decision: Laravel 13 is approved by the assessment authority according to user-confirmed communication. Approval evidence is user-reported; no written evidence is claimed.
 - Phase 3 tasks 3.1-3.2 batch verification: `composer ci:check` passes (257 tests, 1536 assertions; npm formatting/lint, TypeScript, Pint, and PHPStan with 0 errors). `npm run build`, `openspec validate deliver-assessment-core --strict`, and `git diff --check` pass. The known non-fatal PHPStan turbo-extension warning remains.
-- Last committed checkpoint: the task 3.2 implementation and PHPStan correction commits on `phase/03-seat-allocation-vacancy`. Task 3.3 changes are committed with this status update.
-- Uncommitted work: Expected to be none after the quality-gate commit. Do not push, open a PR, or merge without explicit authorization.
-- Next recommended action: Stop after task 3.2. Do not start tasks 3.3-3.6 without explicit authorization. Tasks 2.6-2.7 remain unchecked until their named Phase 3/4.4 checkpoints are implemented and verified.
+- Last committed checkpoint: tasks 3.3-3.5 are committed on `phase/03-seat-allocation-vacancy` with this status update.
+- Uncommitted work: Expected to be none after the task 3.5 commit. Do not push, open a PR, or merge without explicit authorization.
+- Next recommended action: Stop after task 3.5. Task 3.6 (MySQL concurrency and migration verification) requires explicit authorization. Tasks 2.6-2.7 remain unchecked until their named checkpoints are separately implemented and verified.

@@ -59,12 +59,16 @@ class UpdateRoomRequest extends FormRequest
                 }
 
                 $seatsCount = $room->seats()->count();
+                $occupiedSeats = $room->seatAllocations()
+                    ->where('active', true)
+                    ->count();
+                $minimumCapacity = max($seatsCount, $occupiedSeats);
 
-                if ($this->integer('capacity') < $seatsCount) {
+                if ($this->integer('capacity') < $minimumCapacity) {
                     $validator->errors()->add(
                         'capacity',
-                        __('Capacity cannot be lower than the number of seats already defined (:count).', [
-                            'count' => $seatsCount,
+                        __('Capacity cannot be lower than the seats already defined or currently occupied (:count).', [
+                            'count' => $minimumCapacity,
                         ]),
                     );
                 }
