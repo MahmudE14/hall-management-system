@@ -99,9 +99,11 @@ function RegistrationCard({
     const rejectForm = useForm({ reason: '' });
 
     function approve() {
-        router.post(RegistrationController.approve.url(profile), {
-            preserveScroll: true,
-        });
+        router.post(
+            RegistrationController.approve.url(profile),
+            {},
+            { preserveScroll: true },
+        );
     }
 
     function reject() {
