@@ -109,7 +109,7 @@ There are no implementation tasks in Phase 0.
 
 **Entry:** Phase 1 is complete and `docs/PROJECT_STATUS.md` explicitly authorizes Phase 6.
 
-- [ ] 6.1 Add notice migration, model, enums, relationships, and factory; verify Draft/Published state and category behavior.
+- [x] 6.1 Add notice migration, model, enums, relationships, and factory; verify Draft/Published state and category behavior.
 - [ ] 6.2 Add PDF storage validation with generated filenames, executable rejection, and 5 MB limit; verify accepted and rejected uploads.
 - [ ] 6.3 Add notice Form Requests, policies, routes, and create/list controllers; verify Office Staff/Provost/Super Admin publishing, Club Admin category restriction, and unauthorized `403` responses.
 - [ ] 6.4 Add authorized notice create/list pages; verify role-aware controls, validation errors, and success feedback.
