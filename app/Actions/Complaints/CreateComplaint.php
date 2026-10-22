@@ -2,6 +2,7 @@
 
 namespace App\Actions\Complaints;
 
+use App\Enums\ComplaintCategory;
 use App\Enums\ComplaintStatus;
 use App\Models\Complaint;
 use App\Models\StudentProfile;
@@ -17,7 +18,7 @@ class CreateComplaint
     ) {}
 
     /**
-     * @param  array{category: string, title: string, description: string, location?: string|null}  $attributes
+     * @param  array{category: ComplaintCategory, title: string, description: string, location?: string|null}  $attributes
      */
     public function handle(
         StudentProfile $studentProfile,

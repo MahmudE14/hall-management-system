@@ -51,11 +51,17 @@ class ComplaintController extends Controller
             abort(403);
         }
 
+        $data = $request->validated();
         $image = $request->file('image');
 
         $complaint = $createComplaint->handle(
             $studentProfile,
-            $request->validated(),
+            [
+                'category' => ComplaintCategory::from((string) $data['category']),
+                'title' => (string) $data['title'],
+                'description' => (string) $data['description'],
+                'location' => isset($data['location']) ? (string) $data['location'] : null,
+            ],
             $image instanceof UploadedFile ? $image : null,
         );
 
