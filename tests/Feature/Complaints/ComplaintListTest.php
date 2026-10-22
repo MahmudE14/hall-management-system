@@ -116,13 +116,19 @@ test('leadership lists every complaint within the selected filters', function (s
         );
 })->with(['super_admin', 'provost', 'hall_office_staff']);
 
-test('a tutor lists only complaints whose room is in an assigned block', function () {
+test('a tutor lists only complaints assigned to them', function () {
     $assignedBlock = Block::factory()->create();
     $otherBlock = Block::factory()->create();
     $tutor = complaintListTutor([$assignedBlock]);
-    $visible = complaintListComplaintInBlock($assignedBlock);
-    $other = complaintListComplaintInBlock($otherBlock);
-    $attached = Complaint::factory()->create([
+    $otherTutor = complaintListTutor([$otherBlock]);
+    $visible = complaintListComplaintInBlock($otherBlock, [
+        'assignee_id' => $tutor->id,
+    ]);
+    $unassignedInAssignedBlock = complaintListComplaintInBlock($assignedBlock);
+    $assignedToAnotherTutor = complaintListComplaintInBlock($assignedBlock, [
+        'assignee_id' => $otherTutor->id,
+    ]);
+    $unassignedAttached = Complaint::factory()->create([
         'location' => 'North Block corridor',
         'category' => ComplaintCategory::Security,
     ]);
@@ -134,19 +140,40 @@ test('a tutor lists only complaints whose room is in an assigned block', functio
             ->has('complaints.data', 1)
             ->where('complaints.total', 1)
             ->where('complaints.data.0.id', $visible->id)
-            ->where('complaints.data.0.id', fn (int $id) => ! in_array($id, [$other->id, $attached->id], true))
+            ->where('complaints.data.0.id', fn (int $id) => ! in_array($id, [
+                $unassignedInAssignedBlock->id,
+                $assignedToAnotherTutor->id,
+                $unassignedAttached->id,
+            ], true))
         );
 });
 
-test('crafted filters cannot widen a tutor block scope', function () {
+test('a tutor can list an assigned complaint without a room block', function () {
+    $tutor = complaintListTutor([]);
+    $assigned = Complaint::factory()->create([
+        'assignee_id' => $tutor->id,
+        'location' => 'North Block corridor',
+    ]);
+
+    $this->actingAs($tutor)
+        ->get(route('complaints.index'))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->has('complaints.data', 1)
+            ->where('complaints.total', 1)
+            ->where('complaints.data.0.id', $assigned->id)
+        );
+});
+
+test('crafted filters cannot widen a tutor assignment scope', function () {
     $assignedBlock = Block::factory()->create();
-    $otherBlock = Block::factory()->create();
     $tutor = complaintListTutor([$assignedBlock]);
     complaintListComplaintInBlock($assignedBlock, [
+        'assignee_id' => $tutor->id,
         'category' => ComplaintCategory::Water,
         'status' => ComplaintStatus::Submitted,
     ]);
-    $other = complaintListComplaintInBlock($otherBlock, [
+    $other = complaintListComplaintInBlock($assignedBlock, [
         'category' => ComplaintCategory::Electricity,
         'status' => ComplaintStatus::UnderReview,
     ]);
@@ -155,7 +182,7 @@ test('crafted filters cannot widen a tutor block scope', function () {
         ->get(route('complaints.index', [
             'category' => $other->category->value,
             'status' => $other->status->value,
-            'block' => $otherBlock->id,
+            'block' => $assignedBlock->id,
         ]))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
@@ -164,17 +191,20 @@ test('crafted filters cannot widen a tutor block scope', function () {
         );
 });
 
-test('a tutor without active block assignments cannot list complaints', function (string $scope) {
+test('an inactive or role-only tutor cannot list complaints even when assigned', function (string $scope) {
+    $complaint = Complaint::factory()->create();
+
     $tutor = match ($scope) {
-        'no blocks' => complaintListTutor([]),
-        'inactive' => complaintListTutor([Block::factory()->create()], isActive: false),
+        'inactive' => complaintListTutor([], isActive: false),
         default => complaintListUserWithRole('house_tutor'),
     };
+
+    $complaint->update(['assignee_id' => $tutor->id]);
 
     $this->actingAs($tutor)
         ->get(route('complaints.index'))
         ->assertForbidden();
-})->with(['no blocks', 'inactive', 'no tutor profile']);
+})->with(['inactive', 'no tutor profile']);
 
 test('a user without a complaint role cannot list complaints', function () {
     $this->actingAs(User::factory()->create())

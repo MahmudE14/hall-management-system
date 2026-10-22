@@ -19,8 +19,8 @@ class ComplaintPolicy
 
         $tutorProfile = $user->tutorProfile;
 
-        return $tutorProfile?->is_active === true
-            && $tutorProfile->blocks()->exists();
+        return $user->hasRole('house_tutor')
+            && $tutorProfile?->is_active === true;
     }
 
     public function view(User $user, Complaint $complaint): bool

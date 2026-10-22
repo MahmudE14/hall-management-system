@@ -111,18 +111,12 @@ class Complaint extends Model
         }
 
         $tutorProfile = $user->tutorProfile;
-        $blockIds = $tutorProfile?->is_active === true
-            ? $tutorProfile->blocks()->pluck('blocks.id')->all()
-            : [];
 
-        if ($blockIds === []) {
-            return $query->whereRaw('1 = 0');
+        if ($user->hasRole('house_tutor') && $tutorProfile?->is_active === true) {
+            return $query->where('assignee_id', $user->id);
         }
 
-        return $query->whereHas(
-            'room',
-            fn (Builder $query) => $query->whereIn('block_id', $blockIds),
-        );
+        return $query->whereRaw('1 = 0');
     }
 
     /** @return array<string, string> */

@@ -92,19 +92,26 @@ test('leadership can view and download any complaint image', function (string $r
     expect($response->streamedContent())->toBe('image-bytes');
 })->with(['super_admin', 'provost', 'hall_office_staff']);
 
-test('a tutor can view and download images only for complaints in assigned blocks', function () {
+test('a tutor can view and download images only for complaints assigned to them', function () {
     Storage::fake('local');
 
     $assignedBlock = Block::factory()->create();
-    $otherBlock = Block::factory()->create();
     $tutor = complaintDetailTutor([$assignedBlock]);
-    $visible = complaintDetailComplaintInBlock($assignedBlock, [
+    $otherTutor = complaintDetailTutor([$assignedBlock]);
+    $visible = Complaint::factory()->create([
+        'assignee_id' => $tutor->id,
+        'location' => 'North Block corridor',
         'image_path' => 'complaints/visible.png',
     ]);
-    $other = complaintDetailComplaintInBlock($otherBlock, [
+    $unassignedInAssignedBlock = complaintDetailComplaintInBlock($assignedBlock, [
+        'image_path' => 'complaints/unassigned.png',
+    ]);
+    $assignedToAnotherTutor = complaintDetailComplaintInBlock($assignedBlock, [
+        'assignee_id' => $otherTutor->id,
         'image_path' => 'complaints/other.png',
     ]);
     Storage::disk('local')->put('complaints/visible.png', 'visible-bytes');
+    Storage::disk('local')->put('complaints/unassigned.png', 'unassigned-bytes');
     Storage::disk('local')->put('complaints/other.png', 'other-bytes');
 
     $this->actingAs($tutor)
@@ -117,16 +124,18 @@ test('a tutor can view and download images only for complaints in assigned block
 
     expect($response->streamedContent())->toBe('visible-bytes');
 
-    $this->actingAs($tutor)
-        ->get(route('complaints.show', $other))
-        ->assertForbidden();
+    foreach ([$unassignedInAssignedBlock, $assignedToAnotherTutor] as $forbidden) {
+        $this->actingAs($tutor)
+            ->get(route('complaints.show', $forbidden))
+            ->assertForbidden();
 
-    $this->actingAs($tutor)
-        ->get(route('complaints.image', $other))
-        ->assertForbidden();
+        $this->actingAs($tutor)
+            ->get(route('complaints.image', $forbidden))
+            ->assertForbidden();
+    }
 });
 
-test('a tutor cannot view a complaint with no room block association', function () {
+test('a tutor cannot view an unassigned roomless complaint', function () {
     $tutor = complaintDetailTutor([Block::factory()->create()]);
     $attached = Complaint::factory()->create([
         'location' => 'North Block corridor',
@@ -142,15 +151,18 @@ test('a tutor cannot view a complaint with no room block association', function 
         ->assertForbidden();
 });
 
-test('a tutor without active block assignments cannot view complaints', function () {
-    $complaint = Complaint::factory()->create();
+test('an inactive or role-only tutor cannot view an assigned complaint', function () {
+    $inactive = complaintDetailTutor([], isActive: false);
+    $roleOnly = complaintDetailUserWithRole('house_tutor');
+    $inactiveComplaint = Complaint::factory()->create(['assignee_id' => $inactive->id]);
+    $roleOnlyComplaint = Complaint::factory()->create(['assignee_id' => $roleOnly->id]);
 
-    $this->actingAs(complaintDetailTutor([], isActive: false))
-        ->get(route('complaints.show', $complaint))
+    $this->actingAs($inactive)
+        ->get(route('complaints.show', $inactiveComplaint))
         ->assertForbidden();
 
-    $this->actingAs(complaintDetailUserWithRole('house_tutor'))
-        ->get(route('complaints.show', $complaint))
+    $this->actingAs($roleOnly)
+        ->get(route('complaints.show', $roleOnlyComplaint))
         ->assertForbidden();
 });
 
