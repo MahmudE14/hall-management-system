@@ -48,7 +48,7 @@ There are no implementation tasks in Phase 0.
 
 - [x] 2.1 Add Hall and Block migrations, models, relationships, and factories; verify relationship and persistence tests pass.
 - [x] 2.2 Add Room and Seat migrations, models, relationships, factories, capacity validation, foreign keys, and indexes; verify room/seat relationship and capacity tests pass on SQLite.
-- [ ] 2.3 Add Form Requests, policies, routes, and controllers for block, room, and seat management; verify Hall Office Staff and Super Admin management, Provost view-only access, and other-role `403` responses.
+- [x] 2.3 Add Form Requests, policies, routes, and controllers for block, room, and seat management; verify Hall Office Staff and Super Admin management, Provost view-only access, and other-role `403` responses.
 - [ ] 2.4 Add block and room list/create/edit pages with occupied and free seat counts; verify Inertia props, validation feedback, and occupancy calculations.
 - [ ] 2.5 Add explicit seat management and safe room-capacity reconciliation; verify seat creation/editing cannot invalidate occupancy or allocation history.
 - [ ] 2.6 Add the eager-loaded paginated student directory with name/registration search and block/department/session/status filters; verify own-only, all-record, combined-filter, pagination, and bounded-query behavior. Tutor assigned-block scope is completed in task 4.4 after tutor assignments exist.

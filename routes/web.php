@@ -1,13 +1,21 @@
 <?php
 
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\BlockController;
 use App\Http\Controllers\RegistrationController;
+use App\Http\Controllers\RoomController;
+use App\Http\Controllers\SeatController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
+
+    Route::resource('blocks', BlockController::class)->only(['index', 'create', 'store', 'edit', 'update']);
+    Route::resource('rooms', RoomController::class)->only(['index', 'create', 'store', 'edit', 'update']);
+    Route::post('rooms/{room}/seats', [SeatController::class, 'store'])->name('seats.store');
+    Route::put('seats/{seat}', [SeatController::class, 'update'])->name('seats.update');
 });
 
 Route::middleware(['auth', 'verified', 'role:super_admin,provost,hall_office_staff'])->group(function () {
