@@ -6,11 +6,13 @@ use App\Actions\Complaints\AssignComplaint;
 use App\Actions\Complaints\CreateComplaint;
 use App\Enums\ComplaintCategory;
 use App\Enums\ComplaintStatus;
+use App\Enums\RegistrationStatus;
 use App\Http\Requests\Complaints\AssignComplaintRequest;
 use App\Http\Requests\Complaints\StoreComplaintCommentRequest;
 use App\Http\Requests\Complaints\StoreComplaintRequest;
 use App\Models\Complaint;
 use App\Models\ComplaintComment;
+use App\Models\ComplaintStatusLog;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -62,6 +64,8 @@ class ComplaintController extends Controller
             ],
             'statuses' => array_column(ComplaintStatus::cases(), 'value'),
             'categories' => array_column(ComplaintCategory::cases(), 'value'),
+            'can_create' => $user->hasRole('student')
+                && $user->studentProfile?->registration_status === RegistrationStatus::Approved,
         ]);
     }
 
@@ -70,7 +74,12 @@ class ComplaintController extends Controller
         Gate::authorize('view', $complaint);
 
         return Inertia::render('complaints/show', [
-            'complaint' => $this->serializeComplaint($complaint, includeDescription: true, includeComments: true),
+            'complaint' => $this->serializeComplaint(
+                $complaint,
+                includeDescription: true,
+                includeComments: true,
+                includeTimeline: true,
+            ),
         ]);
     }
 
@@ -190,11 +199,16 @@ class ComplaintController extends Controller
         Complaint $complaint,
         bool $includeDescription = false,
         bool $includeComments = false,
+        bool $includeTimeline = false,
     ): array {
-        $complaint->loadMissing(['studentProfile.user', 'room.block']);
+        $complaint->loadMissing(['studentProfile.user', 'room.block', 'assignee']);
 
         if ($includeComments) {
             $complaint->loadMissing('comments.author');
+        }
+
+        if ($includeTimeline) {
+            $complaint->loadMissing('statusLogs.actor');
         }
 
         $room = $complaint->room;
@@ -213,6 +227,11 @@ class ComplaintController extends Controller
             'days_open' => $complaint->daysOpen(),
             'is_overdue' => $complaint->isOverdue(),
             'created_at' => $complaint->created_at->toIso8601String(),
+            'assignee' => $complaint->assignee === null ? null : [
+                'id' => $complaint->assignee->id,
+                'name' => $complaint->assignee->name,
+            ],
+            'assigned_at' => $complaint->assigned_at?->toIso8601String(),
             'image_url' => $complaint->image_path === null
                 ? null
                 : route('complaints.image', $complaint),
@@ -227,6 +246,22 @@ class ComplaintController extends Controller
                         ],
                         'body' => $comment->body,
                         'created_at' => $comment->created_at?->toIso8601String(),
+                    ])
+                    ->values()
+                    ->all(),
+            ] : []),
+            ...($includeTimeline ? [
+                'status_history' => $complaint->statusLogs
+                    ->map(fn (ComplaintStatusLog $log): array => [
+                        'id' => $log->id,
+                        'from_status' => $log->from_status?->value,
+                        'status' => $log->status->value,
+                        'note' => $log->note,
+                        'actor' => $log->actor === null ? null : [
+                            'id' => $log->actor->id,
+                            'name' => $log->actor->name,
+                        ],
+                        'created_at' => $log->created_at?->toIso8601String(),
                     ])
                     ->values()
                     ->all(),
