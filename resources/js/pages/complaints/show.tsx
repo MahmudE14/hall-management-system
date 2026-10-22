@@ -17,6 +17,7 @@ import {
     index as complaintsIndex,
 } from '@/routes/complaints';
 import { store as storeComment } from '@/routes/complaints/comments';
+import { store as storeTransition } from '@/routes/complaints/transitions';
 
 type Assignee = {
     id: number;
@@ -91,11 +92,13 @@ export default function ComplaintShow({
     can_assign: canAssign,
     can_comment: canComment,
     eligible_assignees: eligibleAssignees = [],
+    available_transitions: availableTransitions,
 }: {
     complaint: Complaint;
     can_assign: boolean;
     can_comment: boolean;
     eligible_assignees?: EligibleAssignee[];
+    available_transitions: string[];
 }) {
     const timeline: TimelineItem[] = [
         ...complaint.status_history.map((entry) => ({
@@ -115,7 +118,9 @@ export default function ComplaintShow({
             new Date(left.created_at).getTime() -
             new Date(right.created_at).getTime();
 
-        return difference !== 0 ? difference : left.key.localeCompare(right.key);
+        return difference !== 0
+            ? difference
+            : left.key.localeCompare(right.key);
     });
 
     return (
@@ -248,7 +253,9 @@ export default function ComplaintShow({
                             <AssignComplaintForm
                                 complaintId={complaint.id}
                                 assignees={eligibleAssignees}
-                                currentAssigneeId={complaint.assignee?.id ?? null}
+                                currentAssigneeId={
+                                    complaint.assignee?.id ?? null
+                                }
                             />
                         )}
                     </section>
@@ -279,6 +286,22 @@ export default function ComplaintShow({
                             src={complaint.image_url}
                             alt="Complaint attachment"
                             className="mt-3 max-h-80 rounded-lg border border-sidebar-border/70 object-contain dark:border-sidebar-border"
+                        />
+                    </section>
+                )}
+
+                {availableTransitions.length > 0 && (
+                    <section className="rounded-xl border border-sidebar-border/70 p-4 dark:border-sidebar-border">
+                        <h2 className="font-medium">Update status</h2>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                            Only transitions permitted for your role and this
+                            complaint are shown.
+                        </p>
+                        <TransitionForm
+                            key={complaint.status}
+                            complaintId={complaint.id}
+                            currentStatus={complaint.status}
+                            transitions={availableTransitions}
                         />
                     </section>
                 )}
@@ -315,9 +338,7 @@ export default function ComplaintShow({
                         </ol>
                     )}
 
-                    {canComment && (
-                        <CommentForm complaintId={complaint.id} />
-                    )}
+                    {canComment && <CommentForm complaintId={complaint.id} />}
                 </section>
             </div>
         </>
@@ -362,6 +383,118 @@ function CommentTimelineEntry({ entry }: { entry: Comment }) {
             <p className="mt-2 whitespace-pre-wrap">{entry.body}</p>
         </div>
     );
+}
+
+function TransitionForm({
+    complaintId,
+    currentStatus,
+    transitions,
+}: {
+    complaintId: number;
+    currentStatus: string;
+    transitions: string[];
+}) {
+    const form = useForm({
+        status: transitions[0] ?? '',
+        note: '',
+    });
+    const requiresNote =
+        form.data.status === 'rejected' || form.data.status === 'resolved';
+
+    function submit(event: React.FormEvent) {
+        event.preventDefault();
+
+        form.post(storeTransition.url(complaintId), {
+            preserveScroll: true,
+        });
+    }
+
+    return (
+        <form onSubmit={submit} className="mt-4 space-y-3">
+            <div className="grid gap-2">
+                <Label htmlFor="transition_status">New status</Label>
+                <select
+                    id="transition_status"
+                    value={form.data.status}
+                    onChange={(event) =>
+                        form.setData('status', event.target.value)
+                    }
+                    aria-invalid={Boolean(form.errors.status)}
+                    className="flex h-9 w-full max-w-sm rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive"
+                >
+                    {transitions.map((status) => (
+                        <option key={status} value={status}>
+                            {formatValue(status)}
+                        </option>
+                    ))}
+                </select>
+                <InputError message={form.errors.status} />
+            </div>
+
+            <div className="grid gap-2">
+                <Label htmlFor="transition_note">
+                    {requiresNote
+                        ? noteLabel(form.data.status)
+                        : 'Note (optional)'}
+                </Label>
+                <textarea
+                    id="transition_note"
+                    rows={3}
+                    value={form.data.note}
+                    required={requiresNote}
+                    onChange={(event) =>
+                        form.setData('note', event.target.value)
+                    }
+                    aria-invalid={Boolean(form.errors.note)}
+                    className="flex min-h-24 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40"
+                />
+                <InputError message={form.errors.note} />
+            </div>
+
+            <Button
+                type="submit"
+                disabled={
+                    form.processing ||
+                    (requiresNote && form.data.note.trim() === '')
+                }
+            >
+                {form.processing
+                    ? 'Updating...'
+                    : transitionActionLabel(form.data.status, currentStatus)}
+            </Button>
+        </form>
+    );
+}
+
+function noteLabel(status: string) {
+    if (status === 'rejected') {
+        return 'Rejection reason';
+    }
+
+    if (status === 'resolved') {
+        return 'Resolution note';
+    }
+
+    return 'Note';
+}
+
+function transitionActionLabel(status: string, currentStatus: string) {
+    switch (status) {
+        case 'under_review':
+            return 'Move to under review';
+        case 'in_progress':
+            return currentStatus === 'resolved'
+                ? 'Reopen complaint'
+                : 'Mark in progress';
+        case 'resolved':
+            return 'Resolve complaint';
+        case 'closed':
+            return 'Close complaint';
+        case 'rejected':
+            return 'Reject complaint';
+        default:
+            return 'Update status';
+    }
 }
 
 function AssignComplaintForm({

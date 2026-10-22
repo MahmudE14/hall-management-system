@@ -120,7 +120,9 @@ export default function ComplaintsIndex({
                         <select
                             id="category"
                             value={category}
-                            onChange={(event) => setCategory(event.target.value)}
+                            onChange={(event) =>
+                                setCategory(event.target.value)
+                            }
                             className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
                         >
                             <option value="">All categories</option>
@@ -191,7 +193,9 @@ export default function ComplaintsIndex({
                                                 {complaint.tracking_id}
                                             </p>
                                             <p className="mt-1 text-muted-foreground">
-                                                {formatDate(complaint.created_at)}
+                                                {formatDate(
+                                                    complaint.created_at,
+                                                )}
                                             </p>
                                         </td>
                                         <td className="px-4 py-3 align-top">
@@ -230,8 +234,7 @@ export default function ComplaintsIndex({
                                             {complaint.room_no ? (
                                                 <div>
                                                     <p className="font-medium">
-                                                        Room{' '}
-                                                        {complaint.room_no}
+                                                        Room {complaint.room_no}
                                                     </p>
                                                     <p className="text-muted-foreground">
                                                         {complaint.block ??

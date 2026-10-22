@@ -101,7 +101,7 @@ There are no implementation tasks in Phase 0.
 - [x] 5.13 Add the student complaint-submission page; verify room/location behavior, file validation, field errors, and success feedback.
 - [x] 5.14 Add complaint list, detail, timeline, and overdue interfaces; verify role-scoped Inertia props, filters, empty states, and private-media links.
 - [x] 5.15 Add staff assignment and comment controls; verify controls follow C2/C5 permissions and successful actions preserve timeline order.
-- [ ] 5.16 Add transition controls and perform focused browser review; verify controls follow C1/C3/C4, validation errors remain visible, and no unauthorized control grants server access.
+- [x] 5.16 Add transition controls and perform focused browser review; verify controls follow C1/C3/C4, validation errors remain visible, and no unauthorized control grants server access.
 
 **Exit:** Tasks 5.1-5.16 are complete; all C1-C5/C11 decisions are captured; complaint submission, privacy, tracking, assignment, comments, transitions, audit, timing, and UI checks pass; `docs/PROJECT_STATUS.md` is updated; implementation stops.
 

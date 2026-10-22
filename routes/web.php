@@ -43,6 +43,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('complaints/{complaint}/comments', [ComplaintController::class, 'comment'])
         ->whereNumber('complaint')
         ->name('complaints.comments.store');
+    Route::post('complaints/{complaint}/transitions', [ComplaintController::class, 'transition'])
+        ->whereNumber('complaint')
+        ->name('complaints.transitions.store');
 });
 
 Route::middleware(['auth', 'verified', 'approved.student'])->group(function () {

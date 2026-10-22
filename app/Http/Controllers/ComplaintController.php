@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Actions\Complaints\AssignComplaint;
 use App\Actions\Complaints\CreateComplaint;
+use App\Actions\Complaints\TransitionComplaint;
 use App\Enums\ComplaintCategory;
 use App\Enums\ComplaintStatus;
 use App\Enums\RegistrationStatus;
 use App\Http\Requests\Complaints\AssignComplaintRequest;
 use App\Http\Requests\Complaints\StoreComplaintCommentRequest;
 use App\Http\Requests\Complaints\StoreComplaintRequest;
+use App\Http\Requests\Complaints\TransitionComplaintRequest;
 use App\Models\Complaint;
 use App\Models\ComplaintComment;
 use App\Models\ComplaintStatusLog;
@@ -69,10 +71,15 @@ class ComplaintController extends Controller
         ]);
     }
 
-    public function show(Complaint $complaint): Response
-    {
+    public function show(
+        Request $request,
+        Complaint $complaint,
+        TransitionComplaint $transitionComplaint,
+    ): Response {
         Gate::authorize('view', $complaint);
 
+        /** @var User $user */
+        $user = $request->user();
         $canAssign = Gate::allows('assign', $complaint);
 
         return Inertia::render('complaints/show', [
@@ -84,8 +91,36 @@ class ComplaintController extends Controller
             ),
             'can_assign' => $canAssign,
             'can_comment' => Gate::allows('comment', $complaint),
+            'available_transitions' => array_map(
+                fn (ComplaintStatus $status): string => $status->value,
+                $transitionComplaint->availableTransitions($complaint, $user),
+            ),
             ...($canAssign ? ['eligible_assignees' => $this->eligibleAssignees()] : []),
         ]);
+    }
+
+    public function transition(
+        TransitionComplaintRequest $request,
+        Complaint $complaint,
+        TransitionComplaint $transitionComplaint,
+    ): RedirectResponse {
+        Gate::authorize('view', $complaint);
+
+        /** @var User $user */
+        $user = $request->user();
+
+        $transitionComplaint->handle(
+            $complaint,
+            ComplaintStatus::from((string) $request->validated('status')),
+            $user,
+            $request->validated('note') === null
+                ? null
+                : (string) $request->validated('note'),
+        );
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Complaint status updated.')]);
+
+        return to_route('complaints.show', $complaint);
     }
 
     public function image(Complaint $complaint): StreamedResponse

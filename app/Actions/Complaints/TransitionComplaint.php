@@ -106,37 +106,74 @@ class TransitionComplaint
         });
     }
 
+    /**
+     * @return array<int, ComplaintStatus>
+     */
+    public function availableTransitions(Complaint $complaint, User $actor): array
+    {
+        $fromStatus = $complaint->status;
+
+        return array_values(array_filter(
+            self::ALLOWED_TRANSITIONS[$fromStatus->value] ?? [],
+            fn (ComplaintStatus $toStatus): bool => $this->isTransitionAuthorized(
+                $complaint,
+                $fromStatus,
+                $toStatus,
+                $actor,
+            ),
+        ));
+    }
+
     private function authorizeTransition(
         Complaint $complaint,
         ComplaintStatus $fromStatus,
         ComplaintStatus $toStatus,
         User $actor,
     ): void {
-        $edge = $fromStatus->value.':'.$toStatus->value;
-
-        if ($actor->hasAnyRole('hall_office_staff', 'provost', 'super_admin')) {
-            if (in_array($edge, self::STAFF_TRANSITIONS, true)) {
-                return;
-            }
-
-            if ($edge === 'resolved:closed' && $actor->hasAnyRole('hall_office_staff', 'provost')) {
-                return;
-            }
-
-            throw new AuthorizationException(__('You are not allowed to perform this complaint transition.'));
-        }
-
-        if ($this->isAssignedActiveTutor($complaint, $actor) && in_array($edge, self::TUTOR_TRANSITIONS, true)) {
+        if ($this->isTransitionAuthorized($complaint, $fromStatus, $toStatus, $actor)) {
             return;
         }
+
+        $edge = $fromStatus->value.':'.$toStatus->value;
 
         if ($edge === 'resolved:in_progress' && $this->isComplaintOwner($complaint, $actor)) {
             $this->authorizeReopeningWindow($complaint);
-
-            return;
         }
 
         throw new AuthorizationException(__('You are not allowed to perform this complaint transition.'));
+    }
+
+    private function isTransitionAuthorized(
+        Complaint $complaint,
+        ComplaintStatus $fromStatus,
+        ComplaintStatus $toStatus,
+        User $actor,
+    ): bool {
+        $edge = $fromStatus->value.':'.$toStatus->value;
+
+        if (
+            $actor->hasAnyRole('hall_office_staff', 'provost', 'super_admin')
+            && in_array($edge, self::STAFF_TRANSITIONS, true)
+        ) {
+            return true;
+        }
+
+        if (
+            $edge === 'resolved:closed'
+            && $actor->hasAnyRole('hall_office_staff', 'provost')
+        ) {
+            return true;
+        }
+
+        if ($this->isAssignedActiveTutor($complaint, $actor) && in_array($edge, self::TUTOR_TRANSITIONS, true)) {
+            return true;
+        }
+
+        if ($edge === 'resolved:in_progress' && $this->isComplaintOwner($complaint, $actor)) {
+            return $this->isWithinReopeningWindow($complaint);
+        }
+
+        return false;
     }
 
     private function isAssignedActiveTutor(Complaint $complaint, User $actor): bool
@@ -155,6 +192,10 @@ class TransitionComplaint
 
     private function authorizeReopeningWindow(Complaint $complaint): void
     {
+        if ($this->isWithinReopeningWindow($complaint)) {
+            return;
+        }
+
         $resolvedAt = $complaint->resolved_at?->copy()->utc();
 
         if ($resolvedAt === null) {
@@ -163,11 +204,20 @@ class TransitionComplaint
             ]);
         }
 
-        if (now()->utc()->greaterThan($resolvedAt->addHours(168))) {
-            throw ValidationException::withMessages([
-                'status' => __('The complaint can no longer be reopened.'),
-            ]);
+        throw ValidationException::withMessages([
+            'status' => __('The complaint can no longer be reopened.'),
+        ]);
+    }
+
+    private function isWithinReopeningWindow(Complaint $complaint): bool
+    {
+        $resolvedAt = $complaint->resolved_at?->copy()->utc();
+
+        if ($resolvedAt === null) {
+            return false;
         }
+
+        return ! now()->utc()->greaterThan($resolvedAt->addHours(168));
     }
 
     private function validateTransitionNote(ComplaintStatus $toStatus, ?string $note): ?string
