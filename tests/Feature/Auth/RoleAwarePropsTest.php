@@ -34,6 +34,16 @@ test('shared auth props expose the student registration status', function () {
         );
 });
 
+test('shared auth props expose every role for multi-role users', function () {
+    $user = userWithRoles(['club_admin', 'student']);
+
+    $this->actingAs($user)
+        ->get(route('dashboard'))
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('auth.user.roles', fn ($roles) => collect($roles)->sort()->values()->all() === ['club_admin', 'student'])
+        );
+});
+
 test('staff-only registration routes reject roles without documented access', function (string $role) {
     $this->actingAs(userWithRoles([$role]))
         ->get(route('registrations.index'))

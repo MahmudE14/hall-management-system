@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ResidencyStatus;
 use App\Models\Role;
 use App\Models\StudentProfile;
 use App\Models\User;
@@ -94,6 +95,8 @@ test('read-only registration and academic fields are ignored', function () {
         ->and($this->profile->department)->not->toBe('Mutated Department')
         ->and($this->profile->session)->not->toBe('2000-01')
         ->and($this->profile->registration_status->value)->not->toBe('rejected')
+        ->and($this->profile->residency_status)->toBe(ResidencyStatus::Attached)
+        ->and($this->profile->user_id)->toBe($this->student->id)
         ->and($this->student->is_active)->toBeTrue()
         ->and(password_verify('attacker-controlled-password', $this->student->password))->toBeFalse();
 });
