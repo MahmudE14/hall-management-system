@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\BlockController;
 use App\Http\Controllers\ComplaintController;
+use App\Http\Controllers\NoticeController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\SeatAllocationController;
@@ -58,6 +59,12 @@ Route::middleware(['auth', 'verified', 'role:super_admin,provost,hall_office_sta
     Route::post('registrations/{studentProfile}/approve', [RegistrationController::class, 'approve'])->name('registrations.approve');
     Route::post('registrations/{studentProfile}/reject', [RegistrationController::class, 'reject'])->name('registrations.reject');
     Route::post('registrations/{studentProfile}/reconsider', [RegistrationController::class, 'reconsider'])->name('registrations.reconsider');
+});
+
+Route::middleware(['auth', 'verified', 'role:super_admin,provost,hall_office_staff,club_admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('notices', [NoticeController::class, 'index'])->name('notices.index');
+    Route::get('notices/create', [NoticeController::class, 'create'])->name('notices.create');
+    Route::post('notices', [NoticeController::class, 'store'])->name('notices.store');
 });
 
 Route::middleware(['auth', 'verified', 'role:super_admin'])->prefix('admin')->name('admin.')->group(function () {
