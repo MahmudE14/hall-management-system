@@ -1,5 +1,11 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, ClipboardCheck, FolderGit2, LayoutGrid, Users } from 'lucide-react';
+import {
+    BookOpen,
+    ClipboardCheck,
+    FolderGit2,
+    LayoutGrid,
+    Users,
+} from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -55,7 +61,8 @@ export function AppSidebar() {
     const { auth } = usePage<{ auth: Auth }>().props;
     const roles = auth.user?.roles ?? [];
     const visibleNavItems = mainNavItems.filter(
-        (item) => !item.roles || item.roles.some((role) => roles.includes(role)),
+        (item) =>
+            !item.roles || item.roles.some((role) => roles.includes(role)),
     );
 
     return (

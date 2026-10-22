@@ -185,18 +185,14 @@ export default function UsersIndex({
                                         </td>
                                         <td className="px-4 py-3">
                                             <div className="flex flex-wrap gap-1">
-                                                {user.roles.map(
-                                                    (roleName) => (
-                                                        <Badge
-                                                            key={roleName}
-                                                            variant="secondary"
-                                                        >
-                                                            {formatRole(
-                                                                roleName,
-                                                            )}
-                                                        </Badge>
-                                                    ),
-                                                )}
+                                                {user.roles.map((roleName) => (
+                                                    <Badge
+                                                        key={roleName}
+                                                        variant="secondary"
+                                                    >
+                                                        {formatRole(roleName)}
+                                                    </Badge>
+                                                ))}
                                             </div>
                                         </td>
                                         <td className="px-4 py-3">
@@ -210,8 +206,7 @@ export default function UsersIndex({
                                                     </p>
                                                     <p className="text-muted-foreground">
                                                         {formatRole(
-                                                            user
-                                                                .student_profile
+                                                            user.student_profile
                                                                 .registration_status,
                                                         )}
                                                     </p>

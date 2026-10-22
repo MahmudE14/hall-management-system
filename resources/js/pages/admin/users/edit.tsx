@@ -44,7 +44,9 @@ export default function EditUser({
 
     function submit(event: React.FormEvent) {
         event.preventDefault();
-        form.put(UserController.updateRoles.url(user), { preserveScroll: true });
+        form.put(UserController.updateRoles.url(user), {
+            preserveScroll: true,
+        });
     }
 
     return (
@@ -90,7 +92,9 @@ export default function EditUser({
                             )
                         }
                     >
-                        {user.is_active ? 'Deactivate account' : 'Activate account'}
+                        {user.is_active
+                            ? 'Deactivate account'
+                            : 'Activate account'}
                     </Button>
                 </div>
 

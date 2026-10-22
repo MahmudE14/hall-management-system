@@ -54,12 +54,18 @@ export default function RegistrationsIndex({
                 />
 
                 <div className="flex gap-2">
-                    <Button asChild variant={status === 'pending' ? 'default' : 'outline'}>
+                    <Button
+                        asChild
+                        variant={status === 'pending' ? 'default' : 'outline'}
+                    >
                         <Link href={index({ query: { status: 'pending' } })}>
                             Pending
                         </Link>
                     </Button>
-                    <Button asChild variant={status === 'rejected' ? 'default' : 'outline'}>
+                    <Button
+                        asChild
+                        variant={status === 'rejected' ? 'default' : 'outline'}
+                    >
                         <Link href={index({ query: { status: 'rejected' } })}>
                             Rejected
                         </Link>
