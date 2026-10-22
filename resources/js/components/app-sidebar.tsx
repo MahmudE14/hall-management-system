@@ -6,6 +6,7 @@ import {
     FolderGit2,
     GraduationCap,
     LayoutGrid,
+    MessageSquare,
     Users,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
@@ -23,6 +24,7 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { index as blocks } from '@/routes/blocks';
+import { index as complaints } from '@/routes/complaints';
 import { index as houseTutors } from '@/routes/house-tutors';
 import { index as registrations } from '@/routes/registrations';
 import { index as students } from '@/routes/students';
@@ -34,6 +36,19 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
+    },
+    {
+        title: 'Complaints',
+        href: complaints(),
+        icon: MessageSquare,
+        roles: [
+            'super_admin',
+            'provost',
+            'hall_office_staff',
+            'house_tutor',
+            'student',
+            'club_admin',
+        ],
     },
     {
         title: 'Registrations',

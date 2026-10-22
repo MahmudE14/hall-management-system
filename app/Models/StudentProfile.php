@@ -56,6 +56,12 @@ class StudentProfile extends Model
         return $this->hasMany(SeatAllocation::class);
     }
 
+    /** @return HasMany<Complaint, $this> */
+    public function complaints(): HasMany
+    {
+        return $this->hasMany(Complaint::class);
+    }
+
     /** @return HasOne<SeatAllocation, $this> */
     public function activeSeatAllocation(): HasOne
     {

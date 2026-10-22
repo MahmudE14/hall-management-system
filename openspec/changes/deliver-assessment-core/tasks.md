@@ -86,22 +86,22 @@ There are no implementation tasks in Phase 0.
 
 **Entry:** Phases 1, 3, and 4 are complete and `docs/PROJECT_STATUS.md` explicitly authorizes Phase 5. Resolve C1-C5 and C11 before their dependent tasks.
 
-- [ ] 5.1 Add complaint, status-log, and comment migrations plus status/category enums, foreign keys, and indexes; verify schema and enum tests.
-- [ ] 5.2 Add complaint models, relationships, factories, supported categories, and derived aging behavior; verify model and days-open/overdue tests.
-- [ ] 5.3 Add the annual tracking-counter persistence and transactional `KJH-YYYY-NNNN` generator; verify yearly reset and simultaneous-submission uniqueness.
-- [ ] 5.4 Add approved-student complaint creation with Resident room autofill and Attached location input; verify Pending refusal and location behavior.
-- [ ] 5.5 Add private JPG/PNG upload validation, generated filenames, 2 MB limit, and cleanup on failed creation; verify unsafe and oversized files are rejected.
-- [ ] 5.6 Add policy-scoped complaint lists with status/category filters and days-open/overdue values; verify students list only their own complaints and leadership receives documented scope.
-- [ ] 5.7 Add complaint detail and authorized private-image delivery; verify another student cannot view the complaint or download its image.
-- [ ] 5.8 Add complaint assignment using only roles and assignee types confirmed by C2 and C5; verify assignment authorization and tutor scope.
-- [ ] 5.9 Add chronological comments using only staff roles confirmed by C5; verify participant authorization, ordering, and cross-record denial.
-- [ ] 5.10 Add the transactional transition engine and audit-log write for the documented state graph; verify allowed edges, forbidden edges, and atomic logging independent of actor permissions.
-- [ ] 5.11 Add transition authorization, rejection reason, resolution note, closure authority, and tutor scope using C1 and C3; verify each role boundary and failure mode.
-- [ ] 5.12 Add student reopening and resolution-time behavior using C4 and C11; verify exact boundary, timezone, repeated resolution, and unauthorized reopening.
-- [ ] 5.13 Add the student complaint-submission page; verify room/location behavior, file validation, field errors, and success feedback.
-- [ ] 5.14 Add complaint list, detail, timeline, and overdue interfaces; verify role-scoped Inertia props, filters, empty states, and private-media links.
-- [ ] 5.15 Add staff assignment and comment controls; verify controls follow C2/C5 permissions and successful actions preserve timeline order.
-- [ ] 5.16 Add transition controls and perform focused browser review; verify controls follow C1/C3/C4, validation errors remain visible, and no unauthorized control grants server access.
+- [x] 5.1 Add complaint, status-log, and comment migrations plus status/category enums, foreign keys, and indexes; verify schema and enum tests.
+- [x] 5.2 Add complaint models, relationships, factories, supported categories, and derived aging behavior; verify model and days-open/overdue tests.
+- [x] 5.3 Add the annual tracking-counter persistence and transactional `KJH-YYYY-NNNN` generator; verify yearly reset and simultaneous-submission uniqueness.
+- [x] 5.4 Add approved-student complaint creation with Resident room autofill and Attached location input; verify Pending refusal and location behavior.
+- [x] 5.5 Add private JPG/PNG upload validation, generated filenames, 2 MB limit, and cleanup on failed creation; verify unsafe and oversized files are rejected.
+- [x] 5.6 Add policy-scoped complaint lists with status/category filters and days-open/overdue values; verify students list only their own complaints and leadership receives documented scope.
+- [x] 5.7 Add complaint detail and authorized private-image delivery; verify another student cannot view the complaint or download its image.
+- [x] 5.8 Add complaint assignment using only roles and assignee types confirmed by C2 and C5; verify assignment authorization and tutor scope.
+- [x] 5.9 Add chronological comments using only staff roles confirmed by C5; verify participant authorization, ordering, and cross-record denial.
+- [x] 5.10 Add the transactional transition engine and audit-log write for the documented state graph; verify allowed edges, forbidden edges, and atomic logging independent of actor permissions.
+- [x] 5.11 Add transition authorization, rejection reason, resolution note, closure authority, and tutor scope using C1 and C3; verify each role boundary and failure mode.
+- [x] 5.12 Add student reopening and resolution-time behavior using C4 and C11; verify exact boundary, timezone, repeated resolution, and unauthorized reopening.
+- [x] 5.13 Add the student complaint-submission page; verify room/location behavior, file validation, field errors, and success feedback.
+- [x] 5.14 Add complaint list, detail, timeline, and overdue interfaces; verify role-scoped Inertia props, filters, empty states, and private-media links.
+- [x] 5.15 Add staff assignment and comment controls; verify controls follow C2/C5 permissions and successful actions preserve timeline order.
+- [x] 5.16 Add transition controls and perform focused browser review; verify controls follow C1/C3/C4, validation errors remain visible, and no unauthorized control grants server access.
 
 **Exit:** Tasks 5.1-5.16 are complete; all C1-C5/C11 decisions are captured; complaint submission, privacy, tracking, assignment, comments, transitions, audit, timing, and UI checks pass; `docs/PROJECT_STATUS.md` is updated; implementation stops.
 

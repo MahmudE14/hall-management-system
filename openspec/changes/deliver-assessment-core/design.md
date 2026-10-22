@@ -128,6 +128,12 @@ A phase with **documented cross-phase deferrals** may become foundation-complete
 
 Alternative considered: implementing on `main` or squashing an entire phase into an opaque commit. Rejected because both approaches weaken task-level traceability, review, rollback boundaries, and phase authorization controls.
 
+### 17. Scope House Tutor complaint access by assignment
+
+Follow the mandatory permission matrix for complaint visibility: an active House Tutor may view only complaints assigned to that tutor. Membership of the complaint's room block alone does not grant access. The rule applies to complaint lists, detail routes, and private attachment delivery. Student directory and student-profile block scoping remain unchanged because those capabilities follow the tutor's assigned blocks rather than complaint assignment.
+
+Alternative considered: retaining block-based complaint visibility. Rejected because the mandatory matrix says House Tutors view complaints "Assigned to them," and block membership would expose unassigned complaints.
+
 ## Implementation Phases
 
 The table's exit criteria define **implementation-complete**, not review-complete or integrated. References to a prior phase being complete in an entry criterion mean that phase is integrated into `main` through the branch and pull-request workflow above, including an integration-eligible phase with documented cross-phase deferrals.
@@ -139,10 +145,10 @@ The table's exit criteria define **implementation-complete**, not review-complet
 | Phase 2 | Hall Structure and Student Records | Phase 1 complete; Phase 2 explicitly authorized | All Phase 2 tasks complete; structure, occupancy, directory, profile, and access tests pass; status updated; work stops |
 | Phase 3 | Seat Allocation and Vacancy | Phase 2 complete; Phase 3 explicitly authorized | All Phase 3 tasks complete; allocation, vacancy, history, capacity, and concurrency checks pass; status updated; work stops |
 | Phase 4 | House Tutors | Phase 3 complete; Phase 4 explicitly authorized; C8 resolved before account onboarding | All Phase 4 tasks complete; tutor administration and scoping tests pass; status updated; work stops |
-| Phase 5 | Complaints | Phases 1, 3, and 4 complete; Phase 5 explicitly authorized; C1-C5 and C11 resolved before affected tasks | All Phase 5 tasks complete; submission, privacy, assignment, comments, transitions, audit, and UI checks pass; status updated; work stops |
+| Phase 5 | Complaints | Phases 1, 3, and 4 complete; Phase 5 explicitly authorized; C1-C5 and C11 approved | All Phase 5 tasks complete; submission, privacy, assignment, comments, transitions, audit, and UI checks pass; status updated; work stops |
 | Phase 6 | Notice Board | Phase 1 complete; Phase 6 explicitly authorized | All Phase 6 tasks complete; authoring, public discovery, draft isolation, and download tests pass; status updated; work stops |
 | Phase 7 | Clubs and Memberships | Phases 1 and 2 complete; Phase 7 explicitly authorized | All Phase 7 tasks complete; directory, request, administration, upload, and scope tests pass; status updated; work stops |
-| Phase 8 | Operations Dashboard | Phases 3-7 complete; Phase 8 explicitly authorized; C10-C11 resolved | All Phase 8 tasks complete; leadership and tutor-scoped metrics match deterministic records; status updated; work stops |
+| Phase 8 | Operations Dashboard | Phases 3-7 complete; Phase 8 explicitly authorized; C10 decision recorded with implementation deferred to tasks 8.3-8.4; C11 approved | All Phase 8 tasks complete; leadership and tutor-scoped metrics match deterministic records; status updated; work stops |
 | Phase 9 | Assessment Data and Delivery | Phases 1-8 complete; Phase 9 explicitly authorized | All Phase 9 tasks complete; the approved Laravel 13 deviation, seed minima, responsive review, documentation, evidence, and quality pipeline are verified; status updated; work stops |
 
 ## Requirement Traceability
@@ -161,22 +167,21 @@ The table's exit criteria define **implementation-complete**, not review-complet
 
 ## Outstanding Clarifications
 
-These source-document ambiguities are not confirmed requirements. The affected task remains blocked until its referenced decision is approved:
-
-- **C1:** Whether Super Admin may close complaints despite closure being explicitly limited to Provost or Hall Office Staff.
-- **C2:** How to reconcile M4 naming Office Staff or Provost as complaint assigners with the mandatory permission matrix also granting assignment to Super Admin.
-- **C3:** Which roles may reject complaints and which transitions an assigned House Tutor may perform.
-- **C4:** Whether the seven-day reopening boundary includes the exact seventh-day instant and which timezone governs it.
-- **C5:** Which roles qualify as a complaint-assignment target described as a "staff member," and which staff roles may add complaint comments.
-- **C10:** How an Attached student's free-form complaint location contributes to a House Tutor's block-scoped dashboard.
-- **C11:** Which Resolved timestamp is used for resolution time when a complaint is reopened and resolved again.
+None. The complaint clarifications C1-C5, C10, and C11 are recorded below.
 
 ## Resolved Clarifications
 
+- **C1 — Resolved:** Only Provost and Hall Office Staff may perform Resolved to Closed. Super Admin cannot close complaints.
+- **C2 — Resolved:** Hall Office Staff, Provost, and Super Admin may assign complaints.
+- **C3 — Resolved:** Hall Office Staff, Provost, and Super Admin may reject complaints. An assigned House Tutor may perform only Submitted to Under Review, Under Review to In Progress, and In Progress to Resolved. House Tutors cannot reject, close, or reopen complaints.
+- **C4 — Resolved:** Student reopening is permitted within a rolling 168-hour window after resolution, inclusive at the exact boundary. The window is evaluated using UTC timestamps.
+- **C5 — Resolved:** Eligible assignees are active House Tutors and Hall Office Staff only. The complaint owner, current assignee, Hall Office Staff, Provost, and Super Admin may add comments.
 - **C6 — Resolved:** Authorized registration-decision roles may transition Rejected to Pending with original rejection reason and complete decision history retained. Student self-resubmission is excluded.
 - **C7 — Resolved:** Students may edit name, email, and phone. Email uniqueness, institutional domain, and verification safeguards remain; all other registration and academic identity fields are read-only.
 - **C8 — Resolved for the assessment:** Tutor onboarding uses the existing seeded-account credential setup only. The fictional `tutor@kjh.test` identity authenticates with the shared demo credential and has an active tutor profile assigned to at least one seeded block. Tutor identities created through administration receive an authenticated user account with an internal random password but no delivered credential. No email invitation, credential-emailing workflow, separate onboarding subsystem, password exposure, or credential logging is introduced. Newly created tutors therefore have no assessment-supported initial credential beyond the seeded demo identity.
 - **C9 — Resolved:** Super Admin may list/search users, manage roles, and activate/deactivate accounts. Inactive access is blocked server-side. Administrative deletion, password resets, and unrestricted CRUD are excluded.
+- **C10 — Resolved, implementation deferred:** Roomless Attached complaints are excluded from House Tutor block-scoped dashboard metrics. The dashboard implementation remains deferred to Phase 8 tasks 8.3-8.4.
+- **C11 — Resolved:** Resolution time uses the latest resolution timestamp. Reopening clears the current `resolved_at` value; a subsequent resolution sets a new latest value. Previous resolution events remain in the complaint status history.
 - **C12 — Resolved, authority approved:** Continue with Laravel 13; no downgrade is required. Approval source is user-confirmed communication with the authority. Evidence is recorded as user-reported, not written evidence.
 
 Bengali localization remains deferred because it is a PRD requirement but not a mandatory assessment requirement. This is a scope classification, not a rejection of the longer-term requirement.

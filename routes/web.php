@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\BlockController;
+use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\SeatAllocationController;
@@ -29,6 +30,27 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('house-tutors/{tutorProfile}/edit', [TutorController::class, 'edit'])->name('house-tutors.edit');
     Route::put('house-tutors/{tutorProfile}', [TutorController::class, 'update'])->name('house-tutors.update');
     Route::patch('house-tutors/{tutorProfile}/deactivate', [TutorController::class, 'deactivate'])->name('house-tutors.deactivate');
+    Route::get('complaints', [ComplaintController::class, 'index'])->name('complaints.index');
+    Route::get('complaints/{complaint}', [ComplaintController::class, 'show'])
+        ->whereNumber('complaint')
+        ->name('complaints.show');
+    Route::get('complaints/{complaint}/image', [ComplaintController::class, 'image'])
+        ->whereNumber('complaint')
+        ->name('complaints.image');
+    Route::post('complaints/{complaint}/assign', [ComplaintController::class, 'assign'])
+        ->whereNumber('complaint')
+        ->name('complaints.assign');
+    Route::post('complaints/{complaint}/comments', [ComplaintController::class, 'comment'])
+        ->whereNumber('complaint')
+        ->name('complaints.comments.store');
+    Route::post('complaints/{complaint}/transitions', [ComplaintController::class, 'transition'])
+        ->whereNumber('complaint')
+        ->name('complaints.transitions.store');
+});
+
+Route::middleware(['auth', 'verified', 'approved.student'])->group(function () {
+    Route::get('complaints/create', [ComplaintController::class, 'create'])->name('complaints.create');
+    Route::post('complaints', [ComplaintController::class, 'store'])->name('complaints.store');
 });
 
 Route::middleware(['auth', 'verified', 'role:super_admin,provost,hall_office_staff'])->group(function () {

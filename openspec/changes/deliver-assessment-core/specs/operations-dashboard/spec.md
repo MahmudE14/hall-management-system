@@ -18,11 +18,15 @@ The system SHALL show authorized Hall Office Staff, Provost, and Super Admin use
 - **THEN** average resolution time is displayed as unavailable rather than as a misleading duration
 
 ### Requirement: Tutor-scoped complaint metrics
-The system MUST show a House Tutor open complaints by category, overdue complaints, and 30-day average resolution time limited to complaints associated with assigned blocks according to the confirmed block-association rule.
+The system MUST show a House Tutor open complaints by category, overdue complaints, and 30-day average resolution time limited to complaints associated with assigned blocks. Complaints without a room, including Attached-student complaints identified only by free-text location, MUST be excluded from these block-scoped metrics.
 
 #### Scenario: Tutor views dashboard
 - **WHEN** a House Tutor opens the dashboard
 - **THEN** complaint counts, overdue figures, and average resolution time exclude complaints outside that tutor's assigned blocks
+
+#### Scenario: Roomless Attached complaints are excluded
+- **WHEN** a House Tutor's dashboard is calculated and an Attached-student complaint has no room association
+- **THEN** that complaint is excluded from the tutor's block-scoped complaint metrics
 
 ### Requirement: Dashboard authorization
 The system SHALL make the operational dashboard available only to documented staff, Provost, House Tutor, and Super Admin roles.
