@@ -14,6 +14,8 @@ The delivery path is:
 
 Lifecycle terms are strict: **implementation-complete** means every phase task and implementation exit criterion is verified and committed; **review-complete** means its PR has satisfactory review and all available remote checks; **integrated** means the approved PR is merged and local `main` is synchronized. A later phase prerequisite is satisfied only when the earlier phase is integrated.
 
+**Foundation-complete** is distinct from implementation-complete: every independently implementable phase task is verified and committed, while remaining tasks are explicitly deferred to named later-phase checkpoints under the OpenSpec Phase-Gate Rules. A foundation-complete phase is **integration-eligible** only when each deferral has a named future checkpoint in `docs/PROJECT_STATUS.md`, deferred tasks remain unchecked, and the user explicitly authorizes integration and progression. Its PR must list the deferrals. Integrating such a phase satisfies a later phase's prerequisite only for the implemented foundation; it neither authorizes the next phase nor completes deferred tasks.
+
 ## Branch Policy
 
 - `main` is the stable integration branch. Planning-only documentation may be refined there when authorized, but application features must use a phase branch.
@@ -41,7 +43,7 @@ CI means only checks already configured for the repository or hosting provider; 
 
 Before opening a phase PR:
 
-1. Complete every authorized phase task and its task-commit mapping.
+1. Complete every independently implementable authorized phase task and its task-commit mapping, or record each remaining task as an explicit cross-phase deferral with a named future completion checkpoint.
 2. Run the phase's full quality gates and record exact results.
 3. Review the implementation against the applicable capability scenarios and phase exit criteria.
 4. Review the complete diff and commit list against `main`; remove no unrelated work.
@@ -67,6 +69,6 @@ Merging requires separate explicit user approval after CI and review are satisfa
 3. Stage an OpenSpec task checkbox only after that task's behavior and focused verification pass, include it in the same authorized task commit when practical, and confirm the task-to-commit mapping afterward.
 4. Update `docs/PROJECT_STATUS.md` with current phase, authorization, branch, task/commit progress, verification, blockers, and pending PR state.
 5. Create only explicitly authorized commits. Do not leave a task marked complete without its required commit; request authorization instead.
-6. If the phase is implementation-complete, follow the Phase Pull Request procedure. After it becomes review-complete, stop for explicit merge approval. Otherwise, identify unfinished work and the next-session starting point.
+6. If the phase is implementation-complete or integration-eligible with documented cross-phase deferrals, follow the Phase Pull Request procedure. After it becomes review-complete, stop for explicit merge approval. Otherwise, identify unfinished work and the next-session starting point.
 
 Never discard or overwrite unfinished changes. Never merge a PR, begin another phase, or implement on `main` without the required explicit authorization.

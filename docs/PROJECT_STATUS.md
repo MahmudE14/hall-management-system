@@ -1,13 +1,15 @@
 # Project Status
 
 - Current phase: Phase 2 - Hall Structure and Student Records on `phase/02-hall-structure-student-records`.
-- Implementation authorization: Phase 2, tasks 2.6-2.7 only for this session.
+- Implementation authorization: Phase 2, tasks 2.6-2.7 only for application implementation. This session is additionally authorized for documentation-only phase-gate updates; no application code or tests.
 - Phase branch creation authorization: Granted for `phase/02-hall-structure-student-records`, created from the Phase 1 integration merge.
-- Task-commit authorization: Granted for tasks 2.6-2.7. Push/PR/merge authorization: NONE.
+- Task-commit authorization: Granted for tasks 2.6-2.7 and for documentation-only gate updates. Push/PR/merge authorization: NONE.
 - Integration branch: `main` at `f9ba7c2`, the Phase 1 integration merge.
 - Active phase branch: `phase/02-hall-structure-student-records`; no remote tracking is configured and remote PR state is unverified because GitHub CLI/API authentication is unavailable.
 - Active specification/change: `deliver-assessment-core` (19/81 tasks complete; Phase 1 tasks 1.1-1.14 and Phase 2 tasks 2.1-2.5 complete).
 - Phase 2 readiness: Tasks 2.1-2.5 are complete. Tasks 2.6-2.7 are partially implemented: search, department/session/status filters, pagination, scoped directory visibility, profile visibility, and bounded eager loading are implemented; block filtering, current room, and allocation history are deferred until Phase 3 active allocations exist.
+- Phase 2 gate status: Foundation implementation is complete for tasks 2.1-2.5 and the non-deferred portions of tasks 2.6-2.7. Phase 2 overall is partially complete because tasks 2.6-2.7 remain unchecked. PR integration is eligible with the documented deferrals below, pending explicit push/PR/merge authorization. Phase 3 is not authorized.
+- Phase 2 documented deferrals: (a) Task 2.6 block filtering → Phase 3 seat-allocation implementation; (b) Task 2.7 current room and allocation history → Phase 3 seat-allocation implementation; (c) House Tutor block-scoped access → task 4.4. Tasks 2.6-2.7 remain unchecked until their named checkpoints complete. The existing occupancy and capacity connections remain at their recorded Phase 3 checkpoint (task 3.5).
 - Phase 2 task 2.1 implementation: Added `halls` and `blocks` migrations, `Hall` and `Block` Eloquent models with `Hall hasMany Block` / `Block belongsTo Hall` relationships, and factories. Blocks reference their hall with a cascading foreign key.
 - Phase 2 task 2.2 implementation: Added `rooms` and `seats` migrations, `Room` and `Seat` Eloquent models with `Block hasMany Room`, `Room belongsTo Block`, `Room hasMany Seat`, and `Seat belongsTo Room` relationships, plus factories. Room numbers are unique within a block and seat labels within a room; both use cascading foreign keys. Room capacity is guarded as a positive integer on SQLite and MySQL.
 - Phase 2 task 2.3 implementation: Added Block, Room, and Seat policies; Form Requests; controllers; and named routes for list/create/edit pages and create/update persistence. Hall Office Staff and Super Admin can manage the structure, Provost has view-only access, and other roles receive forbidden responses. Seat creation is nested under rooms and seat updates are standalone; block creation attaches to the single existing hall. Frontend pages remain tasks 2.4 and 2.5.
@@ -34,6 +36,6 @@
 - Phase 1 lifecycle: Integrated into `main` by merge commit `f9ba7c2`. Deferred non-functional findings remain recorded in `docs/AUDIT_BACKLOG.md` and are not addressed.
 - Unresolved clarifications: C1 Super Admin complaint closure; C2 Super Admin complaint assignment; C3 rejection and tutor transition permissions; C4 reopening boundary/timezone; C5 eligible assignees and commenters; C8 tutor onboarding; C10 Attached complaint block association; C11 repeated-resolution timing.
 - Framework decision: Laravel 13 is approved by the assessment authority according to user-confirmed communication. Approval evidence is user-reported; no written evidence is claimed.
-- Last committed checkpoint: task 2.7 commit on `phase/02-hall-structure-student-records`.
-- Uncommitted work: Expected to be none after the task 2.7 commit. Do not push, open a PR, or merge without explicit authorization.
-- Next recommended action: Stop after task 2.7. Revisit tasks 2.6-2.7 dependencies only when Phase 3 allocation history is authorized; do not mark either task complete before then.
+- Last committed checkpoint: the `docs(openspec): document cross-phase completion gates` commit on `phase/02-hall-structure-student-records`.
+- Uncommitted work: Expected to be none after the documentation-gate commit. Do not push, open a PR, or merge without explicit authorization.
+- Next recommended action: Prepare the Phase 2 PR only after explicit push/PR authorization, recording tasks 2.1-2.7 with the deferrals above. Do not mark tasks 2.6-2.7 complete, and do not start Phase 3 without explicit authorization and prior integration of this phase.
