@@ -1,14 +1,13 @@
 # Project Status
 
-- Current phase: Phase 3 - Seat Allocation and Vacancy on `phase/03-seat-allocation-vacancy`.
-- Implementation authorization: Deferred Phase 2 tasks 2.6-2.7 and Phase 3 tasks 3.1-3.6 (now complete); House Tutor scoped access (task 4.4) is not authorized.
-- Phase branch creation authorization: Granted for `phase/03-seat-allocation-vacancy`, created from the Phase 2 integration merge.
-- Task-commit authorization: Granted for tasks 2.6-2.7 and 3.1-3.6. Push/PR/merge authorization: NONE.
-- Integration branch: `main` at `52d1468`, the Phase 2 integration merge.
-- Active phase branch: `phase/03-seat-allocation-vacancy`; no remote tracking is configured and remote PR state is unverified because GitHub CLI/API authentication is unavailable.
-- Active specification/change: `deliver-assessment-core` (27/81 tasks complete; Phase 1 tasks 1.1-1.14, Phase 2 tasks 2.1-2.7, and Phase 3 tasks 3.1-3.6 complete).
-- Phase 2 lifecycle: Integrated into `main` at `52d1468` with task 2.7 and House Tutor block-scoped access deliberately deferred to their named checkpoints; tasks 2.6-2.7 are now completed on the Phase 3 branch.
-- Phase 3 authorization: The user explicitly authorized Phase 3 tasks 3.1-3.6 and the deferred Phase 2 checkpoints 2.6-2.7. Task 3.6 is complete.
+- Current phase: Phase 4 - House Tutors on `phase/04-house-tutors`.
+- Implementation authorization: Phase 4 tasks 4.1-4.2 only; tasks 4.3-4.5 and later phases are not authorized.
+- Phase branch creation authorization: Granted for `phase/04-house-tutors`, created from the Phase 3 integration merge.
+- Task-commit authorization: Granted for tasks 4.1-4.2. Push/PR/merge authorization: NONE.
+- Integration branch: `main` at `b4efe2f`, the Phase 3 integration merge.
+- Active phase branch: `phase/04-house-tutors`; no remote tracking is configured and remote PR state is unverified because GitHub CLI/API authentication is unavailable.
+- Active specification/change: `deliver-assessment-core` (28/81 tasks complete; Phase 1 tasks 1.1-1.14, Phase 2 tasks 2.1-2.7, Phase 3 tasks 3.1-3.6, and Phase 4 task 4.1 complete).
+- Phase 4 authorization: The user explicitly authorized Phase 4 tasks 4.1-4.2 only. Tasks 4.3-4.5 remain unauthorized, and C8 remains unresolved for tutor account onboarding.
 - Phase 2 documented deferrals: House Tutor block-scoped access → task 4.4. The task 2.6 block-filter and task 2.7 current-room/allocation-history checkpoints are completed. The existing occupancy and capacity connections remain at their recorded Phase 3 checkpoint (task 3.5).
 - Phase 2 task 2.1 implementation: Added `halls` and `blocks` migrations, `Hall` and `Block` Eloquent models with `Hall hasMany Block` / `Block belongsTo Hall` relationships, and factories. Blocks reference their hall with a cascading foreign key.
 - Phase 2 task 2.2 implementation: Added `rooms` and `seats` migrations, `Room` and `Seat` Eloquent models with `Block hasMany Room`, `Room belongsTo Block`, `Room hasMany Seat`, and `Seat belongsTo Room` relationships, plus factories. Room numbers are unique within a block and seat labels within a room; both use cascading foreign keys. Room capacity is guarded as a positive integer on SQLite and MySQL.
@@ -40,12 +39,15 @@
 - Phase 3 tasks 3.3-3.5 batch verification: `composer ci:check` passes (268 tests, 1675 assertions; npm formatting/lint, TypeScript, Pint, and PHPStan with 0 errors). `npm run build`, `openspec validate deliver-assessment-core --strict`, and `git diff --check` pass. The known non-fatal PHPStan turbo-extension warning remains.
 - Phase 3 final quality gate (PR-readiness): `composer ci:check` passes (275 tests, 1783 assertions; npm formatting/lint, TypeScript, Pint, and PHPStan with 0 errors), `npm run build` passes, `openspec validate deliver-assessment-core --strict` reports the change valid, and `git diff --check` passes. Focused coverage: `SeatAllocationTest` 11 tests/88 assertions, `SeatVacancyTest` 10/93, `StudentDirectoryTest` 16/195, `StudentRecordTest` 10/172, `AccommodationManagementTest` 29/407, and `Models/SeatAllocationTest` 8/20 (84 tests, 975 assertions). The known non-fatal PHPStan turbo-extension warning remains.
 - Phase 3 acceptance review: Allocation, vacancy, capacity protection, active-allocation uniqueness, approved-student restriction, allocation authorization, retained history, student directory filtering, and profile current-room/history scenarios are covered by passing feature and model tests. No functional Phase 3 requirement failures were found. No Phase 4+ implementation was introduced. Deferred non-functional findings remain in `docs/AUDIT_BACKLOG.md`.
+- Phase 4 task 4.1 implementation: Added `tutor_profiles` and `block_tutor_profile` migrations, the `TutorProfile` model, `User hasOne TutorProfile`, `TutorProfile belongsTo User` and `belongsToMany Block`, `Block belongsToMany TutorProfile`, and the tutor factory. The pivot enforces one assignment per block/tutor pair and cascades on block or tutor deletion.
+- Phase 4 task 4.1 verification: Focused `TutorProfileTest` passes (6 tests, 13 assertions).
 - Task 3.1 commit mapping: The task 3.1 Conventional Commit contains its implementation, focused tests, task checkbox, and status update.
 - Task 3.2 commit mapping: The task 3.2 Conventional Commit contains its implementation, focused tests, task checkbox, and status update.
 - Task 3.3 commit mapping: The task 3.3 Conventional Commit contains its implementation, focused tests, task checkbox, authorization-ledger update, and status update.
 - Task 3.4 commit mapping: The task 3.4 Conventional Commit contains its implementation, focused tests, task checkbox, and status update.
 - Task 3.5 commit mapping: The task 3.5 Conventional Commit contains its implementation, focused tests, task checkbox, and status update.
 - Task 3.6 commit mapping: The task 3.6 Conventional Commit contains its task checkbox and verification status update.
+- Task 4.1 commit mapping: The task 4.1 Conventional Commit contains its implementation, focused tests, task checkbox, and status update.
 - Task 2.1 commit mapping: The task 2.1 Conventional Commit contains its implementation, focused test, task checkbox, and status update.
 - Task 2.2 commit mapping: The task 2.2 Conventional Commit contains its implementation, focused test, task checkbox, and status update.
 - Task 2.3 commit mapping: The task 2.3 Conventional Commit contains its implementation, focused test, task checkbox, and status update.
@@ -57,6 +59,6 @@
 - Unresolved clarifications: C1 Super Admin complaint closure; C2 Super Admin complaint assignment; C3 rejection and tutor transition permissions; C4 reopening boundary/timezone; C5 eligible assignees and commenters; C8 tutor onboarding; C10 Attached complaint block association; C11 repeated-resolution timing.
 - Framework decision: Laravel 13 is approved by the assessment authority according to user-confirmed communication. Approval evidence is user-reported; no written evidence is claimed.
 - Phase 3 tasks 3.1-3.2 batch verification: `composer ci:check` passes (257 tests, 1536 assertions; npm formatting/lint, TypeScript, Pint, and PHPStan with 0 errors). `npm run build`, `openspec validate deliver-assessment-core --strict`, and `git diff --check` pass. The known non-fatal PHPStan turbo-extension warning remains.
-- Last committed checkpoint: tasks 3.1-3.6 are committed on `phase/03-seat-allocation-vacancy`; the final quality-gate results above are recorded in the status-documentation commit.
-- Uncommitted work: None expected after the status-documentation commit. Do not push, open a PR, or merge without explicit authorization.
-- Next recommended action: Phase 3 branch is PR-ready based on the completed local quality gate. Stop for explicit authorization before push, PR creation, review, or merge; Phase 4 is not authorized.
+- Last committed checkpoint: tasks 4.1-4.2 are being delivered on `phase/04-house-tutors`; each task commit contains its implementation, focused tests, task checkbox, and status update.
+- Uncommitted work: None expected after the current task commit. Do not push, open a PR, or merge without explicit authorization.
+- Next recommended action: Continue only with the authorized Phase 4 task being delivered; tasks 4.3-4.5 require separate authorization and C8 must be resolved before tutor account onboarding.
