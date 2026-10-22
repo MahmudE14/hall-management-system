@@ -134,6 +134,14 @@ Follow the mandatory permission matrix for complaint visibility: an active House
 
 Alternative considered: retaining block-based complaint visibility. Rejected because the mandatory matrix says House Tutors view complaints "Assigned to them," and block membership would expose unassigned complaints.
 
+### 18. Keep Phase 6 notice authoring create-only and category-scoped
+
+Represent notice category and publication state as PHP enums with the three assessment categories (`provost_office`, `hall_office`, `club`) and Draft/Published states. Authoring stores title, body, category, status, pinned flag, optional generated-filename PDF, creator, and `published_at` at creation. Published notices receive `published_at` immediately; drafts keep it null. Phase 6 provides no edit, delete, unpublish, or later-publish workflow.
+
+Hall Office Staff, Provost, and Super Admin may author any category. Club Admins may author only Club notices, for either Draft or Published status, and may pin them. Club Admin authoring requires an active account and the Club Admin role; it does not require an approved Student profile. Administrative lists include both Draft and Published notices, scoped to the creator for Club Admins. Public queries expose Published notices only, order pinned notices first then `published_at` and ID descending, and return `404` for Draft detail or attachment requests. Public pages live at `/notices`, `/notices/{notice}`, and a guest-safe layout. Attachment downloads use safe generated filenames.
+
+Alternative considered: a full notice lifecycle with later publication and editing. Rejected because the approved assessment scope is create-only for Phase 6 and later lifecycle work is not authorized.
+
 ## Implementation Phases
 
 The table's exit criteria define **implementation-complete**, not review-complete or integrated. References to a prior phase being complete in an entry criterion mean that phase is integrated into `main` through the branch and pull-request workflow above, including an integration-eligible phase with documented cross-phase deferrals.
@@ -185,6 +193,17 @@ None. The complaint clarifications C1-C5, C10, and C11 are recorded below.
 - **C12 — Resolved, authority approved:** Continue with Laravel 13; no downgrade is required. Approval source is user-confirmed communication with the authority. Evidence is recorded as user-reported, not written evidence.
 
 Bengali localization remains deferred because it is a PRD requirement but not a mandatory assessment requirement. This is a scope classification, not a rejection of the longer-term requirement.
+
+### Approved Phase 6 Implementation Decisions
+
+- **D1:** The administrative notice list includes Draft and Published notices. Club Admins see only notices they created; Hall Office Staff, Provost, and Super Admin see all notices.
+- **D2:** Notice authoring is create-only in Phase 6. No edit, delete, unpublish, or later-publish workflow exists beyond choosing Draft or Published at creation.
+- **D3:** Public Draft notice detail and attachment requests return `404`.
+- **D4:** Persist `published_at`. Public ordering is pinned descending, then `published_at` descending, then ID descending. Published notices receive `published_at` at creation; Draft notices keep it null.
+- **D5:** Club Admins may create Draft or Published Club notices and may pin them.
+- **D6:** PDF attachment download responses use safe generated filenames.
+- **D7:** Public notice URLs are `/notices` and `/notices/{notice}` and use a guest-safe layout.
+- **D8:** Club Admin authoring requires an active account and the Club Admin role. An approved Student profile is not required.
 
 The assessment requires size validation for every upload but does not give a club-logo limit. A 2 MB JPG/PNG limit is the provisional low-risk implementation assumption and must be documented as an assumption unless the client provides another limit.
 
