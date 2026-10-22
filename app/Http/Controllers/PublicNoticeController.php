@@ -54,7 +54,8 @@ class PublicNoticeController extends Controller
         $notice = Notice::query()
             ->published()
             ->with('creator')
-            ->findOrFail($notice->getKey());
+            ->whereKey($notice->getKey())
+            ->firstOrFail();
 
         return Inertia::render('notices/show', [
             'notice' => $this->serializeNotice($notice, includeBody: true),
@@ -65,7 +66,8 @@ class PublicNoticeController extends Controller
     {
         $notice = Notice::query()
             ->published()
-            ->findOrFail($notice->getKey());
+            ->whereKey($notice->getKey())
+            ->firstOrFail();
 
         $path = $notice->attachment_path;
 
