@@ -30,4 +30,9 @@ class ComplaintPolicy
             ->whereKey($complaint->getKey())
             ->exists();
     }
+
+    public function assign(User $user, Complaint $complaint): bool
+    {
+        return $user->hasAnyRole('hall_office_staff', 'provost', 'super_admin');
+    }
 }

@@ -37,6 +37,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('complaints/{complaint}/image', [ComplaintController::class, 'image'])
         ->whereNumber('complaint')
         ->name('complaints.image');
+    Route::post('complaints/{complaint}/assign', [ComplaintController::class, 'assign'])
+        ->whereNumber('complaint')
+        ->name('complaints.assign');
 });
 
 Route::middleware(['auth', 'verified', 'approved.student'])->group(function () {

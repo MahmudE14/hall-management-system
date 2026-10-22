@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Complaints\AssignComplaint;
 use App\Actions\Complaints\CreateComplaint;
 use App\Enums\ComplaintCategory;
 use App\Enums\ComplaintStatus;
+use App\Http\Requests\Complaints\AssignComplaintRequest;
 use App\Http\Requests\Complaints\StoreComplaintRequest;
 use App\Models\Complaint;
 use App\Models\User;
@@ -81,6 +83,22 @@ class ComplaintController extends Controller
         }
 
         return Storage::disk('local')->response($path);
+    }
+
+    public function assign(
+        AssignComplaintRequest $request,
+        Complaint $complaint,
+        AssignComplaint $assignComplaint,
+    ): RedirectResponse {
+        Gate::authorize('assign', $complaint);
+
+        $assignee = User::query()->findOrFail((int) $request->validated('assignee_id'));
+
+        $assignComplaint->handle($complaint, $assignee);
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Complaint assigned.')]);
+
+        return to_route('complaints.show', $complaint);
     }
 
     public function create(Request $request): Response
