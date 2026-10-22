@@ -3,9 +3,11 @@
 namespace App\Http\Requests\Admin;
 
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class UpdateUserRolesRequest extends FormRequest
 {
@@ -33,6 +35,33 @@ class UpdateUserRolesRequest extends FormRequest
                 Rule::in(Role::DOCUMENTED),
                 Rule::exists(Role::class, 'name'),
             ],
+        ];
+    }
+
+    /**
+     * Get the "after" validation callables for the request.
+     *
+     * @return array<int, callable>
+     */
+    public function after(): array
+    {
+        return [
+            function (Validator $validator): void {
+                $roles = $this->input('roles');
+
+                if (! is_array($roles) || ! in_array('student', $roles, true)) {
+                    return;
+                }
+
+                $user = $this->route('user');
+
+                if ($user instanceof User && ! $user->studentProfile()->exists()) {
+                    $validator->errors()->add(
+                        'roles',
+                        __('A student profile is required to assign the student role.'),
+                    );
+                }
+            },
         ];
     }
 }

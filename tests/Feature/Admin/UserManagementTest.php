@@ -131,6 +131,7 @@ test('super admins can update multiple roles without changing identity', functio
     $superAdmin = managedUserWithRole('super_admin');
     $target = managedUserWithRole('student');
     $target->update(['name' => 'Role Target', 'email' => 'role-target@student.du.test']);
+    StudentProfile::factory()->for($target)->create();
     $targetId = $target->id;
 
     $this->actingAs($superAdmin)
@@ -165,6 +166,47 @@ test('role updates require at least one role', function () {
     $this->actingAs($superAdmin)
         ->put(route('admin.users.roles.update', $target), ['roles' => []])
         ->assertSessionHasErrors('roles');
+});
+
+test('student role assignment is rejected when the user has no student profile', function () {
+    $superAdmin = managedUserWithRole('super_admin');
+    $target = managedUserWithRole('provost');
+
+    $this->actingAs($superAdmin)
+        ->put(route('admin.users.roles.update', $target), ['roles' => ['student']])
+        ->assertSessionHasErrors('roles');
+
+    expect($target->refresh()->roles()->pluck('name')->all())->toBe(['provost'])
+        ->and($target->studentProfile()->exists())->toBeFalse();
+});
+
+test('student role assignment succeeds when the user already has a student profile', function () {
+    $superAdmin = managedUserWithRole('super_admin');
+    $target = managedUserWithRole('provost');
+    $profile = StudentProfile::factory()->for($target)->create([
+        'registration_number' => '2023000088',
+    ]);
+
+    $this->actingAs($superAdmin)
+        ->put(route('admin.users.roles.update', $target), ['roles' => ['provost', 'student']])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect(route('admin.users.edit', $target));
+
+    expect($target->refresh()->roles()->pluck('name')->all())->toEqualCanonicalizing(['provost', 'student'])
+        ->and($profile->refresh()->registration_number)->toBe('2023000088');
+});
+
+test('rejected student role assignments preserve existing roles without creating a profile', function () {
+    $superAdmin = managedUserWithRole('super_admin');
+    $target = managedUserWithRole('student');
+    $target->roles()->attach(Role::query()->where('name', 'provost')->firstOrFail());
+
+    $this->actingAs($superAdmin)
+        ->put(route('admin.users.roles.update', $target), ['roles' => ['student', 'provost', 'club_admin']])
+        ->assertSessionHasErrors('roles');
+
+    expect($target->refresh()->roles()->pluck('name')->all())->toEqualCanonicalizing(['student', 'provost'])
+        ->and($target->studentProfile()->exists())->toBeFalse();
 });
 
 test('other roles cannot manage user roles', function (string $role) {
