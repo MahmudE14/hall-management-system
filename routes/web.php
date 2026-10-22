@@ -31,6 +31,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('house-tutors/{tutorProfile}', [TutorController::class, 'update'])->name('house-tutors.update');
     Route::patch('house-tutors/{tutorProfile}/deactivate', [TutorController::class, 'deactivate'])->name('house-tutors.deactivate');
     Route::get('complaints', [ComplaintController::class, 'index'])->name('complaints.index');
+    Route::get('complaints/{complaint}', [ComplaintController::class, 'show'])
+        ->whereNumber('complaint')
+        ->name('complaints.show');
+    Route::get('complaints/{complaint}/image', [ComplaintController::class, 'image'])
+        ->whereNumber('complaint')
+        ->name('complaints.image');
 });
 
 Route::middleware(['auth', 'verified', 'approved.student'])->group(function () {

@@ -13,9 +13,11 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ComplaintController extends Controller
 {
@@ -57,6 +59,28 @@ class ComplaintController extends Controller
             'statuses' => array_column(ComplaintStatus::cases(), 'value'),
             'categories' => array_column(ComplaintCategory::cases(), 'value'),
         ]);
+    }
+
+    public function show(Complaint $complaint): Response
+    {
+        Gate::authorize('view', $complaint);
+
+        return Inertia::render('complaints/show', [
+            'complaint' => $this->serializeComplaint($complaint, includeDescription: true),
+        ]);
+    }
+
+    public function image(Complaint $complaint): StreamedResponse
+    {
+        Gate::authorize('view', $complaint);
+
+        $path = $complaint->image_path;
+
+        if ($path === null || ! Storage::disk('local')->exists($path)) {
+            abort(404);
+        }
+
+        return Storage::disk('local')->response($path);
     }
 
     public function create(Request $request): Response
@@ -143,6 +167,9 @@ class ComplaintController extends Controller
             'days_open' => $complaint->daysOpen(),
             'is_overdue' => $complaint->isOverdue(),
             'created_at' => $complaint->created_at?->toIso8601String(),
+            'image_url' => $complaint->image_path === null
+                ? null
+                : route('complaints.image', $complaint),
             ...($includeDescription ? ['description' => $complaint->description] : []),
         ];
     }
