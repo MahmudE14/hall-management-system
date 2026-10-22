@@ -32,9 +32,12 @@
 - Phase 3 task 3.2 verification: Focused `SeatAllocationTest` passes (10 tests, 42 assertions).
 - Phase 3 task 3.3 implementation: Added seat-allocation controls to the student profile for approved, attached students, listing free seats with room and block context. Room lists and edit pages now derive occupied and free seat counts from active allocations through the new `Room::seatAllocations` relationship. The student profile now exposes the active allocation while allocation history remains deferred under task 2.7.
 - Phase 3 task 3.3 verification: Focused `SeatAllocationTest` and `AccommodationManagementTest` pass (40 tests, 495 assertions). `vendor/bin/pint --dirty --format agent` and `npm run types:check` pass.
+- Phase 3 task 3.4 implementation: Added the transactional `VacateSeat` action, vacancy Form Request, `allocations.vacate` route, controller action, and a student-profile vacancy control with required date and reason. Vacancy locks the allocation and student, closes the allocation with a null active marker, records the date and reason, and returns the student to Attached. Allocation history is retained and the freed seat can be allocated again.
+- Phase 3 task 3.4 verification: Focused `SeatVacancyTest` passes (9 tests, 82 assertions). `vendor/bin/pint --dirty --format agent` and `npm run types:check` pass.
 - Task 3.1 commit mapping: The task 3.1 Conventional Commit contains its implementation, focused tests, task checkbox, and status update.
 - Task 3.2 commit mapping: The task 3.2 Conventional Commit contains its implementation, focused tests, task checkbox, and status update.
 - Task 3.3 commit mapping: The task 3.3 Conventional Commit contains its implementation, focused tests, task checkbox, authorization-ledger update, and status update.
+- Task 3.4 commit mapping: The task 3.4 Conventional Commit contains its implementation, focused tests, task checkbox, and status update.
 - Task 2.1 commit mapping: The task 2.1 Conventional Commit contains its implementation, focused test, task checkbox, and status update.
 - Task 2.2 commit mapping: The task 2.2 Conventional Commit contains its implementation, focused test, task checkbox, and status update.
 - Task 2.3 commit mapping: The task 2.3 Conventional Commit contains its implementation, focused test, task checkbox, and status update.

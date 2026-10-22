@@ -1,10 +1,11 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft, History, MapPin } from 'lucide-react';
+import { ArrowLeft, History, LogOut, MapPin } from 'lucide-react';
 import SeatAllocationController from '@/actions/App/Http/Controllers/SeatAllocationController';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
     Select,
@@ -141,6 +142,20 @@ export default function StudentShow({
                         )}
                     </section>
                 </div>
+
+                {canAllocate && activeAllocation && (
+                    <section className="rounded-xl border border-sidebar-border/70 p-4 dark:border-sidebar-border">
+                        <div className="flex items-center gap-2">
+                            <LogOut className="size-4 text-muted-foreground" />
+                            <h2 className="font-medium">Vacate current seat</h2>
+                        </div>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                            Closing this allocation frees the seat and returns
+                            the student to attached status.
+                        </p>
+                        <VacancyForm allocationId={activeAllocation.id} />
+                    </section>
+                )}
 
                 {canAllocate &&
                     student.registration_status === 'approved' &&
@@ -291,6 +306,57 @@ function AllocationForm({
             <Button type="submit" disabled={form.processing}>
                 {form.processing ? 'Allocating...' : 'Allocate seat'}
             </Button>
+        </form>
+    );
+}
+
+function VacancyForm({ allocationId }: { allocationId: number }) {
+    const form = useForm({
+        vacated_at: new Date().toISOString().slice(0, 10),
+        vacancy_reason: '',
+    });
+
+    function submit(event: React.FormEvent) {
+        event.preventDefault();
+
+        form.patch(SeatAllocationController.vacate.url(allocationId), {
+            preserveScroll: true,
+        });
+    }
+
+    return (
+        <form onSubmit={submit} className="mt-4 grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-2">
+                <Label htmlFor="vacated_at">Vacancy date</Label>
+                <Input
+                    id="vacated_at"
+                    type="date"
+                    value={form.data.vacated_at}
+                    onChange={(event) =>
+                        form.setData('vacated_at', event.target.value)
+                    }
+                    aria-invalid={Boolean(form.errors.vacated_at)}
+                />
+                <InputError message={form.errors.vacated_at} />
+            </div>
+            <div className="grid gap-2">
+                <Label htmlFor="vacancy_reason">Reason</Label>
+                <Input
+                    id="vacancy_reason"
+                    value={form.data.vacancy_reason}
+                    onChange={(event) =>
+                        form.setData('vacancy_reason', event.target.value)
+                    }
+                    autoComplete="off"
+                    aria-invalid={Boolean(form.errors.vacancy_reason)}
+                />
+                <InputError message={form.errors.vacancy_reason} />
+            </div>
+            <div className="sm:col-span-2">
+                <Button type="submit" disabled={form.processing}>
+                    {form.processing ? 'Vacating...' : 'Vacate seat'}
+                </Button>
+            </div>
         </form>
     );
 }
