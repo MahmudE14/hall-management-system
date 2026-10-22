@@ -4,16 +4,61 @@ namespace App\Http\Controllers;
 
 use App\Actions\Complaints\CreateComplaint;
 use App\Enums\ComplaintCategory;
+use App\Enums\ComplaintStatus;
 use App\Http\Requests\Complaints\StoreComplaintRequest;
+use App\Models\Complaint;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class ComplaintController extends Controller
 {
+    public function index(Request $request): Response
+    {
+        Gate::authorize('viewAny', Complaint::class);
+
+        $filters = $request->validate([
+            'status' => ['nullable', Rule::enum(ComplaintStatus::class)],
+            'category' => ['nullable', Rule::enum(ComplaintCategory::class)],
+        ]);
+
+        /** @var User $user */
+        $user = $request->user();
+
+        $complaints = Complaint::query()
+            ->visibleTo($user)
+            ->with(['studentProfile.user', 'room.block'])
+            ->when(
+                $filters['status'] ?? null,
+                fn (Builder $query, string $status) => $query->where('status', $status),
+            )
+            ->when(
+                $filters['category'] ?? null,
+                fn (Builder $query, string $category) => $query->where('category', $category),
+            )
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
+            ->paginate(20)
+            ->withQueryString()
+            ->through(fn (Complaint $complaint) => $this->serializeComplaint($complaint));
+
+        return Inertia::render('complaints/index', [
+            'complaints' => $complaints,
+            'filters' => [
+                'status' => $filters['status'] ?? null,
+                'category' => $filters['category'] ?? null,
+            ],
+            'statuses' => array_column(ComplaintStatus::cases(), 'value'),
+            'categories' => array_column(ComplaintCategory::cases(), 'value'),
+        ]);
+    }
+
     public function create(Request $request): Response
     {
         /** @var User $user */
@@ -73,5 +118,32 @@ class ComplaintController extends Controller
         ]);
 
         return to_route('dashboard');
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function serializeComplaint(Complaint $complaint, bool $includeDescription = false): array
+    {
+        $complaint->loadMissing(['studentProfile.user', 'room.block']);
+
+        $room = $complaint->room;
+
+        return [
+            'id' => $complaint->id,
+            'tracking_id' => $complaint->tracking_id,
+            'category' => $complaint->category->value,
+            'title' => $complaint->title,
+            'status' => $complaint->status->value,
+            'location' => $complaint->location,
+            'room_no' => $room?->room_no,
+            'block' => $room?->block?->name,
+            'student_name' => $complaint->studentProfile?->user?->name,
+            'registration_number' => $complaint->studentProfile?->registration_number,
+            'days_open' => $complaint->daysOpen(),
+            'is_overdue' => $complaint->isOverdue(),
+            'created_at' => $complaint->created_at?->toIso8601String(),
+            ...($includeDescription ? ['description' => $complaint->description] : []),
+        ];
     }
 }

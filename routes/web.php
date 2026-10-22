@@ -30,6 +30,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('house-tutors/{tutorProfile}/edit', [TutorController::class, 'edit'])->name('house-tutors.edit');
     Route::put('house-tutors/{tutorProfile}', [TutorController::class, 'update'])->name('house-tutors.update');
     Route::patch('house-tutors/{tutorProfile}/deactivate', [TutorController::class, 'deactivate'])->name('house-tutors.deactivate');
+    Route::get('complaints', [ComplaintController::class, 'index'])->name('complaints.index');
 });
 
 Route::middleware(['auth', 'verified', 'approved.student'])->group(function () {

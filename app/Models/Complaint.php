@@ -6,6 +6,7 @@ use App\Enums\ComplaintCategory;
 use App\Enums\ComplaintStatus;
 use Database\Factories\ComplaintFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -93,6 +94,35 @@ class Complaint extends Model
         }
 
         return $this->created_at->lt(now()->subDays(7));
+    }
+
+    /**
+     * @param  Builder<Complaint>  $query
+     * @return Builder<Complaint>
+     */
+    public function scopeVisibleTo(Builder $query, User $user): Builder
+    {
+        if ($user->hasAnyRole('super_admin', 'provost', 'hall_office_staff')) {
+            return $query;
+        }
+
+        if ($user->hasAnyRole('student', 'club_admin')) {
+            return $query->where('student_profile_id', $user->studentProfile?->id ?? 0);
+        }
+
+        $tutorProfile = $user->tutorProfile;
+        $blockIds = $tutorProfile?->is_active === true
+            ? $tutorProfile->blocks()->pluck('blocks.id')->all()
+            : [];
+
+        if ($blockIds === []) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        return $query->whereHas(
+            'room',
+            fn (Builder $query) => $query->whereIn('block_id', $blockIds),
+        );
     }
 
     /** @return array<string, string> */
