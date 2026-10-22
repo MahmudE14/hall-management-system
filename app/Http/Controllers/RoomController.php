@@ -21,6 +21,10 @@ class RoomController extends Controller
         return Inertia::render('rooms/index', [
             'rooms' => Room::query()
                 ->with(['block', 'seats'])
+                ->withCount([
+                    'seats',
+                    'seatAllocations as occupied_seats_count' => fn ($query) => $query->where('active', true),
+                ])
                 ->orderBy('room_no')
                 ->get()
                 ->map(fn (Room $room) => $this->serializeRoom($room))
@@ -54,8 +58,13 @@ class RoomController extends Controller
     {
         Gate::authorize('update', $room);
 
+        $room->load(['block', 'seats'])->loadCount([
+            'seats',
+            'seatAllocations as occupied_seats_count' => fn ($query) => $query->where('active', true),
+        ]);
+
         return Inertia::render('rooms/edit', [
-            'room' => $this->serializeRoom($room->load(['block', 'seats'])),
+            'room' => $this->serializeRoom($room),
         ]);
     }
 
@@ -73,6 +82,8 @@ class RoomController extends Controller
      */
     private function serializeRoom(Room $room): array
     {
+        $occupiedSeats = (int) ($room->occupied_seats_count ?? 0);
+
         return [
             'id' => $room->id,
             'block_id' => $room->block_id,
@@ -80,9 +91,9 @@ class RoomController extends Controller
             'floor' => $room->floor,
             'capacity' => $room->capacity,
             'seats_count' => $room->seats->count(),
-            'occupancy_available' => false,
-            'occupied_seats' => null,
-            'free_seats' => null,
+            'occupancy_available' => true,
+            'occupied_seats' => $occupiedSeats,
+            'free_seats' => max(0, $room->capacity - $occupiedSeats),
             'block' => $room->block?->only(['id', 'name', 'code']),
             'seats' => $room->seats
                 ->sortBy('label')

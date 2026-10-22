@@ -153,27 +153,15 @@ export default function RoomsIndex({
                                             {room.capacity}
                                         </td>
                                         <td className="px-4 py-3 align-top">
-                                            {room.occupancy_available ? (
-                                                <div className="flex flex-wrap gap-1">
-                                                    <Badge variant="secondary">
-                                                        {room.occupied_seats}{' '}
-                                                        occupied
-                                                    </Badge>
-                                                    <Badge variant="outline">
-                                                        {room.free_seats} free
-                                                    </Badge>
-                                                </div>
-                                            ) : (
-                                                <div className="space-y-1">
-                                                    <p className="text-muted-foreground">
-                                                        Not yet available
-                                                    </p>
-                                                    <p className="text-xs text-muted-foreground">
-                                                        Allocation history is
-                                                        required.
-                                                    </p>
-                                                </div>
-                                            )}
+                                            <div className="flex flex-wrap gap-1">
+                                                <Badge variant="secondary">
+                                                    {room.occupied_seats}{' '}
+                                                    occupied
+                                                </Badge>
+                                                <Badge variant="outline">
+                                                    {room.free_seats} free
+                                                </Badge>
+                                            </div>
                                         </td>
                                         {canManage && (
                                             <td className="px-4 py-3 align-top">

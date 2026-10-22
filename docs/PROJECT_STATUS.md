@@ -1,9 +1,9 @@
 # Project Status
 
 - Current phase: Phase 3 - Seat Allocation and Vacancy on `phase/03-seat-allocation-vacancy`.
-- Implementation authorization: Phase 3 tasks 3.1-3.2 only.
+- Implementation authorization: Phase 3 tasks 3.3-3.5 only (tasks 3.1-3.2 complete).
 - Phase branch creation authorization: Granted for `phase/03-seat-allocation-vacancy`, created from the Phase 2 integration merge.
-- Task-commit authorization: Granted for tasks 3.1-3.2. Push/PR/merge authorization: NONE.
+- Task-commit authorization: Granted for tasks 3.3-3.5. Push/PR/merge authorization: NONE.
 - Integration branch: `main` at `52d1468`, the Phase 2 integration merge.
 - Active phase branch: `phase/03-seat-allocation-vacancy`; no remote tracking is configured and remote PR state is unverified because GitHub CLI/API authentication is unavailable.
 - Active specification/change: `deliver-assessment-core` (21/81 tasks complete; Phase 1 tasks 1.1-1.14, Phase 2 tasks 2.1-2.5, and Phase 3 tasks 3.1-3.2 complete).
@@ -30,8 +30,11 @@
 - Phase 3 task 3.1 verification: Focused `SeatAllocationTest` passes (8 tests, 20 assertions).
 - Phase 3 task 3.2 implementation: Added the transactional `AllocateSeat` action, `SeatAllocationPolicy`, allocation Form Request, controller, and `allocations.store` route. Allocation locks the student and seat, requires an approved registration, refuses duplicate active student allocations and occupied seats, records the active allocation, and marks the student Resident. Hall Office Staff, Provost, and Super Admin may allocate; all other roles are forbidden.
 - Phase 3 task 3.2 verification: Focused `SeatAllocationTest` passes (10 tests, 42 assertions).
+- Phase 3 task 3.3 implementation: Added seat-allocation controls to the student profile for approved, attached students, listing free seats with room and block context. Room lists and edit pages now derive occupied and free seat counts from active allocations through the new `Room::seatAllocations` relationship. The student profile now exposes the active allocation while allocation history remains deferred under task 2.7.
+- Phase 3 task 3.3 verification: Focused `SeatAllocationTest` and `AccommodationManagementTest` pass (40 tests, 495 assertions). `vendor/bin/pint --dirty --format agent` and `npm run types:check` pass.
 - Task 3.1 commit mapping: The task 3.1 Conventional Commit contains its implementation, focused tests, task checkbox, and status update.
 - Task 3.2 commit mapping: The task 3.2 Conventional Commit contains its implementation, focused tests, task checkbox, and status update.
+- Task 3.3 commit mapping: The task 3.3 Conventional Commit contains its implementation, focused tests, task checkbox, authorization-ledger update, and status update.
 - Task 2.1 commit mapping: The task 2.1 Conventional Commit contains its implementation, focused test, task checkbox, and status update.
 - Task 2.2 commit mapping: The task 2.2 Conventional Commit contains its implementation, focused test, task checkbox, and status update.
 - Task 2.3 commit mapping: The task 2.3 Conventional Commit contains its implementation, focused test, task checkbox, and status update.
@@ -43,6 +46,6 @@
 - Unresolved clarifications: C1 Super Admin complaint closure; C2 Super Admin complaint assignment; C3 rejection and tutor transition permissions; C4 reopening boundary/timezone; C5 eligible assignees and commenters; C8 tutor onboarding; C10 Attached complaint block association; C11 repeated-resolution timing.
 - Framework decision: Laravel 13 is approved by the assessment authority according to user-confirmed communication. Approval evidence is user-reported; no written evidence is claimed.
 - Phase 3 tasks 3.1-3.2 batch verification: `composer ci:check` passes (257 tests, 1536 assertions; npm formatting/lint, TypeScript, Pint, and PHPStan with 0 errors). `npm run build`, `openspec validate deliver-assessment-core --strict`, and `git diff --check` pass. The known non-fatal PHPStan turbo-extension warning remains.
-- Last committed checkpoint: the task 3.2 implementation and PHPStan correction commits on `phase/03-seat-allocation-vacancy`.
+- Last committed checkpoint: the task 3.2 implementation and PHPStan correction commits on `phase/03-seat-allocation-vacancy`. Task 3.3 changes are committed with this status update.
 - Uncommitted work: Expected to be none after the quality-gate commit. Do not push, open a PR, or merge without explicit authorization.
 - Next recommended action: Stop after task 3.2. Do not start tasks 3.3-3.6 without explicit authorization. Tasks 2.6-2.7 remain unchecked until their named Phase 3/4.4 checkpoints are implemented and verified.

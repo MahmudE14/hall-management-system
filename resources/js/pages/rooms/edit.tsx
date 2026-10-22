@@ -123,12 +123,8 @@ export default function EditRoom({ room }: { room: Room }) {
                                     aria-invalid={Boolean(form.errors.capacity)}
                                 />
                                 <p className="text-xs text-muted-foreground">
-                                    Capacity cannot be lower than the{' '}
-                                    {room.seats_count}{' '}
-                                    {room.seats_count === 1
-                                        ? 'seat already defined'
-                                        : 'seats already defined'}
-                                    .
+                                    Capacity cannot be lower than the seats
+                                    already defined or currently occupied.
                                 </p>
                                 <InputError message={form.errors.capacity} />
                             </div>
@@ -146,23 +142,14 @@ export default function EditRoom({ room }: { room: Room }) {
 
                     <aside className="space-y-3 rounded-xl border border-sidebar-border/70 p-4 dark:border-sidebar-border">
                         <p className="font-medium">Occupancy</p>
-                        {room.occupancy_available ? (
-                            <div className="flex flex-wrap gap-1">
-                                <Badge variant="secondary">
-                                    {room.occupied_seats} occupied
-                                </Badge>
-                                <Badge variant="outline">
-                                    {room.free_seats} free
-                                </Badge>
-                            </div>
-                        ) : (
-                            <p className="text-sm text-muted-foreground">
-                                Occupied and free seat counts are unavailable
-                                until seat allocation history is implemented.
-                                This page does not treat missing allocation data
-                                as zero occupancy.
-                            </p>
-                        )}
+                        <div className="flex flex-wrap gap-1">
+                            <Badge variant="secondary">
+                                {room.occupied_seats} occupied
+                            </Badge>
+                            <Badge variant="outline">
+                                {room.free_seats} free
+                            </Badge>
+                        </div>
                         <p className="text-sm text-muted-foreground">
                             Capacity {room.capacity}. {room.seats_count}{' '}
                             {room.seats_count === 1 ? 'seat' : 'seats'} defined.

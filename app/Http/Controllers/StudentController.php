@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Enums\RegistrationStatus;
+use App\Models\Seat;
+use App\Models\SeatAllocation;
 use App\Models\StudentProfile;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -95,8 +97,51 @@ class StudentController extends Controller
 
         $studentProfile->load('user');
 
+        $activeAllocation = $studentProfile->seatAllocations()
+            ->where('active', true)
+            ->with(['seat.room.block'])
+            ->first();
+
+        $canAllocate = Gate::allows('create', SeatAllocation::class);
+
+        $availableSeats = $canAllocate && $activeAllocation === null
+            && $studentProfile->registration_status === RegistrationStatus::Approved
+                ? Seat::query()
+                    ->whereDoesntHave(
+                        'seatAllocations',
+                        fn (Builder $query) => $query->where('active', true),
+                    )
+                    ->with('room.block')
+                    ->orderBy('room_id')
+                    ->orderBy('label')
+                    ->get()
+                    ->map(fn (Seat $seat) => [
+                        'id' => $seat->id,
+                        'label' => $seat->label,
+                        'room_no' => $seat->room->room_no,
+                        'block' => $seat->room->block?->name,
+                    ])
+                    ->values()
+                    ->all()
+                : [];
+
         return Inertia::render('students/show', [
             'student' => $this->serializeStudent($studentProfile),
+            'canAllocate' => $canAllocate,
+            'availableSeats' => $availableSeats,
+            'activeAllocation' => $activeAllocation === null ? null : [
+                'id' => $activeAllocation->id,
+                'allocated_at' => $activeAllocation->allocated_at->toDateString(),
+                'seat' => [
+                    'id' => $activeAllocation->seat->id,
+                    'label' => $activeAllocation->seat->label,
+                ],
+                'room' => [
+                    'id' => $activeAllocation->seat->room->id,
+                    'room_no' => $activeAllocation->seat->room->room_no,
+                ],
+                'block' => $activeAllocation->seat->room->block?->only(['id', 'name', 'code']),
+            ],
         ]);
     }
 

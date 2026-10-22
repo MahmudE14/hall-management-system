@@ -3,13 +3,19 @@
 use App\Enums\RegistrationStatus;
 use App\Enums\ResidencyStatus;
 use App\Models\Role;
+use App\Models\Room;
 use App\Models\Seat;
 use App\Models\SeatAllocation;
 use App\Models\StudentProfile;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia;
 
 uses(RefreshDatabase::class);
+
+beforeEach(function () {
+    $this->withoutVite();
+});
 
 test('authorized staff can allocate an available seat to an approved student', function (string $role) {
     $actor = seatAllocationUserWithRole($role);
@@ -32,6 +38,51 @@ test('authorized staff can allocate an available seat to an approved student', f
     expect($allocation->allocated_at->toDateString())->toBe(now()->toDateString());
     expect($student->refresh()->residency_status)->toBe(ResidencyStatus::Resident);
 })->with(['super_admin', 'provost', 'hall_office_staff']);
+
+test('student and room pages expose allocation controls and current occupancy', function () {
+    $actor = seatAllocationUserWithRole('hall_office_staff');
+    $student = StudentProfile::factory()->create([
+        'registration_status' => RegistrationStatus::Approved,
+        'residency_status' => ResidencyStatus::Attached,
+    ]);
+    $room = Room::factory()->create(['capacity' => 2]);
+    $seatA = Seat::factory()->for($room)->create(['label' => 'A']);
+    $seatB = Seat::factory()->for($room)->create(['label' => 'B']);
+
+    $this->actingAs($actor)
+        ->get(route('students.show', $student))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('students/show', false)
+            ->where('canAllocate', true)
+            ->where('activeAllocation', null)
+            ->has('availableSeats', 2)
+            ->where('availableSeats.0.id', $seatA->id)
+            ->where('availableSeats.1.id', $seatB->id)
+        );
+
+    $this->actingAs($actor)
+        ->post(route('allocations.store', $student), ['seat_id' => $seatA->id])
+        ->assertRedirect(route('students.show', $student));
+
+    $this->actingAs($actor)
+        ->get(route('students.show', $student))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('student.residency_status', ResidencyStatus::Resident->value)
+            ->where('activeAllocation.seat.id', $seatA->id)
+            ->where('activeAllocation.room.id', $room->id)
+            ->has('availableSeats', 0)
+        );
+
+    $this->actingAs($actor)
+        ->get(route('rooms.index'))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('rooms.0.occupied_seats', 1)
+            ->where('rooms.0.free_seats', 1)
+        );
+});
 
 test('a student with an active allocation cannot receive another seat', function () {
     $actor = seatAllocationUserWithRole('hall_office_staff');
