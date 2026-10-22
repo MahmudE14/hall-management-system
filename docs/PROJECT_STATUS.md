@@ -1,14 +1,14 @@
 # Project Status
 
-- Current phase: Phase 2 - Hall Structure and Student Records on `phase/02-hall-structure-student-records`.
-- Implementation authorization: Phase 2, tasks 2.6-2.7 only for application implementation. This session is additionally authorized for documentation-only phase-gate updates; no application code or tests.
-- Phase branch creation authorization: Granted for `phase/02-hall-structure-student-records`, created from the Phase 1 integration merge.
-- Task-commit authorization: Granted for tasks 2.6-2.7 and for documentation-only gate updates. Push/PR/merge authorization: NONE.
-- Integration branch: `main` at `f9ba7c2`, the Phase 1 integration merge.
-- Active phase branch: `phase/02-hall-structure-student-records`; no remote tracking is configured and remote PR state is unverified because GitHub CLI/API authentication is unavailable.
-- Active specification/change: `deliver-assessment-core` (19/81 tasks complete; Phase 1 tasks 1.1-1.14 and Phase 2 tasks 2.1-2.5 complete).
-- Phase 2 readiness: Tasks 2.1-2.5 are complete. Tasks 2.6-2.7 are partially implemented: search, department/session/status filters, pagination, scoped directory visibility, profile visibility, and bounded eager loading are implemented; block filtering, current room, and allocation history are deferred until Phase 3 active allocations exist.
-- Phase 2 gate status: Foundation implementation is complete for tasks 2.1-2.5 and the non-deferred portions of tasks 2.6-2.7. Phase 2 overall is partially complete because tasks 2.6-2.7 remain unchecked. PR integration is eligible with the documented deferrals below, pending explicit push/PR/merge authorization. Phase 3 is not authorized.
+- Current phase: Phase 3 - Seat Allocation and Vacancy on `phase/03-seat-allocation-vacancy`.
+- Implementation authorization: Phase 3 tasks 3.1-3.2 only.
+- Phase branch creation authorization: Granted for `phase/03-seat-allocation-vacancy`, created from the Phase 2 integration merge.
+- Task-commit authorization: Granted for tasks 3.1-3.2. Push/PR/merge authorization: NONE.
+- Integration branch: `main` at `52d1468`, the Phase 2 integration merge.
+- Active phase branch: `phase/03-seat-allocation-vacancy`; no remote tracking is configured and remote PR state is unverified because GitHub CLI/API authentication is unavailable.
+- Active specification/change: `deliver-assessment-core` (20/81 tasks complete; Phase 1 tasks 1.1-1.14, Phase 2 tasks 2.1-2.5, and Phase 3 task 3.1 complete).
+- Phase 2 lifecycle: Integrated into `main` at `52d1468` with tasks 2.6-2.7 deliberately deferred at their named Phase 3 and task 4.4 checkpoints.
+- Phase 3 authorization: The user explicitly authorized tasks 3.1-3.2. The Phase 3 entry condition in the OpenSpec tasks file still reads "Phase 2 is complete"; the Phase 2 deferrals remain recorded and must not be marked complete as part of this phase.
 - Phase 2 documented deferrals: (a) Task 2.6 block filtering → Phase 3 seat-allocation implementation; (b) Task 2.7 current room and allocation history → Phase 3 seat-allocation implementation; (c) House Tutor block-scoped access → task 4.4. Tasks 2.6-2.7 remain unchecked until their named checkpoints complete. The existing occupancy and capacity connections remain at their recorded Phase 3 checkpoint (task 3.5).
 - Phase 2 task 2.1 implementation: Added `halls` and `blocks` migrations, `Hall` and `Block` Eloquent models with `Hall hasMany Block` / `Block belongsTo Hall` relationships, and factories. Blocks reference their hall with a cascading foreign key.
 - Phase 2 task 2.2 implementation: Added `rooms` and `seats` migrations, `Room` and `Seat` Eloquent models with `Block hasMany Room`, `Room belongsTo Block`, `Room hasMany Seat`, and `Seat belongsTo Room` relationships, plus factories. Room numbers are unique within a block and seat labels within a room; both use cascading foreign keys. Room capacity is guarded as a positive integer on SQLite and MySQL.
@@ -26,6 +26,9 @@
 - Phase 2 task 2.7 partial implementation: Added the student profile page with personal details, registration and residency status, back navigation, and explicit unavailable states for the current room and allocation history. Hall Office Staff, Provost, and Super Admin can view any profile; Student and Club Admin accounts can view only their own profile; House Tutor access remains deferred to task 4.4.
 - Phase 2 task 2.7 dependency: Current room and allocation history require the Phase 3 seat-allocation history model. The profile exposes `allocation_history_available: false` and `current_room: null` rather than fabricating values, so task 2.7 remains unchecked until those sections can be implemented and verified.
 - Phase 2 task 2.7 verification: Focused `StudentRecordTest` passes (8 tests, 123 assertions).
+- Phase 3 task 3.1 implementation: Added the `seat_allocations` migration with active-marker uniqueness for student and seat, the `SeatAllocation` model and factory, and `StudentProfile`/`Seat` allocation relationships. Completed allocations clear the nullable active marker so history may retain the same student and seat.
+- Phase 3 task 3.1 verification: Focused `SeatAllocationTest` passes (8 tests, 20 assertions).
+- Task 3.1 commit mapping: The task 3.1 Conventional Commit contains its implementation, focused tests, task checkbox, and status update.
 - Task 2.1 commit mapping: The task 2.1 Conventional Commit contains its implementation, focused test, task checkbox, and status update.
 - Task 2.2 commit mapping: The task 2.2 Conventional Commit contains its implementation, focused test, task checkbox, and status update.
 - Task 2.3 commit mapping: The task 2.3 Conventional Commit contains its implementation, focused test, task checkbox, and status update.

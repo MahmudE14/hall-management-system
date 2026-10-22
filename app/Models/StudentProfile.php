@@ -49,6 +49,12 @@ class StudentProfile extends Model
         return $this->hasMany(RegistrationDecision::class)->latest();
     }
 
+    /** @return HasMany<SeatAllocation, $this> */
+    public function seatAllocations(): HasMany
+    {
+        return $this->hasMany(SeatAllocation::class);
+    }
+
     /** @return array<string, string> */
     protected function casts(): array
     {
