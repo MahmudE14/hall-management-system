@@ -31,6 +31,11 @@ test('valid students can register with a pending profile', function () {
 
     $user = User::query()->where('email', 'test@student.du.test')->firstOrFail();
 
+    expect(auth()->user()?->is_active)->toBeTrue()
+        ->and($user->is_active)->toBeTrue();
+
+    $this->get(route('profile.edit'))->assertOk();
+
     expect($user->studentProfile)->not->toBeNull();
     expect($user->studentProfile->registration_number)->toBe('2023000001');
     expect($user->studentProfile->department)->toBe('English');

@@ -16,6 +16,10 @@ test('inactive users cannot authenticate with valid credentials', function () {
     ])->assertSessionHasErrors('email');
 
     $this->assertGuest();
+
+    expect($user->refresh()->is_active)->toBeFalse();
+
+    $this->get(route('dashboard'))->assertRedirect(route('login'));
 });
 
 test('active users can still authenticate', function () {
