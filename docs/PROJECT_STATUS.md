@@ -1,13 +1,15 @@
 # Project Status
 
-- Current phase: Phase 4 - House Tutors on `phase/04-house-tutors`.
-- Implementation authorization: Phase 4 tasks 4.1-4.5 and C8 resolution (now complete); later phases are not authorized.
-- Phase branch creation authorization: Granted for `phase/04-house-tutors`, created from the Phase 3 integration merge.
-- Task-commit authorization: Granted for tasks 4.1-4.5 and C8 resolution. Push/PR/merge authorization: NONE.
-- Integration branch: `main` at `b4efe2f`, the Phase 3 integration merge.
-- Active phase branch: `phase/04-house-tutors`; no remote tracking is configured and remote PR state is unverified because GitHub CLI/API authentication is unavailable.
+- Current phase: Phase 5 - Complaints, Batch 1 on `phase/05-complaints`.
+- Implementation authorization: Phase 5 Batch 1 tasks 5.1-5.3 only. Tasks 5.4 onward remain unauthorized.
+- Phase branch creation authorization: Granted for `phase/05-complaints`, created from the Phase 4 integration merge. No further branch creation is authorized.
+- Task-commit authorization: Granted for tasks 5.1-5.3 (local commits only). Push/PR/merge authorization: NONE.
+- Integration branch: `main` at `4fe483b`, the Phase 4 integration merge.
+- Active phase branch: `phase/05-complaints`; no remote tracking is configured and remote PR state is unverified because GitHub CLI/API authentication is unavailable.
 - Active specification/change: `deliver-assessment-core` (32/81 tasks complete; Phase 1 tasks 1.1-1.14, Phase 2 tasks 2.1-2.7, Phase 3 tasks 3.1-3.6, and Phase 4 tasks 4.1-4.5 complete).
-- Phase 4 authorization: The user explicitly authorized Phase 4 tasks 4.1-4.5 and C8 resolution, now complete. Later phases remain unauthorized.
+- Phase 5 Batch 1 authorization: The user explicitly authorized tasks 5.1-5.3 only, including local task commits. Tasks 5.4 onward, push, PR, and merge are not authorized. C1-C5 and C11 remain unresolved and must not be resolved by assumption.
+- Phase 5 task 5.1 implementation: Added `complaints`, `complaint_status_logs`, and `complaint_comments` migrations with complaint/status/category enums, foreign keys, tracking-ID uniqueness, and indexes for ownership, filters, assignment, aging, and timeline queries.
+- Phase 5 task 5.1 verification: Focused `ComplaintSchemaTest` passes (6 tests, 23 assertions); `vendor/bin/pint --dirty --format agent` passes.
 - Phase 2 documented deferrals: House Tutor block-scoped access → task 4.4. The task 2.6 block-filter and task 2.7 current-room/allocation-history checkpoints are completed. The existing occupancy and capacity connections remain at their recorded Phase 3 checkpoint (task 3.5).
 - Phase 2 task 2.1 implementation: Added `halls` and `blocks` migrations, `Hall` and `Block` Eloquent models with `Hall hasMany Block` / `Block belongsTo Hall` relationships, and factories. Blocks reference their hall with a cascading foreign key.
 - Phase 2 task 2.2 implementation: Added `rooms` and `seats` migrations, `Room` and `Seat` Eloquent models with `Block hasMany Room`, `Room belongsTo Block`, `Room hasMany Seat`, and `Seat belongsTo Room` relationships, plus factories. Room numbers are unique within a block and seat labels within a room; both use cascading foreign keys. Room capacity is guarded as a positive integer on SQLite and MySQL.

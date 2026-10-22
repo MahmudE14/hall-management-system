@@ -86,7 +86,7 @@ There are no implementation tasks in Phase 0.
 
 **Entry:** Phases 1, 3, and 4 are complete and `docs/PROJECT_STATUS.md` explicitly authorizes Phase 5. Resolve C1-C5 and C11 before their dependent tasks.
 
-- [ ] 5.1 Add complaint, status-log, and comment migrations plus status/category enums, foreign keys, and indexes; verify schema and enum tests.
+- [x] 5.1 Add complaint, status-log, and comment migrations plus status/category enums, foreign keys, and indexes; verify schema and enum tests.
 - [ ] 5.2 Add complaint models, relationships, factories, supported categories, and derived aging behavior; verify model and days-open/overdue tests.
 - [ ] 5.3 Add the annual tracking-counter persistence and transactional `KJH-YYYY-NNNN` generator; verify yearly reset and simultaneous-submission uniqueness.
 - [ ] 5.4 Add approved-student complaint creation with Resident room autofill and Attached location input; verify Pending refusal and location behavior.
