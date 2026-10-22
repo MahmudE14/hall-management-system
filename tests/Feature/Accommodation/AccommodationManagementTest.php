@@ -5,6 +5,7 @@ use App\Models\Hall;
 use App\Models\Role;
 use App\Models\Room;
 use App\Models\Seat;
+use App\Models\SeatAllocation;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
@@ -268,14 +269,16 @@ test('structure list pages expose role-appropriate management controls', functio
     ['provost', false],
 ]);
 
-test('room pages report occupancy as unavailable until allocation history exists', function () {
+test('room pages report occupancy from active allocations', function () {
     $block = Block::factory()->create();
     $room = Room::factory()->for($block)->create(['capacity' => 4]);
-    Seat::factory()->for($room)->count(3)->sequence(
+    $seats = Seat::factory()->for($room)->count(3)->sequence(
         ['label' => 'A'],
         ['label' => 'B'],
         ['label' => 'C'],
     )->create();
+    SeatAllocation::factory()->for($seats[0])->create();
+    SeatAllocation::factory()->for($seats[1])->create();
     $manager = accommodationUserWithRole('hall_office_staff');
 
     $this->actingAs($manager)
@@ -287,9 +290,9 @@ test('room pages report occupancy as unavailable until allocation history exists
             ->where('rooms.0.id', $room->id)
             ->where('rooms.0.capacity', 4)
             ->where('rooms.0.seats_count', 3)
-            ->where('rooms.0.occupancy_available', false)
-            ->where('rooms.0.occupied_seats', null)
-            ->where('rooms.0.free_seats', null)
+            ->where('rooms.0.occupancy_available', true)
+            ->where('rooms.0.occupied_seats', 2)
+            ->where('rooms.0.free_seats', 2)
             ->where('rooms.0.block.id', $block->id)
             ->has('rooms.0.seats', 3)
         );
@@ -299,9 +302,9 @@ test('room pages report occupancy as unavailable until allocation history exists
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('rooms/edit', false)
-            ->where('room.occupancy_available', false)
-            ->where('room.occupied_seats', null)
-            ->where('room.free_seats', null)
+            ->where('room.occupancy_available', true)
+            ->where('room.occupied_seats', 2)
+            ->where('room.free_seats', 2)
         );
 });
 
@@ -401,7 +404,7 @@ test('room capacity cannot be reduced below the seats already defined', function
             'capacity' => 1,
         ])
         ->assertSessionHasErrors([
-            'capacity' => 'Capacity cannot be lower than the number of seats already defined (2).',
+            'capacity' => 'Capacity cannot be lower than the seats already defined or currently occupied (2).',
         ]);
 
     expect($room->refresh()->capacity)->toBe(3);

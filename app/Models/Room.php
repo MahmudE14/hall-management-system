@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 
@@ -17,6 +18,7 @@ use InvalidArgumentException;
  * @property string $room_no
  * @property int $floor
  * @property int $capacity
+ * @property-read int|null $occupied_seats_count
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
@@ -45,6 +47,12 @@ class Room extends Model
     public function seats(): HasMany
     {
         return $this->hasMany(Seat::class);
+    }
+
+    /** @return HasManyThrough<SeatAllocation, Seat, $this> */
+    public function seatAllocations(): HasManyThrough
+    {
+        return $this->hasManyThrough(SeatAllocation::class, Seat::class);
     }
 
     /** @return array<string, string> */

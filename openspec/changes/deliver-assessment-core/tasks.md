@@ -52,8 +52,8 @@ There are no implementation tasks in Phase 0.
 - [x] 2.3 Add Form Requests, policies, routes, and controllers for block, room, and seat management; verify Hall Office Staff and Super Admin management, Provost view-only access, and other-role `403` responses.
 - [x] 2.4 Add block and room list/create/edit pages with occupied and free seat counts; verify Inertia props, validation feedback, and occupancy calculations.
 - [x] 2.5 Add explicit seat management and safe room-capacity reconciliation; verify seat creation/editing cannot invalidate occupancy or allocation history.
-- [ ] 2.6 Add the eager-loaded paginated student directory with name/registration search and block/department/session/status filters; verify own-only, all-record, combined-filter, pagination, and bounded-query behavior. Tutor assigned-block scope is completed in task 4.4 after tutor assignments exist.
-- [ ] 2.7 Add the student profile page with personal details, current room, and allocation history; verify authorized visibility and student self-record access.
+- [x] 2.6 Add the eager-loaded paginated student directory with name/registration search and block/department/session/status filters; verify own-only, all-record, combined-filter, pagination, and bounded-query behavior. Tutor assigned-block scope is completed in task 4.4 after tutor assignments exist.
+- [x] 2.7 Add the student profile page with personal details, current room, and allocation history; verify authorized visibility and student self-record access.
 
 **Exit:** Tasks 2.1-2.7 are complete; structure, capacity, occupancy, directory, profile, and authorization tests pass; `docs/PROJECT_STATUS.md` is updated; implementation stops.
 
@@ -61,12 +61,12 @@ There are no implementation tasks in Phase 0.
 
 **Entry:** Phase 2 is complete and `docs/PROJECT_STATUS.md` explicitly authorizes Phase 3.
 
-- [ ] 3.1 Add allocation-history persistence and active student/seat uniqueness safeguards; verify database constraints and model relationships.
-- [ ] 3.2 Add the transactional allocation action; verify Office Staff/Provost/Super Admin authorization, approved allocation, duplicate student allocation, occupied seat, and Pending-student refusal.
-- [ ] 3.3 Add allocation controls to the student/room workflow; verify allocation changes Attached to Resident and updates occupancy.
-- [ ] 3.4 Add transactional vacancy with required date and reason; verify the student returns to Attached, the seat becomes free, and history remains intact.
-- [ ] 3.5 Protect room-capacity changes from current occupancy and retained history; verify capacity cannot fall below occupancy and no history is deleted.
-- [ ] 3.6 Verify allocation concurrency and migrations against configured MySQL while retaining SQLite feature coverage.
+- [x] 3.1 Add allocation-history persistence and active student/seat uniqueness safeguards; verify database constraints and model relationships.
+- [x] 3.2 Add the transactional allocation action; verify Office Staff/Provost/Super Admin authorization, approved allocation, duplicate student allocation, occupied seat, and Pending-student refusal.
+- [x] 3.3 Add allocation controls to the student/room workflow; verify allocation changes Attached to Resident and updates occupancy.
+- [x] 3.4 Add transactional vacancy with required date and reason; verify the student returns to Attached, the seat becomes free, and history remains intact.
+- [x] 3.5 Protect room-capacity changes from current occupancy and retained history; verify capacity cannot fall below occupancy and no history is deleted.
+- [x] 3.6 Verify allocation concurrency and migrations against configured MySQL while retaining SQLite feature coverage.
 
 **Exit:** Tasks 3.1-3.6 are complete; allocation, vacancy, history, capacity, authorization, and concurrency checks pass; `docs/PROJECT_STATUS.md` is updated; implementation stops.
 

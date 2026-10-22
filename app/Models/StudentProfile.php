@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 
 /**
@@ -47,6 +48,18 @@ class StudentProfile extends Model
     public function registrationDecisions(): HasMany
     {
         return $this->hasMany(RegistrationDecision::class)->latest();
+    }
+
+    /** @return HasMany<SeatAllocation, $this> */
+    public function seatAllocations(): HasMany
+    {
+        return $this->hasMany(SeatAllocation::class);
+    }
+
+    /** @return HasOne<SeatAllocation, $this> */
+    public function activeSeatAllocation(): HasOne
+    {
+        return $this->hasOne(SeatAllocation::class)->where('active', true);
     }
 
     /** @return array<string, string> */

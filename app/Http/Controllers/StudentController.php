@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Enums\RegistrationStatus;
+use App\Models\Block;
+use App\Models\Seat;
+use App\Models\SeatAllocation;
 use App\Models\StudentProfile;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -23,6 +26,7 @@ class StudentController extends Controller
 
         $filters = $request->validate([
             'search' => ['nullable', 'string', 'max:255'],
+            'block' => ['nullable', 'integer', Rule::exists('blocks', 'id')],
             'department' => ['nullable', 'string', 'max:255'],
             'session' => ['nullable', 'string', 'max:255'],
             'status' => ['nullable', Rule::in(array_column(RegistrationStatus::cases(), 'value'))],
@@ -31,10 +35,17 @@ class StudentController extends Controller
         $user = $request->user();
 
         $students = StudentProfile::query()
-            ->with('user')
+            ->with(['user', 'activeSeatAllocation.seat.room.block'])
             ->when(
                 ! $user->hasAnyRole(...self::DIRECTORY_ROLES),
                 fn (Builder $query) => $query->where('user_id', $user->id),
+            )
+            ->when(
+                isset($filters['block']),
+                fn (Builder $query) => $query->whereHas(
+                    'activeSeatAllocation.seat.room',
+                    fn (Builder $query) => $query->where('block_id', $filters['block']),
+                ),
             )
             ->when(
                 $filters['search'] ?? null,
@@ -68,10 +79,15 @@ class StudentController extends Controller
             'students' => $students,
             'filters' => [
                 'search' => $filters['search'] ?? null,
+                'block' => isset($filters['block']) ? (int) $filters['block'] : null,
                 'department' => $filters['department'] ?? null,
                 'session' => $filters['session'] ?? null,
                 'status' => $filters['status'] ?? null,
             ],
+            'blocks' => Block::query()
+                ->orderBy('name')
+                ->get(['id', 'name', 'code'])
+                ->all(),
             'departments' => StudentProfile::query()
                 ->distinct()
                 ->orderBy('department')
@@ -85,7 +101,6 @@ class StudentController extends Controller
                 ->values()
                 ->all(),
             'statuses' => array_column(RegistrationStatus::cases(), 'value'),
-            'block_filter_available' => false,
         ]);
     }
 
@@ -93,20 +108,65 @@ class StudentController extends Controller
     {
         Gate::authorize('view', $studentProfile);
 
-        $studentProfile->load('user');
+        $studentProfile->load([
+            'user',
+            'activeSeatAllocation.seat.room.block',
+        ]);
+
+        $activeAllocation = $studentProfile->activeSeatAllocation;
+
+        $canAllocate = Gate::allows('create', SeatAllocation::class);
+
+        $availableSeats = $canAllocate && $activeAllocation === null
+            && $studentProfile->registration_status === RegistrationStatus::Approved
+                ? Seat::query()
+                    ->whereDoesntHave(
+                        'seatAllocations',
+                        fn (Builder $query) => $query->where('active', true),
+                    )
+                    ->with('room.block')
+                    ->orderBy('room_id')
+                    ->orderBy('label')
+                    ->get()
+                    ->map(fn (Seat $seat) => [
+                        'id' => $seat->id,
+                        'label' => $seat->label,
+                        'room_no' => $seat->room->room_no,
+                        'block' => $seat->room->block?->name,
+                    ])
+                    ->values()
+                    ->all()
+                : [];
 
         return Inertia::render('students/show', [
-            'student' => $this->serializeStudent($studentProfile),
+            'student' => $this->serializeStudent($studentProfile, includeAllocationHistory: true),
+            'canAllocate' => $canAllocate,
+            'availableSeats' => $availableSeats,
+            'activeAllocation' => $activeAllocation === null ? null : [
+                'id' => $activeAllocation->id,
+                'allocated_at' => $activeAllocation->allocated_at->toDateString(),
+                'seat' => [
+                    'id' => $activeAllocation->seat->id,
+                    'label' => $activeAllocation->seat->label,
+                ],
+                'room' => [
+                    'id' => $activeAllocation->seat->room->id,
+                    'room_no' => $activeAllocation->seat->room->room_no,
+                ],
+                'block' => $activeAllocation->seat->room->block?->only(['id', 'name', 'code']),
+            ],
         ]);
     }
 
     /**
      * @return array<string, mixed>
      */
-    private function serializeStudent(StudentProfile $studentProfile): array
+    private function serializeStudent(StudentProfile $studentProfile, bool $includeAllocationHistory = false): array
     {
         /** @var User $user */
         $user = $studentProfile->user;
+
+        $currentRoom = $studentProfile->activeSeatAllocation?->seat?->room;
 
         return [
             'id' => $studentProfile->id,
@@ -119,10 +179,36 @@ class StudentController extends Controller
             'phone' => $studentProfile->phone,
             'registration_status' => $studentProfile->registration_status->value,
             'residency_status' => $studentProfile->residency_status->value,
-            'block' => null,
-            'current_room' => null,
-            'allocation_history' => [],
-            'allocation_history_available' => false,
+            'block' => $currentRoom?->block?->only(['id', 'name', 'code']),
+            'current_room' => $currentRoom === null ? null : [
+                'id' => $currentRoom->id,
+                'room_no' => $currentRoom->room_no,
+            ],
+            'allocation_history' => $includeAllocationHistory
+                ? $this->serializeAllocationHistory($studentProfile)
+                : [],
         ];
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function serializeAllocationHistory(StudentProfile $studentProfile): array
+    {
+        return $studentProfile->seatAllocations()
+            ->with('seat.room.block')
+            ->orderByDesc('allocated_at')
+            ->orderByDesc('id')
+            ->get()
+            ->map(fn (SeatAllocation $allocation) => [
+                'id' => $allocation->id,
+                'room_no' => $allocation->seat->room->room_no,
+                'block' => $allocation->seat->room->block?->name,
+                'started_at' => $allocation->allocated_at->toDateString(),
+                'vacated_at' => $allocation->vacated_at?->toDateString(),
+                'vacancy_reason' => $allocation->vacancy_reason,
+            ])
+            ->values()
+            ->all();
     }
 }
