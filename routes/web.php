@@ -7,6 +7,7 @@ use App\Http\Controllers\RoomController;
 use App\Http\Controllers\SeatAllocationController;
 use App\Http\Controllers\SeatController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\TutorController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
@@ -22,6 +23,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('allocations/{seatAllocation}/vacate', [SeatAllocationController::class, 'vacate'])->name('allocations.vacate');
     Route::post('rooms/{room}/seats', [SeatController::class, 'store'])->name('seats.store');
     Route::put('seats/{seat}', [SeatController::class, 'update'])->name('seats.update');
+    Route::post('house-tutors', [TutorController::class, 'store'])->name('house-tutors.store');
+    Route::put('house-tutors/{tutorProfile}', [TutorController::class, 'update'])->name('house-tutors.update');
+    Route::patch('house-tutors/{tutorProfile}/deactivate', [TutorController::class, 'deactivate'])->name('house-tutors.deactivate');
 });
 
 Route::middleware(['auth', 'verified', 'role:super_admin,provost,hall_office_staff'])->group(function () {
