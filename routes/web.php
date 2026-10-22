@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\BlockController;
+use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\SeatAllocationController;
@@ -29,6 +30,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('house-tutors/{tutorProfile}/edit', [TutorController::class, 'edit'])->name('house-tutors.edit');
     Route::put('house-tutors/{tutorProfile}', [TutorController::class, 'update'])->name('house-tutors.update');
     Route::patch('house-tutors/{tutorProfile}/deactivate', [TutorController::class, 'deactivate'])->name('house-tutors.deactivate');
+});
+
+Route::middleware(['auth', 'verified', 'approved.student'])->group(function () {
+    Route::post('complaints', [ComplaintController::class, 'store'])->name('complaints.store');
 });
 
 Route::middleware(['auth', 'verified', 'role:super_admin,provost,hall_office_staff'])->group(function () {
