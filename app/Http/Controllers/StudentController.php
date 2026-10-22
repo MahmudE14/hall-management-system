@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\RegistrationStatus;
+use App\Models\Block;
 use App\Models\Seat;
 use App\Models\SeatAllocation;
 use App\Models\StudentProfile;
@@ -25,6 +26,7 @@ class StudentController extends Controller
 
         $filters = $request->validate([
             'search' => ['nullable', 'string', 'max:255'],
+            'block' => ['nullable', 'integer', Rule::exists('blocks', 'id')],
             'department' => ['nullable', 'string', 'max:255'],
             'session' => ['nullable', 'string', 'max:255'],
             'status' => ['nullable', Rule::in(array_column(RegistrationStatus::cases(), 'value'))],
@@ -33,10 +35,17 @@ class StudentController extends Controller
         $user = $request->user();
 
         $students = StudentProfile::query()
-            ->with('user')
+            ->with(['user', 'activeSeatAllocation.seat.room.block'])
             ->when(
                 ! $user->hasAnyRole(...self::DIRECTORY_ROLES),
                 fn (Builder $query) => $query->where('user_id', $user->id),
+            )
+            ->when(
+                isset($filters['block']),
+                fn (Builder $query) => $query->whereHas(
+                    'activeSeatAllocation.seat.room',
+                    fn (Builder $query) => $query->where('block_id', $filters['block']),
+                ),
             )
             ->when(
                 $filters['search'] ?? null,
@@ -70,10 +79,15 @@ class StudentController extends Controller
             'students' => $students,
             'filters' => [
                 'search' => $filters['search'] ?? null,
+                'block' => isset($filters['block']) ? (int) $filters['block'] : null,
                 'department' => $filters['department'] ?? null,
                 'session' => $filters['session'] ?? null,
                 'status' => $filters['status'] ?? null,
             ],
+            'blocks' => Block::query()
+                ->orderBy('name')
+                ->get(['id', 'name', 'code'])
+                ->all(),
             'departments' => StudentProfile::query()
                 ->distinct()
                 ->orderBy('department')
@@ -87,7 +101,6 @@ class StudentController extends Controller
                 ->values()
                 ->all(),
             'statuses' => array_column(RegistrationStatus::cases(), 'value'),
-            'block_filter_available' => false,
         ]);
     }
 
@@ -153,6 +166,8 @@ class StudentController extends Controller
         /** @var User $user */
         $user = $studentProfile->user;
 
+        $currentRoom = $studentProfile->activeSeatAllocation?->seat?->room;
+
         return [
             'id' => $studentProfile->id,
             'user_id' => $studentProfile->user_id,
@@ -164,8 +179,11 @@ class StudentController extends Controller
             'phone' => $studentProfile->phone,
             'registration_status' => $studentProfile->registration_status->value,
             'residency_status' => $studentProfile->residency_status->value,
-            'block' => null,
-            'current_room' => null,
+            'block' => $currentRoom?->block?->only(['id', 'name', 'code']),
+            'current_room' => $currentRoom === null ? null : [
+                'id' => $currentRoom->id,
+                'room_no' => $currentRoom->room_no,
+            ],
             'allocation_history' => [],
             'allocation_history_available' => false,
         ];

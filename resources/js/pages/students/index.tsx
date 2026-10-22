@@ -27,8 +27,11 @@ type Paginated<T> = {
     links: { url: string | null; label: string; active: boolean }[];
 };
 
+type Block = { id: number; name: string; code: string };
+
 type Filters = {
     search?: string | null;
+    block?: number | null;
     department?: string | null;
     session?: string | null;
     status?: string | null;
@@ -37,19 +40,22 @@ type Filters = {
 export default function StudentsIndex({
     students,
     filters,
+    blocks,
     departments,
     sessions,
     statuses,
-    block_filter_available,
 }: {
     students: Paginated<Student>;
     filters: Filters;
+    blocks: Block[];
     departments: string[];
     sessions: string[];
     statuses: string[];
-    block_filter_available: boolean;
 }) {
     const [search, setSearch] = useState(filters.search ?? '');
+    const [block, setBlock] = useState(
+        filters.block ? String(filters.block) : '',
+    );
     const [department, setDepartment] = useState(filters.department ?? '');
     const [session, setSession] = useState(filters.session ?? '');
     const [status, setStatus] = useState(filters.status ?? '');
@@ -61,6 +67,7 @@ export default function StudentsIndex({
             studentsIndex.url(),
             {
                 search: search || undefined,
+                block: block || undefined,
                 department: department || undefined,
                 session: session || undefined,
                 status: status || undefined,
@@ -81,7 +88,7 @@ export default function StudentsIndex({
 
                 <form
                     onSubmit={applyFilters}
-                    className="grid gap-4 rounded-xl border border-sidebar-border/70 p-4 md:grid-cols-2 xl:grid-cols-5 dark:border-sidebar-border"
+                    className="grid gap-4 rounded-xl border border-sidebar-border/70 p-4 md:grid-cols-2 xl:grid-cols-6 dark:border-sidebar-border"
                 >
                     <div className="grid gap-2">
                         <Label htmlFor="search">Search</Label>
@@ -91,6 +98,25 @@ export default function StudentsIndex({
                             onChange={(event) => setSearch(event.target.value)}
                             placeholder="Name or registration number"
                         />
+                    </div>
+
+                    <div className="grid gap-2">
+                        <Label htmlFor="block">Block</Label>
+                        <select
+                            id="block"
+                            value={block}
+                            onChange={(event) =>
+                                setBlock(event.target.value)
+                            }
+                            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                        >
+                            <option value="">All blocks</option>
+                            {blocks.map((option) => (
+                                <option key={option.id} value={option.id}>
+                                    {option.name} ({option.code})
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     <div className="grid gap-2">
@@ -152,13 +178,6 @@ export default function StudentsIndex({
                         </Button>
                     </div>
                 </form>
-
-                {!block_filter_available && (
-                    <p className="text-sm text-muted-foreground">
-                        Block filtering and current room details become
-                        available when seat allocation history is introduced.
-                    </p>
-                )}
 
                 {students.data.length === 0 ? (
                     <p className="text-sm text-muted-foreground">
@@ -230,9 +249,27 @@ export default function StudentsIndex({
                                             </div>
                                         </td>
                                         <td className="px-4 py-3 align-top">
-                                            <span className="text-muted-foreground">
-                                                Not yet available
-                                            </span>
+                                            {student.current_room ? (
+                                                <div>
+                                                    <p className="font-medium">
+                                                        Room{' '}
+                                                        {
+                                                            student
+                                                                .current_room
+                                                                .room_no
+                                                        }
+                                                    </p>
+                                                    <p className="text-muted-foreground">
+                                                        {student.block
+                                                            ? `${student.block.name} (${student.block.code})`
+                                                            : 'Block unassigned'}
+                                                    </p>
+                                                </div>
+                                            ) : (
+                                                <span className="text-muted-foreground">
+                                                    Not allocated
+                                                </span>
+                                            )}
                                         </td>
                                         <td className="px-4 py-3 align-top">
                                             <Button asChild variant="outline">
