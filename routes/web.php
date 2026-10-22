@@ -23,7 +23,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('allocations/{seatAllocation}/vacate', [SeatAllocationController::class, 'vacate'])->name('allocations.vacate');
     Route::post('rooms/{room}/seats', [SeatController::class, 'store'])->name('seats.store');
     Route::put('seats/{seat}', [SeatController::class, 'update'])->name('seats.update');
+    Route::get('house-tutors', [TutorController::class, 'index'])->name('house-tutors.index');
+    Route::get('house-tutors/create', [TutorController::class, 'create'])->name('house-tutors.create');
     Route::post('house-tutors', [TutorController::class, 'store'])->name('house-tutors.store');
+    Route::get('house-tutors/{tutorProfile}/edit', [TutorController::class, 'edit'])->name('house-tutors.edit');
     Route::put('house-tutors/{tutorProfile}', [TutorController::class, 'update'])->name('house-tutors.update');
     Route::patch('house-tutors/{tutorProfile}/deactivate', [TutorController::class, 'deactivate'])->name('house-tutors.deactivate');
 });

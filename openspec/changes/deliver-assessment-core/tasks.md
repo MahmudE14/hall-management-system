@@ -78,7 +78,7 @@ There are no implementation tasks in Phase 0.
 - [x] 4.2 Add Provost/Super Admin tutor create, edit, and deactivate behavior with policies and Form Requests; verify authorization and validation tests. Add account onboarding only after C8 is resolved.
 - [x] 4.3 Add tutor block-assignment behavior; verify multiple tutors per block and multiple blocks per tutor.
 - [x] 4.4 Add tutor-scoped student list/profile access; verify assigned-block visibility and out-of-scope `403` responses.
-- [ ] 4.5 Add tutor administration and block-assignment pages using existing components and Wayfinder; verify authorized controls and expected Inertia data.
+- [x] 4.5 Add tutor administration and block-assignment pages using existing components and Wayfinder; verify authorized controls and expected Inertia data.
 
 **Exit:** Tasks 4.1-4.5 are complete; tutor administration, assignment, scoping, and UI tests pass; C8-dependent behavior is resolved; `docs/PROJECT_STATUS.md` is updated; implementation stops.
 

@@ -20,7 +20,7 @@ test('authorized users can create tutors', function (string $role) {
             'department' => 'Physics',
             'phone' => '01712345678',
         ])
-        ->assertRedirect(route('dashboard'))
+        ->assertRedirect(route('house-tutors.index'))
         ->assertSessionHasNoErrors();
 
     $user = User::query()->where('email', 'ayesha.rahman@du.test')->firstOrFail();
@@ -47,7 +47,7 @@ test('authorized users can edit tutors', function (string $role) {
             'department' => 'History',
             'phone' => '01812345678',
         ])
-        ->assertRedirect(route('dashboard'))
+        ->assertRedirect(route('house-tutors.index'))
         ->assertSessionHasNoErrors();
 
     expect($tutor->refresh())
@@ -73,7 +73,7 @@ test('authorized users can assign multiple blocks when creating a tutor', functi
             'phone' => '01712345678',
             'block_ids' => $blocks->modelKeys(),
         ])
-        ->assertRedirect(route('dashboard'))
+        ->assertRedirect(route('house-tutors.index'))
         ->assertSessionHasNoErrors();
 
     $tutor = User::query()->where('email', 'ayesha.rahman@du.test')->firstOrFail()->tutorProfile;
@@ -98,7 +98,7 @@ test('authorized users can assign multiple blocks per tutor and multiple tutors 
             'phone' => '01712345678',
             'block_ids' => [$blockA->id, $blockB->id],
         ])
-        ->assertRedirect(route('dashboard'))
+        ->assertRedirect(route('house-tutors.index'))
         ->assertSessionHasNoErrors();
 
     $this->actingAs($actor)
@@ -110,7 +110,7 @@ test('authorized users can assign multiple blocks per tutor and multiple tutors 
             'phone' => '01812345678',
             'block_ids' => [$blockA->id],
         ])
-        ->assertRedirect(route('dashboard'))
+        ->assertRedirect(route('house-tutors.index'))
         ->assertSessionHasNoErrors();
 
     expect($first->blocks()->pluck('blocks.id')->all())
@@ -143,7 +143,7 @@ test('authorized users can deactivate tutors', function (string $role) {
 
     $this->actingAs(tutorUserWithRole($role))
         ->patch(route('house-tutors.deactivate', $tutor))
-        ->assertRedirect(route('dashboard'))
+        ->assertRedirect(route('house-tutors.index'))
         ->assertSessionHasNoErrors();
 
     expect($tutor->refresh()->is_active)->toBeFalse();
