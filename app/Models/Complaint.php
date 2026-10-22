@@ -107,7 +107,7 @@ class Complaint extends Model
         }
 
         if ($user->hasAnyRole('student', 'club_admin')) {
-            return $query->where('student_profile_id', $user->studentProfile?->id ?? 0);
+            return $query->where('student_profile_id', $user->studentProfile->id ?? 0);
         }
 
         $tutorProfile = $user->tutorProfile;

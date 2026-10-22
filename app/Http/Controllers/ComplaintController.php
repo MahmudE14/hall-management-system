@@ -166,7 +166,7 @@ class ComplaintController extends Controller
             'registration_number' => $complaint->studentProfile?->registration_number,
             'days_open' => $complaint->daysOpen(),
             'is_overdue' => $complaint->isOverdue(),
-            'created_at' => $complaint->created_at?->toIso8601String(),
+            'created_at' => $complaint->created_at->toIso8601String(),
             'image_url' => $complaint->image_path === null
                 ? null
                 : route('complaints.image', $complaint),
