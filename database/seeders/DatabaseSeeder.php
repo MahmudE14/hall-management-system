@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use App\Enums\RegistrationStatus;
 use App\Enums\ResidencyStatus;
+use App\Models\Block;
+use App\Models\Hall;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -53,6 +55,21 @@ class DatabaseSeeder extends Seeder
                 $roles->only($account['roles'])->pluck('id')->all(),
             );
         }
+
+        $hall = Hall::query()->firstOrCreate(['name' => 'Kazi Nazrul Islam Hall']);
+        $block = Block::query()->firstOrCreate(
+            ['hall_id' => $hall->id, 'code' => 'NORTH'],
+            ['name' => 'North Block'],
+        );
+
+        $tutor = User::query()->where('email', 'tutor@kjh.test')->firstOrFail();
+        $tutorProfile = $tutor->tutorProfile()->updateOrCreate([], [
+            'designation' => 'Assistant Professor',
+            'department' => 'Physics',
+            'phone' => '01712345678',
+            'is_active' => true,
+        ]);
+        $tutorProfile->blocks()->syncWithoutDetaching([$block->id]);
 
         User::query()->where('email', 'clubadmin@student.du.test')->firstOrFail()
             ->studentProfile()
