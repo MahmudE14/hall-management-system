@@ -45,6 +45,7 @@ class DatabaseSeeder extends Seeder
                     'name' => $account['name'],
                     'password' => 'password',
                     'email_verified_at' => now(),
+                    'is_active' => true,
                 ],
             );
 

@@ -57,3 +57,23 @@ test('demo student identities have approved profiles', function () {
         ->and($student->studentProfile->registration_status)->toBe(RegistrationStatus::Approved)
         ->and($student->studentProfile->residency_status)->toBe(ResidencyStatus::Resident);
 });
+
+test('reseeding reactivates deactivated demo accounts without duplicating them', function () {
+    $demoEmails = [
+        'admin@kjh.test',
+        'provost@kjh.test',
+        'office@kjh.test',
+        'tutor@kjh.test',
+        'clubadmin@student.du.test',
+        'student@student.du.test',
+    ];
+    $deactivated = User::query()->where('email', 'tutor@kjh.test')->firstOrFail();
+    $deactivated->update(['is_active' => false]);
+    User::factory()->create(['email' => 'unrelated@example.test']);
+
+    $this->seed(DatabaseSeeder::class);
+
+    expect($deactivated->refresh()->is_active)->toBeTrue()
+        ->and(User::query()->whereIn('email', $demoEmails)->count())->toBe(6)
+        ->and(User::query()->where('email', 'unrelated@example.test')->exists())->toBeTrue();
+});
