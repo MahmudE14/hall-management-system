@@ -33,6 +33,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::middleware(['auth', 'verified', 'approved.student'])->group(function () {
+    Route::get('complaints/create', [ComplaintController::class, 'create'])->name('complaints.create');
     Route::post('complaints', [ComplaintController::class, 'store'])->name('complaints.store');
 });
 
