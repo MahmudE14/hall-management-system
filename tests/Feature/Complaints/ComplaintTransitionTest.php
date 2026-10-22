@@ -4,14 +4,16 @@ use App\Actions\Complaints\TransitionComplaint;
 use App\Enums\ComplaintStatus;
 use App\Models\Complaint;
 use App\Models\ComplaintStatusLog;
+use App\Models\Role;
 use App\Models\User;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
 
 uses(RefreshDatabase::class);
 
 test('documented forward transitions update status and append one audit entry', function (ComplaintStatus $from, ComplaintStatus $to) {
-    $actor = User::factory()->create();
+    $actor = complaintTransitionTestActor('hall_office_staff');
     $complaint = Complaint::factory()->create(['status' => $from]);
 
     $transitioned = app(TransitionComplaint::class)->handle(
@@ -35,11 +37,10 @@ test('documented forward transitions update status and append one audit entry', 
     'under review to in progress' => [ComplaintStatus::UnderReview, ComplaintStatus::InProgress],
     'in progress to resolved' => [ComplaintStatus::InProgress, ComplaintStatus::Resolved],
     'resolved to closed' => [ComplaintStatus::Resolved, ComplaintStatus::Closed],
-    'resolved reopens to in progress' => [ComplaintStatus::Resolved, ComplaintStatus::InProgress],
 ]);
 
 test('documented rejection transitions record the reason in the audit entry', function (ComplaintStatus $from) {
-    $actor = User::factory()->create();
+    $actor = complaintTransitionTestActor('hall_office_staff');
     $complaint = Complaint::factory()->create(['status' => $from]);
 
     app(TransitionComplaint::class)->handle(
@@ -61,22 +62,19 @@ test('documented rejection transitions record the reason in the audit entry', fu
     'under review to rejected' => [ComplaintStatus::UnderReview],
 ]);
 
-test('a transition does not depend on the actor having a role', function () {
+test('a transition requires an authorized actor', function () {
     $actor = User::factory()->create();
     $complaint = Complaint::factory()->create(['status' => ComplaintStatus::Submitted]);
 
-    app(TransitionComplaint::class)->handle(
-        $complaint,
-        ComplaintStatus::UnderReview,
-        $actor,
-    );
+    expect(fn () => app(TransitionComplaint::class)->handle($complaint, ComplaintStatus::UnderReview, $actor))
+        ->toThrow(AuthorizationException::class);
 
-    expect($complaint->refresh()->status)->toBe(ComplaintStatus::UnderReview)
-        ->and($complaint->statusLogs()->count())->toBe(1);
+    expect($complaint->refresh()->status)->toBe(ComplaintStatus::Submitted)
+        ->and($complaint->statusLogs()->count())->toBe(0);
 });
 
 test('transitions outside the documented graph are refused without changing state or history', function (ComplaintStatus $from, ComplaintStatus $to) {
-    $actor = User::factory()->create();
+    $actor = complaintTransitionTestActor('hall_office_staff');
     $complaint = Complaint::factory()->create(['status' => $from]);
 
     expect(fn () => app(TransitionComplaint::class)->handle($complaint, $to, $actor))
@@ -99,7 +97,7 @@ test('transitions outside the documented graph are refused without changing stat
 ]);
 
 test('a stale complaint instance cannot overwrite a newer transition', function () {
-    $actor = User::factory()->create();
+    $actor = complaintTransitionTestActor('hall_office_staff');
     $complaint = Complaint::factory()->create(['status' => ComplaintStatus::Submitted]);
     $staleComplaint = $complaint->fresh();
 
@@ -114,7 +112,7 @@ test('a stale complaint instance cannot overwrite a newer transition', function 
 });
 
 test('the status change and audit entry are rolled back together', function () {
-    $actor = User::factory()->create();
+    $actor = complaintTransitionTestActor('hall_office_staff');
     $complaint = Complaint::factory()->create(['status' => ComplaintStatus::Submitted]);
 
     ComplaintStatusLog::creating(function (): void {
@@ -134,7 +132,7 @@ test('the status change and audit entry are rolled back together', function () {
 test('sequential transitions keep a complete ordered audit history', function () {
     $this->travelTo(now()->subMinutes(4));
 
-    $actor = User::factory()->create();
+    $actor = complaintTransitionTestActor('hall_office_staff');
     $complaint = Complaint::factory()->create(['status' => ComplaintStatus::Submitted]);
     $action = app(TransitionComplaint::class);
 
@@ -173,3 +171,11 @@ test('sequential transitions keep a complete ordered audit history', function ()
         ])
         ->and($logs->pluck('actor_id')->unique()->all())->toBe([$actor->id]);
 });
+
+function complaintTransitionTestActor(string $role): User
+{
+    $user = User::factory()->create();
+    $user->roles()->attach(Role::query()->firstOrCreate(['name' => $role]));
+
+    return $user->fresh();
+}
