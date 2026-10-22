@@ -108,12 +108,12 @@ class StudentController extends Controller
     {
         Gate::authorize('view', $studentProfile);
 
-        $studentProfile->load('user');
+        $studentProfile->load([
+            'user',
+            'activeSeatAllocation.seat.room.block',
+        ]);
 
-        $activeAllocation = $studentProfile->seatAllocations()
-            ->where('active', true)
-            ->with(['seat.room.block'])
-            ->first();
+        $activeAllocation = $studentProfile->activeSeatAllocation;
 
         $canAllocate = Gate::allows('create', SeatAllocation::class);
 
@@ -139,7 +139,7 @@ class StudentController extends Controller
                 : [];
 
         return Inertia::render('students/show', [
-            'student' => $this->serializeStudent($studentProfile),
+            'student' => $this->serializeStudent($studentProfile, includeAllocationHistory: true),
             'canAllocate' => $canAllocate,
             'availableSeats' => $availableSeats,
             'activeAllocation' => $activeAllocation === null ? null : [
@@ -161,7 +161,7 @@ class StudentController extends Controller
     /**
      * @return array<string, mixed>
      */
-    private function serializeStudent(StudentProfile $studentProfile): array
+    private function serializeStudent(StudentProfile $studentProfile, bool $includeAllocationHistory = false): array
     {
         /** @var User $user */
         $user = $studentProfile->user;
@@ -184,8 +184,31 @@ class StudentController extends Controller
                 'id' => $currentRoom->id,
                 'room_no' => $currentRoom->room_no,
             ],
-            'allocation_history' => [],
-            'allocation_history_available' => false,
+            'allocation_history' => $includeAllocationHistory
+                ? $this->serializeAllocationHistory($studentProfile)
+                : [],
         ];
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function serializeAllocationHistory(StudentProfile $studentProfile): array
+    {
+        return $studentProfile->seatAllocations()
+            ->with('seat.room.block')
+            ->orderByDesc('allocated_at')
+            ->orderByDesc('id')
+            ->get()
+            ->map(fn (SeatAllocation $allocation) => [
+                'id' => $allocation->id,
+                'room_no' => $allocation->seat->room->room_no,
+                'block' => $allocation->seat->room->block?->name,
+                'started_at' => $allocation->allocated_at->toDateString(),
+                'vacated_at' => $allocation->vacated_at?->toDateString(),
+                'vacancy_reason' => $allocation->vacancy_reason,
+            ])
+            ->values()
+            ->all();
     }
 }

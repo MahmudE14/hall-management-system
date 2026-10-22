@@ -54,7 +54,6 @@ type Student = {
     block: { id: number; name: string; code: string } | null;
     current_room: { id: number; room_no: string } | null;
     allocation_history: Allocation[];
-    allocation_history_available: boolean;
 };
 
 export default function StudentShow({
@@ -179,15 +178,7 @@ export default function StudentShow({
                         <h2 className="font-medium">Allocation history</h2>
                     </div>
 
-                    {!student.allocation_history_available ? (
-                        <div className="mt-3 space-y-1 text-sm text-muted-foreground">
-                            <p>Not yet available</p>
-                            <p>
-                                Allocation history becomes available when seat
-                                allocations are introduced.
-                            </p>
-                        </div>
-                    ) : student.allocation_history.length === 0 ? (
+                    {student.allocation_history.length === 0 ? (
                         <p className="mt-3 text-sm text-muted-foreground">
                             This student has no recorded allocations.
                         </p>
