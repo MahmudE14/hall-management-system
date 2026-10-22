@@ -35,4 +35,22 @@ class ComplaintPolicy
     {
         return $user->hasAnyRole('hall_office_staff', 'provost', 'super_admin');
     }
+
+    public function comment(User $user, Complaint $complaint): bool
+    {
+        if (! $this->view($user, $complaint)) {
+            return false;
+        }
+
+        if ($user->hasAnyRole('hall_office_staff', 'provost', 'super_admin')) {
+            return true;
+        }
+
+        if ($complaint->assignee_id === $user->id) {
+            return true;
+        }
+
+        return $user->studentProfile !== null
+            && $complaint->student_profile_id === $user->studentProfile->id;
+    }
 }

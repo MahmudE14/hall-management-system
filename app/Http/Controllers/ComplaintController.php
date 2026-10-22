@@ -7,8 +7,10 @@ use App\Actions\Complaints\CreateComplaint;
 use App\Enums\ComplaintCategory;
 use App\Enums\ComplaintStatus;
 use App\Http\Requests\Complaints\AssignComplaintRequest;
+use App\Http\Requests\Complaints\StoreComplaintCommentRequest;
 use App\Http\Requests\Complaints\StoreComplaintRequest;
 use App\Models\Complaint;
+use App\Models\ComplaintComment;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -68,7 +70,7 @@ class ComplaintController extends Controller
         Gate::authorize('view', $complaint);
 
         return Inertia::render('complaints/show', [
-            'complaint' => $this->serializeComplaint($complaint, includeDescription: true),
+            'complaint' => $this->serializeComplaint($complaint, includeDescription: true, includeComments: true),
         ]);
     }
 
@@ -97,6 +99,25 @@ class ComplaintController extends Controller
         $assignComplaint->handle($complaint, $assignee);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Complaint assigned.')]);
+
+        return to_route('complaints.show', $complaint);
+    }
+
+    public function comment(
+        StoreComplaintCommentRequest $request,
+        Complaint $complaint,
+    ): RedirectResponse {
+        Gate::authorize('comment', $complaint);
+
+        /** @var User $user */
+        $user = $request->user();
+
+        $comment = new ComplaintComment(['body' => (string) $request->validated('body')]);
+        $comment->complaint()->associate($complaint);
+        $comment->author()->associate($user);
+        $comment->save();
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Comment added.')]);
 
         return to_route('complaints.show', $complaint);
     }
@@ -165,9 +186,16 @@ class ComplaintController extends Controller
     /**
      * @return array<string, mixed>
      */
-    private function serializeComplaint(Complaint $complaint, bool $includeDescription = false): array
-    {
+    private function serializeComplaint(
+        Complaint $complaint,
+        bool $includeDescription = false,
+        bool $includeComments = false,
+    ): array {
         $complaint->loadMissing(['studentProfile.user', 'room.block']);
+
+        if ($includeComments) {
+            $complaint->loadMissing('comments.author');
+        }
 
         $room = $complaint->room;
 
@@ -189,6 +217,20 @@ class ComplaintController extends Controller
                 ? null
                 : route('complaints.image', $complaint),
             ...($includeDescription ? ['description' => $complaint->description] : []),
+            ...($includeComments ? [
+                'comments' => $complaint->comments
+                    ->map(fn (ComplaintComment $comment): array => [
+                        'id' => $comment->id,
+                        'author' => [
+                            'id' => $comment->author->id,
+                            'name' => $comment->author->name,
+                        ],
+                        'body' => $comment->body,
+                        'created_at' => $comment->created_at?->toIso8601String(),
+                    ])
+                    ->values()
+                    ->all(),
+            ] : []),
         ];
     }
 }
