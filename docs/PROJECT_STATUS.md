@@ -1,23 +1,24 @@
 # Project Status
 
-- Current phase: Phase 0 planning approved; approved identity clarifications are recorded and Phase 1 authorization is pending.
-- Implementation authorization: NONE. No application code, migrations, seeders, or business feature tests may be implemented.
-- Phase branch creation authorization: NONE.
-- Task-commit authorization: NONE.
+- Current phase: Phase 1 - Identity and Registration is functionally implementation-complete on `phase/01-identity-registration`.
+- Implementation authorization: NONE. Phase 1 tasks 1.1-1.14 are complete; no Phase 2 or later implementation is authorized.
+- Phase branch creation authorization: No new phase branch. The existing `phase/01-identity-registration` branch remains the only active phase branch until Phase 1 is integrated.
+- Task-commit authorization: NONE. Phase 1 task-commit authorization was consumed; future commits, including these documentation updates, require explicit approval.
 - Push/PR authorization: NONE.
 - Merge authorization: NONE.
-- Next proposed phase: Phase 1 - Identity and Registration. It is not authorized until explicitly approved.
-- Integration branch: `main` (local branch is two commits ahead of `origin/main` at this checkpoint). No feature implementation is permitted on this branch.
-- Active phase branch: NONE.
-- Pending phase PR: NONE recorded locally. Remote PR state is unverified because GitHub CLI is unavailable in this environment.
-- Planning commit authorization: NONE. Authorization for the latest planning checkpoint was consumed; future commits require new explicit approval.
-- Active specification/change: `deliver-assessment-core` (proposal, seven capability specs, gated design, and dependency-ordered tasks complete).
+- Next proposed phase: Phase 2 - Hall Structure and Student Records, only after Phase 1 is integrated and Phase 2 is explicitly authorized.
+- Integration branch: `main` at `1228647`, matching `origin/main`. No feature implementation is permitted on `main`.
+- Active phase branch: `phase/01-identity-registration` at `034c8a6`, 9 commits ahead of `origin/phase/01-identity-registration` (`9993c6f`).
+- Pending phase PR: NONE recorded locally. Remote PR state is unverified because GitHub CLI/API authentication is unavailable. A CI workflow exists at `.github/workflows/tests.yml`; remote checks are unobserved.
+- Planning commit authorization: NONE.
+- Active specification/change: `deliver-assessment-core` (planning complete; 14/81 tasks complete; Phase 1 tasks 1.1-1.14 complete).
 - Completed planning: Phase 0 approved; C6 registration reconsideration, C7 profile editing, C9 scoped Super Admin user management, and C12 Laravel 13 authority approval are resolved; client sources reconciled; mandatory assessment scope separated from optional PRD scope; capability acceptance scenarios preserved; phases 0-9 have entry/exit criteria; Phase 1 work is split into focused acceptance tasks; six demo accounts remain explicit; phase branch, task-commit, PR, merge, and post-merge authorization rules are documented.
 - Unresolved clarifications: C1 Super Admin complaint closure; C2 Super Admin complaint assignment; C3 rejection and tutor transition permissions; C4 reopening boundary/timezone; C5 eligible assignees and commenters; C8 tutor onboarding; C10 Attached complaint block association; C11 repeated-resolution timing.
 - Framework decision: Laravel 13 is approved by the assessment authority according to user-confirmed communication. Approval evidence is user-reported; no written evidence is claimed. No framework downgrade is required or authorized.
-- Additional blocker: Local MySQL credentials are not configured for MySQL-specific migration and concurrency verification.
-- Last verified planning state: 2026-10-21 - `openspec validate deliver-assessment-core --strict` and `git diff --check` passed; 10 phase headings, 10 entry/exit pairs, and 81 implementation tasks remain present; an independent documentation review reported no remaining findings after workflow corrections.
-- Application verification: Not rerun because this refinement changes planning documentation only. Previous recorded results remain `composer ci:check`, `php artisan test` (40 passing), `npm run types:check`, `npm run check`, `composer lint:check`, `composer types:check`, and `npm run build` passed, with the previously recorded non-fatal warnings.
-- Last committed planning checkpoint: `docs(workflow): establish phase-based Git and PR process` (identity clarifications and phase-based Git workflow; no application implementation).
-- Uncommitted work at checkpoint: NONE.
-- Next recommended action: Verify remote branch/PR state, then separately authorize or withhold Phase 1 and creation of `phase/01-identity-registration` from the latest verified `main`. Implementation authorization remains `NONE` until that explicit decision.
+- Phase 1 implementation: Tasks 1.1-1.14 are implemented with traceable commits and checked in OpenSpec. All six demo accounts authenticate with documented roles; registration, reconsideration history, profile, scoped user management, inactive-account, and authorization behavior are present. Residual and deferred audit findings are recorded in `docs/AUDIT_BACKLOG.md`; no audit finding was dismissed.
+- Phase 1 verification: Latest full-suite result: 171 tests, 749 assertions passing. Fresh Phase 1 focused rerun: 138 tests, 636 assertions passing. `npm run check`, `vendor/bin/pint --parallel --test --format agent`, `composer types:check` (0 errors; known non-fatal turbo-extension warning), `npm run types:check`, `npm run build`, `openspec validate deliver-assessment-core --strict`, and `git diff --check` passed. MySQL-specific verification remains unavailable because local credentials are not configured.
+- Phase 1 lifecycle: implementation-complete only. It is not review-complete or integrated: no PR, no remote CI/review evidence, and deferred findings remain. Do not push, open a PR, merge, or start Phase 2 without explicit authorization.
+- Phase 2 readiness: Tasks 2.1-2.7 remain unchecked and no Phase 2 task references an unresolved clarification. Entry is blocked by Phase 1 integration and explicit authorization. Cross-phase dependencies: tasks 2.4, 2.5, and 2.7 depend on allocation history introduced in Phase 3; task 2.6's tutor block scope is completed in task 4.4.
+- Last committed checkpoint: `034c8a6` (`fix(auth): preserve active session after registration`).
+- Uncommitted work: `docs/PROJECT_STATUS.md` and new `docs/AUDIT_BACKLOG.md` only. Preserve them; commit only with explicit approval.
+- Next recommended action: Review the Phase 1 implementation diff and this closeout, authorize the documentation commit, then authorize push/PR review. Do not implement Phase 2 yet.

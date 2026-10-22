@@ -73,6 +73,7 @@ export default defineConfig({
             '.opencode/**',
             'AGENTS.md',
             'composer.json',
+            'docs/references/*.docx.md',
             'openspec/**',
             'resources/js/components/ui/*',
             'resources/views/mail/*',

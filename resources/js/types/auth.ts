@@ -1,3 +1,12 @@
+export type StudentProfile = {
+    registration_number: string;
+    department: string;
+    session: string;
+    phone: string;
+    registration_status: string;
+    residency_status: string;
+};
+
 export type User = {
     id: number;
     name: string;
@@ -5,8 +14,10 @@ export type User = {
     avatar?: string;
     email_verified_at: string | null;
     two_factor_enabled?: boolean;
-    created_at: string;
-    updated_at: string;
+    roles: string[];
+    student_profile: StudentProfile | null;
+    created_at?: string;
+    updated_at?: string;
     [key: string]: unknown;
 };
 

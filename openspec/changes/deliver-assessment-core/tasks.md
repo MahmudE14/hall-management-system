@@ -25,20 +25,20 @@ There are no implementation tasks in Phase 0.
 
 **Entry:** Phase 0 is approved and `docs/PROJECT_STATUS.md` explicitly authorizes Phase 1.
 
-- [ ] 1.1 Add roles and multi-role assignments with model factories; verify focused Pest tests cover role relationships and duplicate-role prevention.
-- [ ] 1.2 Add student profiles and approval states with model factories; verify profile relationships, status defaults, and hashed passwords.
-- [ ] 1.3 Change student self-registration to validate all required fields and create a Pending student; verify valid, invalid-domain, invalid-phone, duplicate-email, and duplicate-registration feature tests pass.
-- [ ] 1.4 Enforce approval-gated protected capabilities and server-side role authorization; verify Pending access denial and at least one explicit `403` feature test pass.
-- [ ] 1.5 Add the Pending registration list and initial approval/rejection workflow with required rejection reason; verify Hall Office Staff/Provost/Super Admin permissions, validation, and retained decision records.
-- [ ] 1.6 Add authorized Rejected-to-Pending reconsideration; verify the original rejection reason/actor/time and reconsideration actor/time remain in history, no new role receives permission, and student self-resubmission is refused.
-- [ ] 1.7 Add role-aware shared props and navigation using the existing Inertia shell and Wayfinder; verify each role receives only documented navigation while direct unauthorized requests return `403`.
-- [ ] 1.8 Seed and authenticate the six exact fictional accounts: `admin@kjh.test`, `provost@kjh.test`, `office@kjh.test`, `tutor@kjh.test`, `clubadmin@student.du.test`, and `student@student.du.test`; verify documented roles and that Club Admin also has Student.
-- [ ] 1.9 Add Super Admin user listing and search; verify supported identity filters, returned roles/status, pagination, and other-role `403` responses.
-- [ ] 1.10 Add Super Admin role assignment and update; verify multi-role changes, retained identity, invalid-role validation, and other-role `403` responses.
-- [ ] 1.11 Add Super Admin account activation and deactivation independent from registration approval; verify roles and decision history remain unchanged and every non-Super-Admin receives `403` for both operations.
-- [ ] 1.12 Enforce Inactive restrictions server-side; verify otherwise valid login is refused and a previously authenticated session loses protected access after deactivation.
-- [ ] 1.13 Keep administrative user deletion, administrative password reset, and unspecified user mutations unavailable; verify Super Admin cannot invoke any excluded operation and existing Fortify self-service recovery remains unchanged.
-- [ ] 1.14 Extend the existing Fortify/profile workflow for authenticated Student name, email, and phone changes; verify email uniqueness/domain and phone validation, email-change verification safeguards, own-profile scope, and read-only registration/academic fields.
+- [x] 1.1 Add roles and multi-role assignments with model factories; verify focused Pest tests cover role relationships and duplicate-role prevention.
+- [x] 1.2 Add student profiles and approval states with model factories; verify profile relationships, status defaults, and hashed passwords.
+- [x] 1.3 Change student self-registration to validate all required fields and create a Pending student; verify valid, invalid-domain, invalid-phone, duplicate-email, and duplicate-registration feature tests pass.
+- [x] 1.4 Enforce approval-gated protected capabilities and server-side role authorization; verify Pending access denial and at least one explicit `403` feature test pass.
+- [x] 1.5 Add the Pending registration list and initial approval/rejection workflow with required rejection reason; verify Hall Office Staff/Provost/Super Admin permissions, validation, and retained decision records.
+- [x] 1.6 Add authorized Rejected-to-Pending reconsideration; verify the original rejection reason/actor/time and reconsideration actor/time remain in history, no new role receives permission, and student self-resubmission is refused.
+- [x] 1.7 Add role-aware shared props and navigation using the existing Inertia shell and Wayfinder; verify each role receives only documented navigation while direct unauthorized requests return `403`.
+- [x] 1.8 Seed and authenticate the six exact fictional accounts: `admin@kjh.test`, `provost@kjh.test`, `office@kjh.test`, `tutor@kjh.test`, `clubadmin@student.du.test`, and `student@student.du.test`; verify documented roles and that Club Admin also has Student.
+- [x] 1.9 Add Super Admin user listing and search; verify supported identity filters, returned roles/status, pagination, and other-role `403` responses.
+- [x] 1.10 Add Super Admin role assignment and update; verify multi-role changes, retained identity, invalid-role validation, and other-role `403` responses.
+- [x] 1.11 Add Super Admin account activation and deactivation independent from registration approval; verify roles and decision history remain unchanged and every non-Super-Admin receives `403` for both operations.
+- [x] 1.12 Enforce Inactive restrictions server-side; verify otherwise valid login is refused and a previously authenticated session loses protected access after deactivation.
+- [x] 1.13 Keep administrative user deletion, administrative password reset, and unspecified user mutations unavailable; verify Super Admin cannot invoke any excluded operation and existing Fortify self-service recovery remains unchanged.
+- [x] 1.14 Extend the existing Fortify/profile workflow for authenticated Student name, email, and phone changes; verify email uniqueness/domain and phone validation, email-change verification safeguards, own-profile scope, and read-only registration/academic fields.
 
 **Exit:** Tasks 1.1-1.14 are complete; all six demo identities authenticate with documented roles; registration, reconsideration history, profile, scoped user management, inactive-account, and authorization tests pass; `docs/PROJECT_STATUS.md` is updated; implementation stops.
 
