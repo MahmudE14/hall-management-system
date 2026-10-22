@@ -1,13 +1,13 @@
 # Project Status
 
 - Current phase: Phase 2 - Hall Structure and Student Records on `phase/02-hall-structure-student-records`.
-- Implementation authorization: Phase 2, task 2.5 only for this session. Tasks 2.6-2.7 are not authorized.
+- Implementation authorization: Phase 2, tasks 2.6-2.7 only for this session.
 - Phase branch creation authorization: Granted for `phase/02-hall-structure-student-records`, created from the Phase 1 integration merge.
-- Task-commit authorization: Granted for task 2.5. Push/PR/merge authorization: NONE.
+- Task-commit authorization: Granted for tasks 2.6-2.7. Push/PR/merge authorization: NONE.
 - Integration branch: `main` at `f9ba7c2`, the Phase 1 integration merge.
 - Active phase branch: `phase/02-hall-structure-student-records`; no remote tracking is configured and remote PR state is unverified because GitHub CLI/API authentication is unavailable.
 - Active specification/change: `deliver-assessment-core` (19/81 tasks complete; Phase 1 tasks 1.1-1.14 and Phase 2 tasks 2.1-2.5 complete).
-- Phase 2 readiness: Task 2.5 is complete. Tasks 2.6-2.7 remain pending and unchecked. Cross-phase dependencies remain: task 2.7 depends on allocation history introduced in Phase 3; task 2.6's tutor block scope is completed in task 4.4.
+- Phase 2 readiness: Tasks 2.1-2.5 are complete. Task 2.6 is partially implemented: search, department/session/status filters, pagination, scoped visibility, and bounded eager loading are implemented; the block filter is deferred until Phase 3 active allocations provide a current block. Task 2.7 remains pending.
 - Phase 2 task 2.1 implementation: Added `halls` and `blocks` migrations, `Hall` and `Block` Eloquent models with `Hall hasMany Block` / `Block belongsTo Hall` relationships, and factories. Blocks reference their hall with a cascading foreign key.
 - Phase 2 task 2.2 implementation: Added `rooms` and `seats` migrations, `Room` and `Seat` Eloquent models with `Block hasMany Room`, `Room belongsTo Block`, `Room hasMany Seat`, and `Seat belongsTo Room` relationships, plus factories. Room numbers are unique within a block and seat labels within a room; both use cascading foreign keys. Room capacity is guarded as a positive integer on SQLite and MySQL.
 - Phase 2 task 2.3 implementation: Added Block, Room, and Seat policies; Form Requests; controllers; and named routes for list/create/edit pages and create/update persistence. Hall Office Staff and Super Admin can manage the structure, Provost has view-only access, and other roles receive forbidden responses. Seat creation is nested under rooms and seat updates are standalone; block creation attaches to the single existing hall. Frontend pages remain tasks 2.4 and 2.5.
@@ -18,14 +18,18 @@
 - Phase 2 task 2.5 implementation: Added explicit seat management to the room edit page, including seat creation up to room capacity, in-place seat label editing, validation feedback, processing states, and empty and at-capacity states. Room pages now report occupancy as unavailable rather than showing placeholder zero values. Seat creation is refused when the defined seats reach room capacity, and room capacity cannot be reduced below the number of defined seats; seat label edits preserve seat identity so future allocation history remains valid. Provost retains read-only seat visibility through the room list, Hall Office Staff and Super Admin can manage seats, and other roles remain forbidden by the existing policies.
 - Phase 2 task 2.5 verification: Focused `AccommodationManagementTest` passes (29 tests, 407 assertions). Full `php artisan test --compact` passes (220 tests, 1215 assertions). `vendor/bin/pint --dirty --format agent`, `composer types:check` (0 errors; known non-fatal PHPStan turbo-extension warning), `npm run check`, `npm run types:check`, `npm run build`, `openspec validate deliver-assessment-core --strict`, and `git diff --check` pass.
 - Phase 2 task 2.5 dependency: Capacity protection currently uses the number of defined seats as the conservative boundary because allocation history does not exist yet. Task 3.5 must replace or extend this with current occupancy and retained-history-aware capacity protection when Phase 3 is authorized.
+- Phase 2 task 2.6 partial implementation: Added a paginated student directory with name/registration search, department/session/status filters, eager-loaded students and users, and role-scoped visibility. Hall Office Staff, Provost, and Super Admin see all records; Student and Club Admin accounts see only their own record. House Tutor access remains deferred to task 4.4.
+- Phase 2 task 2.6 dependency: Block filtering is not implemented because student block membership is derived from an active seat allocation, which only arrives in Phase 3. The directory exposes `block_filter_available: false` and reports block/current room as unavailable rather than returning misleading results. Task 2.6 remains unchecked until the block filter can be implemented and verified.
+- Phase 2 task 2.6 verification: Focused `StudentDirectoryTest` passes (11 tests, 136 assertions).
 - Task 2.1 commit mapping: The task 2.1 Conventional Commit contains its implementation, focused test, task checkbox, and status update.
 - Task 2.2 commit mapping: The task 2.2 Conventional Commit contains its implementation, focused test, task checkbox, and status update.
 - Task 2.3 commit mapping: The task 2.3 Conventional Commit contains its implementation, focused test, task checkbox, and status update.
 - Task 2.4 commit mapping: The task 2.4 Conventional Commit contains its implementation, focused tests, task checkbox, and status update.
 - Task 2.5 commit mapping: The task 2.5 Conventional Commit contains its implementation, focused tests, task checkbox, and status update.
+- Task 2.6 commit mapping: The task 2.6 Conventional Commit contains its partial implementation, focused tests, and status update. The OpenSpec checkbox remains unchecked because block filtering is deferred.
 - Phase 1 lifecycle: Integrated into `main` by merge commit `f9ba7c2`. Deferred non-functional findings remain recorded in `docs/AUDIT_BACKLOG.md` and are not addressed.
 - Unresolved clarifications: C1 Super Admin complaint closure; C2 Super Admin complaint assignment; C3 rejection and tutor transition permissions; C4 reopening boundary/timezone; C5 eligible assignees and commenters; C8 tutor onboarding; C10 Attached complaint block association; C11 repeated-resolution timing.
 - Framework decision: Laravel 13 is approved by the assessment authority according to user-confirmed communication. Approval evidence is user-reported; no written evidence is claimed.
-- Last committed checkpoint: task 2.5 commit on `phase/02-hall-structure-student-records` (see branch history).
-- Uncommitted work: Expected to be none after the task 2.5 commit. Do not push, open a PR, merge, or start tasks 2.6-2.7 without explicit authorization.
-- Next recommended action: Stop after task 2.5 and await authorization for task 2.6.
+- Last committed checkpoint: task 2.6 commit on `phase/02-hall-structure-student-records`.
+- Uncommitted work: Task 2.7 student profile work is in progress. Do not push, open a PR, or merge without explicit authorization.
+- Next recommended action: Continue with task 2.7 student profile visibility, then document its allocation-history dependency.

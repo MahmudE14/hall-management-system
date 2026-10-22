@@ -23,6 +23,7 @@ import {
 import { dashboard } from '@/routes';
 import { index as blocks } from '@/routes/blocks';
 import { index as registrations } from '@/routes/registrations';
+import { index as students } from '@/routes/students';
 import { index as users } from '@/routes/admin/users';
 import type { Auth, NavItem } from '@/types';
 
@@ -37,6 +38,18 @@ const mainNavItems: NavItem[] = [
         href: registrations(),
         icon: ClipboardCheck,
         roles: ['super_admin', 'provost', 'hall_office_staff'],
+    },
+    {
+        title: 'Students',
+        href: students(),
+        icon: Users,
+        roles: [
+            'super_admin',
+            'provost',
+            'hall_office_staff',
+            'student',
+            'club_admin',
+        ],
     },
     {
         title: 'Hall structure',
