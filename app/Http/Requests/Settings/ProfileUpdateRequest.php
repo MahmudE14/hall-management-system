@@ -3,12 +3,20 @@
 namespace App\Http\Requests\Settings;
 
 use App\Concerns\ProfileValidationRules;
+use App\Models\User;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ProfileUpdateRequest extends FormRequest
 {
     use ProfileValidationRules;
+
+    public function authorize(): bool
+    {
+        $profileOwner = $this->route('user');
+
+        return $profileOwner instanceof User && $this->user()->is($profileOwner);
+    }
 
     /**
      * Get the validation rules that apply to the request.

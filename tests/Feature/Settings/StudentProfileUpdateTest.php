@@ -23,7 +23,7 @@ beforeEach(function () {
 test('students can update their name, email, and phone', function () {
     $response = $this->actingAs($this->student)
         ->from(route('profile.edit'))
-        ->patch(route('profile.update'), [
+        ->patch(route('profile.update', $this->student), [
             'name' => 'Updated Student',
             'email' => 'updated.student@student.du.test',
             'phone' => '01898765432',
@@ -46,7 +46,7 @@ test('students must use a unique student-domain email', function (string $email)
 
     $this->actingAs($this->student)
         ->from(route('profile.edit'))
-        ->patch(route('profile.update'), [
+        ->patch(route('profile.update', $this->student), [
             'name' => 'Updated Student',
             'email' => $email,
             'phone' => '01712345678',
@@ -59,7 +59,7 @@ test('students must use a unique student-domain email', function (string $email)
 test('students must provide a valid Bangladeshi phone', function () {
     $this->actingAs($this->student)
         ->from(route('profile.edit'))
-        ->patch(route('profile.update'), [
+        ->patch(route('profile.update', $this->student), [
             'name' => 'Updated Student',
             'email' => $this->student->email,
             'phone' => '12345',
@@ -72,7 +72,7 @@ test('students must provide a valid Bangladeshi phone', function () {
 test('read-only registration and academic fields are ignored', function () {
     $this->actingAs($this->student)
         ->from(route('profile.edit'))
-        ->patch(route('profile.update'), [
+        ->patch(route('profile.update', $this->student), [
             'name' => 'Updated Student',
             'email' => $this->student->email,
             'phone' => '01712345678',
@@ -81,39 +81,51 @@ test('read-only registration and academic fields are ignored', function () {
             'session' => '2000-01',
             'registration_status' => 'rejected',
             'residency_status' => 'inactive',
+            'is_active' => false,
+            'password' => 'attacker-controlled-password',
+            'user_id' => User::factory()->create()->id,
         ])
         ->assertSessionHasNoErrors();
 
     $this->profile->refresh();
+    $this->student->refresh();
 
     expect($this->profile->registration_number)->not->toBe('9999999999')
         ->and($this->profile->department)->not->toBe('Mutated Department')
         ->and($this->profile->session)->not->toBe('2000-01')
-        ->and($this->profile->registration_status->value)->not->toBe('rejected');
+        ->and($this->profile->registration_status->value)->not->toBe('rejected')
+        ->and($this->student->is_active)->toBeTrue()
+        ->and(password_verify('attacker-controlled-password', $this->student->password))->toBeFalse();
 });
 
-test('students cannot update another user identity through their own profile', function () {
-    $other = User::factory()->create(['name' => 'Other User']);
+test('students receive a forbidden response when updating another student profile', function () {
+    $other = User::factory()->create([
+        'name' => 'Other Student',
+        'email' => 'other.student@student.du.test',
+    ]);
+    $other->roles()->attach(Role::query()->where('name', 'student')->firstOrFail());
+    $otherProfile = StudentProfile::factory()->for($other)->create([
+        'phone' => '01912345678',
+    ]);
 
     $this->actingAs($this->student)
-        ->patch(route('profile.update'), [
-            'name' => 'Updated Student',
-            'email' => $this->student->email,
-            'phone' => '01712345678',
-            'id' => $other->id,
-            'user_id' => $other->id,
+        ->patch(route('profile.update', $other), [
+            'name' => 'Compromised Student',
+            'email' => 'compromised.student@student.du.test',
+            'phone' => '01612345678',
         ])
-        ->assertSessionHasNoErrors();
+        ->assertForbidden();
 
-    expect($other->refresh()->name)->toBe('Other User')
-        ->and($other->email)->not->toBe('Updated Student');
+    expect($other->refresh()->name)->toBe('Other Student')
+        ->and($other->email)->toBe('other.student@student.du.test')
+        ->and($otherProfile->refresh()->phone)->toBe('01912345678');
 });
 
 test('staff profiles keep their existing name and email workflow', function () {
     $staff = User::factory()->create(['email' => 'staff@kjh.test']);
 
     $this->actingAs($staff)
-        ->patch(route('profile.update'), [
+        ->patch(route('profile.update', $staff), [
             'name' => 'Staff Name',
             'email' => 'staff-updated@kjh.test',
         ])
