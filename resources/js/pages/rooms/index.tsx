@@ -12,8 +12,9 @@ type Room = {
     floor: number;
     capacity: number;
     seats_count: number;
-    occupied_seats: number;
-    free_seats: number;
+    occupancy_available: boolean;
+    occupied_seats: number | null;
+    free_seats: number | null;
     block: {
         id: number;
         name: string;
@@ -40,7 +41,7 @@ export default function RoomsIndex({
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <Heading
                         title="Rooms"
-                        description="Review room capacity, occupied seats, and free seats."
+                        description="Review room capacity, defined seats, and seat management."
                     />
 
                     <div className="flex flex-wrap gap-2">
@@ -63,8 +64,8 @@ export default function RoomsIndex({
                         <DoorOpen className="mx-auto size-8 text-muted-foreground" />
                         <p className="mt-2 font-medium">No rooms yet</p>
                         <p className="mt-1 text-sm text-muted-foreground">
-                            Create a room within a block to start tracking
-                            occupancy.
+                            Create a room within a block to start defining
+                            seats.
                         </p>
                         {canManage && (
                             <Button asChild className="mt-4">
@@ -152,15 +153,27 @@ export default function RoomsIndex({
                                             {room.capacity}
                                         </td>
                                         <td className="px-4 py-3 align-top">
-                                            <div className="flex flex-wrap gap-1">
-                                                <Badge variant="secondary">
-                                                    {room.occupied_seats}{' '}
-                                                    occupied
-                                                </Badge>
-                                                <Badge variant="outline">
-                                                    {room.free_seats} free
-                                                </Badge>
-                                            </div>
+                                            {room.occupancy_available ? (
+                                                <div className="flex flex-wrap gap-1">
+                                                    <Badge variant="secondary">
+                                                        {room.occupied_seats}{' '}
+                                                        occupied
+                                                    </Badge>
+                                                    <Badge variant="outline">
+                                                        {room.free_seats} free
+                                                    </Badge>
+                                                </div>
+                                            ) : (
+                                                <div className="space-y-1">
+                                                    <p className="text-muted-foreground">
+                                                        Not yet available
+                                                    </p>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        Allocation history is
+                                                        required.
+                                                    </p>
+                                                </div>
+                                            )}
                                         </td>
                                         {canManage && (
                                             <td className="px-4 py-3 align-top">

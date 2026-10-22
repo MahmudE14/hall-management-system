@@ -73,20 +73,19 @@ class RoomController extends Controller
      */
     private function serializeRoom(Room $room): array
     {
-        $occupiedSeats = 0;
-        $seatsCount = $room->seats->count();
-
         return [
             'id' => $room->id,
             'block_id' => $room->block_id,
             'room_no' => $room->room_no,
             'floor' => $room->floor,
             'capacity' => $room->capacity,
-            'seats_count' => $seatsCount,
-            'occupied_seats' => $occupiedSeats,
-            'free_seats' => max(0, $room->capacity - $occupiedSeats),
+            'seats_count' => $room->seats->count(),
+            'occupancy_available' => false,
+            'occupied_seats' => null,
+            'free_seats' => null,
             'block' => $room->block?->only(['id', 'name', 'code']),
             'seats' => $room->seats
+                ->sortBy('label')
                 ->map(fn (Seat $seat) => $seat->only(['id', 'label']))
                 ->values()
                 ->all(),

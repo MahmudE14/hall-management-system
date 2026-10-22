@@ -6,6 +6,7 @@ use App\Models\Room;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class UpdateRoomRequest extends FormRequest
 {
@@ -37,6 +38,37 @@ class UpdateRoomRequest extends FormRequest
             ],
             'floor' => ['required', 'integer', 'min:0', 'max:255'],
             'capacity' => ['required', 'integer', 'min:1', 'max:255'],
+        ];
+    }
+
+    /**
+     * @return array<int, callable(Validator): void>
+     */
+    public function after(): array
+    {
+        return [
+            function (Validator $validator): void {
+                if ($validator->errors()->has('capacity')) {
+                    return;
+                }
+
+                $room = $this->room();
+
+                if ($room === null) {
+                    return;
+                }
+
+                $seatsCount = $room->seats()->count();
+
+                if ($this->integer('capacity') < $seatsCount) {
+                    $validator->errors()->add(
+                        'capacity',
+                        __('Capacity cannot be lower than the number of seats already defined (:count).', [
+                            'count' => $seatsCount,
+                        ]),
+                    );
+                }
+            },
         ];
     }
 

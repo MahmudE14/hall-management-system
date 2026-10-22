@@ -268,7 +268,7 @@ test('structure list pages expose role-appropriate management controls', functio
     ['provost', false],
 ]);
 
-test('room list page exposes capacity, occupied, and free seat counts', function () {
+test('room pages report occupancy as unavailable until allocation history exists', function () {
     $block = Block::factory()->create();
     $room = Room::factory()->for($block)->create(['capacity' => 4]);
     Seat::factory()->for($room)->count(3)->sequence(
@@ -276,8 +276,9 @@ test('room list page exposes capacity, occupied, and free seat counts', function
         ['label' => 'B'],
         ['label' => 'C'],
     )->create();
+    $manager = accommodationUserWithRole('hall_office_staff');
 
-    $this->actingAs(accommodationUserWithRole('hall_office_staff'))
+    $this->actingAs($manager)
         ->get(route('rooms.index'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
@@ -286,10 +287,21 @@ test('room list page exposes capacity, occupied, and free seat counts', function
             ->where('rooms.0.id', $room->id)
             ->where('rooms.0.capacity', 4)
             ->where('rooms.0.seats_count', 3)
-            ->where('rooms.0.occupied_seats', 0)
-            ->where('rooms.0.free_seats', 4)
+            ->where('rooms.0.occupancy_available', false)
+            ->where('rooms.0.occupied_seats', null)
+            ->where('rooms.0.free_seats', null)
             ->where('rooms.0.block.id', $block->id)
             ->has('rooms.0.seats', 3)
+        );
+
+    $this->actingAs($manager)
+        ->get(route('rooms.edit', $room))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('rooms/edit', false)
+            ->where('room.occupancy_available', false)
+            ->where('room.occupied_seats', null)
+            ->where('room.free_seats', null)
         );
 });
 
@@ -351,6 +363,89 @@ test('room form validation redirects back with field errors', function () {
         ])
         ->assertRedirect(route('rooms.create'))
         ->assertSessionHasErrors(['room_no', 'capacity']);
+});
+
+test('seat managers can add seats up to room capacity but not beyond it', function (string $role) {
+    $room = Room::factory()->create(['capacity' => 2]);
+    Seat::factory()->for($room)->create(['label' => 'A']);
+    $manager = accommodationUserWithRole($role);
+
+    $this->actingAs($manager)
+        ->post(route('seats.store', $room), ['label' => 'B'])
+        ->assertRedirect(route('rooms.edit', $room))
+        ->assertSessionHasNoErrors();
+
+    expect($room->seats()->count())->toBe(2);
+
+    $this->actingAs($manager)
+        ->post(route('seats.store', $room), ['label' => 'C'])
+        ->assertSessionHasErrors([
+            'label' => 'This room already has the maximum number of seats allowed by its capacity.',
+        ]);
+
+    expect($room->seats()->count())->toBe(2);
+})->with(['hall_office_staff', 'super_admin']);
+
+test('room capacity cannot be reduced below the seats already defined', function () {
+    $room = Room::factory()->create(['capacity' => 3]);
+    Seat::factory()->for($room)->count(2)->sequence(
+        ['label' => 'A'],
+        ['label' => 'B'],
+    )->create();
+    $manager = accommodationUserWithRole('hall_office_staff');
+
+    $this->actingAs($manager)
+        ->put(route('rooms.update', $room), [
+            'room_no' => $room->room_no,
+            'floor' => $room->floor,
+            'capacity' => 1,
+        ])
+        ->assertSessionHasErrors([
+            'capacity' => 'Capacity cannot be lower than the number of seats already defined (2).',
+        ]);
+
+    expect($room->refresh()->capacity)->toBe(3);
+
+    $this->actingAs($manager)
+        ->put(route('rooms.update', $room), [
+            'room_no' => $room->room_no,
+            'floor' => $room->floor,
+            'capacity' => 2,
+        ])
+        ->assertRedirect(route('rooms.index'))
+        ->assertSessionHasNoErrors();
+
+    expect($room->refresh()->capacity)->toBe(2);
+});
+
+test('editing a seat label preserves the seat identity and room capacity', function () {
+    $room = Room::factory()->create(['capacity' => 3]);
+    $seat = Seat::factory()->for($room)->create(['label' => 'A']);
+    $seatId = $seat->id;
+
+    $this->actingAs(accommodationUserWithRole('hall_office_staff'))
+        ->put(route('seats.update', $seat), ['label' => 'B'])
+        ->assertRedirect(route('rooms.edit', $room))
+        ->assertSessionHasNoErrors();
+
+    expect($seat->refresh())
+        ->id->toBe($seatId)
+        ->label->toBe('B')
+        ->room_id->toBe($room->id);
+    expect($room->refresh()->capacity)->toBe(3);
+    expect($room->seats()->count())->toBe(1);
+});
+
+test('seat label updates remain unique within their room', function () {
+    $room = Room::factory()->create(['capacity' => 3]);
+    Seat::factory()->for($room)->create(['label' => 'A']);
+    $seat = Seat::factory()->for($room)->create(['label' => 'B']);
+
+    $this->actingAs(accommodationUserWithRole('hall_office_staff'))
+        ->put(route('seats.update', $seat), ['label' => 'A'])
+        ->assertSessionHasErrors('label');
+
+    expect($seat->refresh()->label)->toBe('B');
 });
 
 function accommodationUserWithRole(string $role): User

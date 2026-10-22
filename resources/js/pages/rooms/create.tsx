@@ -126,6 +126,10 @@ export default function CreateRoom({ blocks }: { blocks: Block[] }) {
                                     }
                                     aria-invalid={Boolean(form.errors.capacity)}
                                 />
+                                <p className="text-xs text-muted-foreground">
+                                    Capacity is the maximum number of seats this
+                                    room can hold.
+                                </p>
                                 <InputError message={form.errors.capacity} />
                             </div>
                         </div>
