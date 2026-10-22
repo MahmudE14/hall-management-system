@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\BlockController;
 use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\NoticeController;
+use App\Http\Controllers\PublicNoticeController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\SeatAllocationController;
@@ -13,6 +14,11 @@ use App\Http\Controllers\TutorController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
+
+Route::get('notices', [PublicNoticeController::class, 'index'])->name('notices.index');
+Route::get('notices/{notice}', [PublicNoticeController::class, 'show'])
+    ->whereNumber('notice')
+    ->name('notices.show');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');

@@ -6,6 +6,7 @@ use App\Enums\NoticeCategory;
 use App\Enums\NoticeStatus;
 use Database\Factories\NoticeFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -43,6 +44,14 @@ class Notice extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * @param  Builder<Notice>  $query
+     */
+    public function scopePublished(Builder $query): void
+    {
+        $query->where('status', NoticeStatus::Published);
     }
 
     /** @return array<string, string> */

@@ -113,7 +113,7 @@ There are no implementation tasks in Phase 0.
 - [x] 6.2 Add PDF storage validation with generated filenames, executable rejection, and 5 MB limit; verify accepted and rejected uploads.
 - [x] 6.3 Add notice Form Requests, policies, routes, and create/list controllers; verify Office Staff/Provost/Super Admin publishing, Club Admin category restriction, and unauthorized `403` responses.
 - [x] 6.4 Add authorized notice create/list pages; verify role-aware controls, validation errors, and success feedback.
-- [ ] 6.5 Add the public paginated notice list and detail with title search, category filter, pinned-first/newest ordering, and eager loading; verify Draft notices are absent from public queries and direct routes.
+- [x] 6.5 Add the public paginated notice list and detail with title search, category filter, pinned-first/newest ordering, and eager loading; verify Draft notices are absent from public queries and direct routes.
 - [ ] 6.6 Add Published attachment download and Draft attachment isolation; verify valid PDF download and direct Draft attachment refusal.
 
 **Exit:** Tasks 6.1-6.6 are complete; authoring, authorization, upload, public discovery, ordering, draft isolation, and download tests pass; `docs/PROJECT_STATUS.md` is updated; implementation stops.
