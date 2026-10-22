@@ -18,7 +18,7 @@ class SeatAllocationController extends Controller
     ): RedirectResponse {
         $allocateSeat->handle(
             $studentProfile,
-            Seat::query()->findOrFail($request->validated('seat_id')),
+            Seat::query()->findOrFail($request->integer('seat_id')),
         );
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Seat allocated.')]);

@@ -42,6 +42,7 @@
 - Phase 1 lifecycle: Integrated into `main` by merge commit `f9ba7c2`. Deferred non-functional findings remain recorded in `docs/AUDIT_BACKLOG.md` and are not addressed.
 - Unresolved clarifications: C1 Super Admin complaint closure; C2 Super Admin complaint assignment; C3 rejection and tutor transition permissions; C4 reopening boundary/timezone; C5 eligible assignees and commenters; C8 tutor onboarding; C10 Attached complaint block association; C11 repeated-resolution timing.
 - Framework decision: Laravel 13 is approved by the assessment authority according to user-confirmed communication. Approval evidence is user-reported; no written evidence is claimed.
-- Last committed checkpoint: the `docs(openspec): document cross-phase completion gates` commit on `phase/02-hall-structure-student-records`.
-- Uncommitted work: Expected to be none after the documentation-gate commit. Do not push, open a PR, or merge without explicit authorization.
-- Next recommended action: Prepare the Phase 2 PR only after explicit push/PR authorization, recording tasks 2.1-2.7 with the deferrals above. Do not mark tasks 2.6-2.7 complete, and do not start Phase 3 without explicit authorization and prior integration of this phase.
+- Phase 3 tasks 3.1-3.2 batch verification: `composer ci:check` passes (257 tests, 1536 assertions; npm formatting/lint, TypeScript, Pint, and PHPStan with 0 errors). `npm run build`, `openspec validate deliver-assessment-core --strict`, and `git diff --check` pass. The known non-fatal PHPStan turbo-extension warning remains.
+- Last committed checkpoint: the task 3.2 implementation and PHPStan correction commits on `phase/03-seat-allocation-vacancy`.
+- Uncommitted work: Expected to be none after the quality-gate commit. Do not push, open a PR, or merge without explicit authorization.
+- Next recommended action: Stop after task 3.2. Do not start tasks 3.3-3.6 without explicit authorization. Tasks 2.6-2.7 remain unchecked until their named Phase 3/4.4 checkpoints are implemented and verified.
