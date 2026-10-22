@@ -6,6 +6,7 @@ use App\Http\Requests\Accommodation\StoreRoomRequest;
 use App\Http\Requests\Accommodation\UpdateRoomRequest;
 use App\Models\Block;
 use App\Models\Room;
+use App\Models\Seat;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -21,7 +22,11 @@ class RoomController extends Controller
             'rooms' => Room::query()
                 ->with(['block', 'seats'])
                 ->orderBy('room_no')
-                ->get(),
+                ->get()
+                ->map(fn (Room $room) => $this->serializeRoom($room))
+                ->values()
+                ->all(),
+            'canManage' => Gate::allows('create', Room::class),
         ]);
     }
 
@@ -29,7 +34,9 @@ class RoomController extends Controller
     {
         Gate::authorize('create', Room::class);
 
-        return Inertia::render('rooms/create');
+        return Inertia::render('rooms/create', [
+            'blocks' => $this->blockOptions(),
+        ]);
     }
 
     public function store(StoreRoomRequest $request): RedirectResponse
@@ -48,7 +55,7 @@ class RoomController extends Controller
         Gate::authorize('update', $room);
 
         return Inertia::render('rooms/edit', [
-            'room' => $room->load(['block', 'seats']),
+            'room' => $this->serializeRoom($room->load(['block', 'seats'])),
         ]);
     }
 
@@ -59,5 +66,44 @@ class RoomController extends Controller
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Room updated.')]);
 
         return to_route('rooms.index');
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function serializeRoom(Room $room): array
+    {
+        $occupiedSeats = 0;
+        $seatsCount = $room->seats->count();
+
+        return [
+            'id' => $room->id,
+            'block_id' => $room->block_id,
+            'room_no' => $room->room_no,
+            'floor' => $room->floor,
+            'capacity' => $room->capacity,
+            'seats_count' => $seatsCount,
+            'occupied_seats' => $occupiedSeats,
+            'free_seats' => max(0, $room->capacity - $occupiedSeats),
+            'block' => $room->block?->only(['id', 'name', 'code']),
+            'seats' => $room->seats
+                ->map(fn (Seat $seat) => $seat->only(['id', 'label']))
+                ->values()
+                ->all(),
+        ];
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function blockOptions(): array
+    {
+        return Block::query()
+            ->select(['id', 'name', 'code'])
+            ->orderBy('name')
+            ->get()
+            ->map(fn (Block $block) => $block->only(['id', 'name', 'code']))
+            ->values()
+            ->all();
     }
 }

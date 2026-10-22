@@ -28,6 +28,7 @@ test('structure viewers can list blocks and rooms', function (string $role) {
             ->component('blocks/index', false)
             ->has('blocks', 1)
             ->where('blocks.0.id', $block->id)
+            ->where('blocks.0.rooms_count', 1)
         );
 
     $this->actingAs($viewer)
@@ -241,6 +242,115 @@ test('seat labels are required and unique within their room', function () {
         ->assertSessionHasErrors('label');
 
     $this->assertDatabaseCount('seats', 1);
+});
+
+test('structure list pages expose role-appropriate management controls', function (string $role, bool $canManage) {
+    $viewer = accommodationUserWithRole($role);
+
+    $this->actingAs($viewer)
+        ->get(route('blocks.index'))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('blocks/index', false)
+            ->where('canManage', $canManage)
+        );
+
+    $this->actingAs($viewer)
+        ->get(route('rooms.index'))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('rooms/index', false)
+            ->where('canManage', $canManage)
+        );
+})->with([
+    ['hall_office_staff', true],
+    ['super_admin', true],
+    ['provost', false],
+]);
+
+test('room list page exposes capacity, occupied, and free seat counts', function () {
+    $block = Block::factory()->create();
+    $room = Room::factory()->for($block)->create(['capacity' => 4]);
+    Seat::factory()->for($room)->count(3)->sequence(
+        ['label' => 'A'],
+        ['label' => 'B'],
+        ['label' => 'C'],
+    )->create();
+
+    $this->actingAs(accommodationUserWithRole('hall_office_staff'))
+        ->get(route('rooms.index'))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('rooms/index', false)
+            ->has('rooms', 1)
+            ->where('rooms.0.id', $room->id)
+            ->where('rooms.0.capacity', 4)
+            ->where('rooms.0.seats_count', 3)
+            ->where('rooms.0.occupied_seats', 0)
+            ->where('rooms.0.free_seats', 4)
+            ->where('rooms.0.block.id', $block->id)
+            ->has('rooms.0.seats', 3)
+        );
+});
+
+test('block and room create and edit pages load their form props', function () {
+    $block = Block::factory()->create(['name' => 'North Block', 'code' => 'NORTH']);
+    $room = Room::factory()->for($block)->create(['room_no' => '305', 'floor' => 3, 'capacity' => 3]);
+    Seat::factory()->for($room)->create(['label' => 'A']);
+    $manager = accommodationUserWithRole('hall_office_staff');
+
+    $this->actingAs($manager)
+        ->get(route('blocks.create'))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('blocks/create', false)
+        );
+
+    $this->actingAs($manager)
+        ->get(route('blocks.edit', $block))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('blocks/edit', false)
+            ->where('block.id', $block->id)
+            ->where('block.name', 'North Block')
+            ->where('block.code', 'NORTH')
+        );
+
+    $this->actingAs($manager)
+        ->get(route('rooms.create'))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('rooms/create', false)
+            ->has('blocks', 1)
+            ->where('blocks.0.id', $block->id)
+        );
+
+    $this->actingAs($manager)
+        ->get(route('rooms.edit', $room))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('rooms/edit', false)
+            ->where('room.id', $room->id)
+            ->where('room.room_no', '305')
+            ->where('room.capacity', 3)
+            ->where('room.block.id', $block->id)
+            ->has('room.seats', 1)
+        );
+});
+
+test('room form validation redirects back with field errors', function () {
+    $block = Block::factory()->create();
+
+    $this->actingAs(accommodationUserWithRole('hall_office_staff'))
+        ->from(route('rooms.create'))
+        ->post(route('rooms.store'), [
+            'block_id' => $block->id,
+            'room_no' => '',
+            'floor' => 1,
+            'capacity' => 0,
+        ])
+        ->assertRedirect(route('rooms.create'))
+        ->assertSessionHasErrors(['room_no', 'capacity']);
 });
 
 function accommodationUserWithRole(string $role): User

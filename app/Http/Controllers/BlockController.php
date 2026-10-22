@@ -22,6 +22,7 @@ class BlockController extends Controller
                 ->withCount('rooms')
                 ->orderBy('name')
                 ->get(),
+            'canManage' => Gate::allows('create', Block::class),
         ]);
     }
 

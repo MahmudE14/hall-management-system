@@ -1,6 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
     BookOpen,
+    Building2,
     ClipboardCheck,
     FolderGit2,
     LayoutGrid,
@@ -20,6 +21,7 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import { index as blocks } from '@/routes/blocks';
 import { index as registrations } from '@/routes/registrations';
 import { index as users } from '@/routes/admin/users';
 import type { Auth, NavItem } from '@/types';
@@ -34,6 +36,12 @@ const mainNavItems: NavItem[] = [
         title: 'Registrations',
         href: registrations(),
         icon: ClipboardCheck,
+        roles: ['super_admin', 'provost', 'hall_office_staff'],
+    },
+    {
+        title: 'Hall structure',
+        href: blocks(),
+        icon: Building2,
         roles: ['super_admin', 'provost', 'hall_office_staff'],
     },
     {

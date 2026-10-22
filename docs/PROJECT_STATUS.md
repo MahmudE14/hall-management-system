@@ -1,23 +1,27 @@
 # Project Status
 
 - Current phase: Phase 2 - Hall Structure and Student Records on `phase/02-hall-structure-student-records`.
-- Implementation authorization: Phase 2, task 2.3 only for this session. Tasks 2.4-2.7 are not authorized.
+- Implementation authorization: Phase 2, task 2.4 only for this session. Tasks 2.5-2.7 are not authorized.
 - Phase branch creation authorization: Granted for `phase/02-hall-structure-student-records`, created from the Phase 1 integration merge.
-- Task-commit authorization: Granted for task 2.3. Push/PR/merge authorization: NONE.
+- Task-commit authorization: Granted for task 2.4. Push/PR/merge authorization: NONE.
 - Integration branch: `main` at `f9ba7c2`, the Phase 1 integration merge.
 - Active phase branch: `phase/02-hall-structure-student-records`; no remote tracking is configured and remote PR state is unverified because GitHub CLI/API authentication is unavailable.
-- Active specification/change: `deliver-assessment-core` (17/81 tasks complete; Phase 1 tasks 1.1-1.14 and Phase 2 tasks 2.1-2.3 complete).
-- Phase 2 readiness: Task 2.3 is complete. Tasks 2.4-2.7 remain pending and unchecked. Cross-phase dependencies remain: tasks 2.4, 2.5, and 2.7 depend on allocation history introduced in Phase 3; task 2.6's tutor block scope is completed in task 4.4.
+- Active specification/change: `deliver-assessment-core` (18/81 tasks complete; Phase 1 tasks 1.1-1.14 and Phase 2 tasks 2.1-2.4 complete).
+- Phase 2 readiness: Task 2.4 is complete. Tasks 2.5-2.7 remain pending and unchecked. Cross-phase dependencies remain: tasks 2.5 and 2.7 depend on allocation history introduced in Phase 3; task 2.6's tutor block scope is completed in task 4.4.
 - Phase 2 task 2.1 implementation: Added `halls` and `blocks` migrations, `Hall` and `Block` Eloquent models with `Hall hasMany Block` / `Block belongsTo Hall` relationships, and factories. Blocks reference their hall with a cascading foreign key.
 - Phase 2 task 2.2 implementation: Added `rooms` and `seats` migrations, `Room` and `Seat` Eloquent models with `Block hasMany Room`, `Room belongsTo Block`, `Room hasMany Seat`, and `Seat belongsTo Room` relationships, plus factories. Room numbers are unique within a block and seat labels within a room; both use cascading foreign keys. Room capacity is guarded as a positive integer on SQLite and MySQL.
 - Phase 2 task 2.3 implementation: Added Block, Room, and Seat policies; Form Requests; controllers; and named routes for list/create/edit pages and create/update persistence. Hall Office Staff and Super Admin can manage the structure, Provost has view-only access, and other roles receive forbidden responses. Seat creation is nested under rooms and seat updates are standalone; block creation attaches to the single existing hall. Frontend pages remain tasks 2.4 and 2.5.
 - Phase 2 task 2.3 verification: Focused `AccommodationManagementTest` passes (18 tests, 212 assertions). Full `php artisan test --compact` passes (209 tests, 1020 assertions). `vendor/bin/pint --dirty --format agent`, `composer types:check` (0 errors; known non-fatal PHPStan turbo-extension warning), `openspec validate deliver-assessment-core --strict`, and `git diff --check` pass.
+- Phase 2 task 2.4 implementation: Added Inertia/React pages for block listing, creation, and editing, and for room listing, creation, and editing. Block and room lists expose role-aware management controls; Provost receives read-only pages, and other roles remain forbidden by the existing policies. Room pages show capacity, seats defined, occupied seats, and free seats, and create/edit forms display validation errors and processing states. The sidebar links authorized structure viewers to the block list. Seats remain read-only in this task; explicit seat management remains task 2.5.
+- Phase 2 task 2.4 dependency: Active seat-allocation history arrives in Phase 3 (task 3.1). Until then, `occupied_seats` is reported as `0` from the supported structure data and `free_seats` is calculated from room capacity; these occupancy props must be connected to active allocations when Phase 3 is authorized.
+- Phase 2 task 2.4 verification: Focused `AccommodationManagementTest` passes (24 tests, 359 assertions). Full `php artisan test --compact` passes (215 tests, 1167 assertions). `vendor/bin/pint --dirty --format agent`, `composer types:check` (0 errors; known non-fatal PHPStan turbo-extension warning), `npm run check`, `npm run types:check`, `npm run build`, and `git diff --check` pass.
 - Task 2.1 commit mapping: The task 2.1 Conventional Commit contains its implementation, focused test, task checkbox, and status update.
 - Task 2.2 commit mapping: The task 2.2 Conventional Commit contains its implementation, focused test, task checkbox, and status update.
 - Task 2.3 commit mapping: The task 2.3 Conventional Commit contains its implementation, focused test, task checkbox, and status update.
+- Task 2.4 commit mapping: The task 2.4 Conventional Commit contains its implementation, focused tests, task checkbox, and status update.
 - Phase 1 lifecycle: Integrated into `main` by merge commit `f9ba7c2`. Deferred non-functional findings remain recorded in `docs/AUDIT_BACKLOG.md` and are not addressed.
 - Unresolved clarifications: C1 Super Admin complaint closure; C2 Super Admin complaint assignment; C3 rejection and tutor transition permissions; C4 reopening boundary/timezone; C5 eligible assignees and commenters; C8 tutor onboarding; C10 Attached complaint block association; C11 repeated-resolution timing.
 - Framework decision: Laravel 13 is approved by the assessment authority according to user-confirmed communication. Approval evidence is user-reported; no written evidence is claimed.
-- Last committed checkpoint: task 2.3 commit on `phase/02-hall-structure-student-records` (see branch history).
-- Uncommitted work: Expected to be none after the task 2.3 commit. Do not push, open a PR, merge, or start task 2.4 without explicit authorization.
-- Next recommended action: Stop after task 2.3 and await authorization for task 2.4.
+- Last committed checkpoint: task 2.4 commit on `phase/02-hall-structure-student-records` (see branch history).
+- Uncommitted work: Expected to be none after the task 2.4 commit. Do not push, open a PR, merge, or start tasks 2.5-2.7 without explicit authorization.
+- Next recommended action: Stop after task 2.4 and await authorization for task 2.5.
