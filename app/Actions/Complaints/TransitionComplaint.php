@@ -86,6 +86,11 @@ class TransitionComplaint
 
             if ($toStatus === ComplaintStatus::Resolved) {
                 $attributes['resolution_note'] = $note;
+                $attributes['resolved_at'] = now()->utc();
+            }
+
+            if ($fromStatus === ComplaintStatus::Resolved && $toStatus === ComplaintStatus::InProgress) {
+                $attributes['resolved_at'] = null;
             }
 
             $lockedComplaint->update($attributes);
@@ -125,6 +130,12 @@ class TransitionComplaint
             return;
         }
 
+        if ($edge === 'resolved:in_progress' && $this->isComplaintOwner($complaint, $actor)) {
+            $this->authorizeReopeningWindow($complaint);
+
+            return;
+        }
+
         throw new AuthorizationException(__('You are not allowed to perform this complaint transition.'));
     }
 
@@ -133,6 +144,30 @@ class TransitionComplaint
         return $actor->hasRole('house_tutor')
             && $actor->tutorProfile?->is_active === true
             && $complaint->assignee_id === $actor->id;
+    }
+
+    private function isComplaintOwner(Complaint $complaint, User $actor): bool
+    {
+        $studentProfileId = $actor->studentProfile?->id;
+
+        return $studentProfileId !== null && $complaint->student_profile_id === $studentProfileId;
+    }
+
+    private function authorizeReopeningWindow(Complaint $complaint): void
+    {
+        $resolvedAt = $complaint->resolved_at?->copy()->utc();
+
+        if ($resolvedAt === null) {
+            throw ValidationException::withMessages([
+                'status' => __('The complaint has no resolution time to reopen from.'),
+            ]);
+        }
+
+        if (now()->utc()->greaterThan($resolvedAt->addHours(168))) {
+            throw ValidationException::withMessages([
+                'status' => __('The complaint can no longer be reopened.'),
+            ]);
+        }
     }
 
     private function validateTransitionNote(ComplaintStatus $toStatus, ?string $note): ?string

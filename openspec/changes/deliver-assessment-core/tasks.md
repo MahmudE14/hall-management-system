@@ -97,7 +97,7 @@ There are no implementation tasks in Phase 0.
 - [x] 5.9 Add chronological comments using only staff roles confirmed by C5; verify participant authorization, ordering, and cross-record denial.
 - [x] 5.10 Add the transactional transition engine and audit-log write for the documented state graph; verify allowed edges, forbidden edges, and atomic logging independent of actor permissions.
 - [x] 5.11 Add transition authorization, rejection reason, resolution note, closure authority, and tutor scope using C1 and C3; verify each role boundary and failure mode.
-- [ ] 5.12 Add student reopening and resolution-time behavior using C4 and C11; verify exact boundary, timezone, repeated resolution, and unauthorized reopening.
+- [x] 5.12 Add student reopening and resolution-time behavior using C4 and C11; verify exact boundary, timezone, repeated resolution, and unauthorized reopening.
 - [x] 5.13 Add the student complaint-submission page; verify room/location behavior, file validation, field errors, and success feedback.
 - [ ] 5.14 Add complaint list, detail, timeline, and overdue interfaces; verify role-scoped Inertia props, filters, empty states, and private-media links.
 - [ ] 5.15 Add staff assignment and comment controls; verify controls follow C2/C5 permissions and successful actions preserve timeline order.
