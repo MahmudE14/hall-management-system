@@ -124,11 +124,13 @@ Keep completed tasks traceable through cohesive Conventional Commits that refere
 
 Prefer a merge commit so the phase boundary and its task history remain visible. After an approved merge, synchronize local `main`, update `docs/PROJECT_STATUS.md`, clear the active branch and pull request, and reset implementation authorization to `NONE`. The phase is then integrated. Only an integrated prerequisite satisfies a later phase entry, and integration never authorizes the next phase.
 
+A phase with **documented cross-phase deferrals** may become foundation-complete and integration-eligible before its Exit statement is fully satisfied, subject to the Phase-Gate Rules in `tasks.md`: independently implementable requirements are complete and verified; every unfinished requirement depends explicitly on a later phase; deferred tasks remain unchecked; each dependency has a named future completion checkpoint in `docs/PROJECT_STATUS.md`; and the user explicitly authorizes integration and progression. The phase is not fully implementation-complete, its PR records the deferrals, and integration satisfies the next phase entry only for the implemented foundation. It does not authorize the next phase or complete deferred tasks.
+
 Alternative considered: implementing on `main` or squashing an entire phase into an opaque commit. Rejected because both approaches weaken task-level traceability, review, rollback boundaries, and phase authorization controls.
 
 ## Implementation Phases
 
-The table's exit criteria define **implementation-complete**, not review-complete or integrated. References to a prior phase being complete in an entry criterion mean that phase is integrated into `main` through the branch and pull-request workflow above.
+The table's exit criteria define **implementation-complete**, not review-complete or integrated. References to a prior phase being complete in an entry criterion mean that phase is integrated into `main` through the branch and pull-request workflow above, including an integration-eligible phase with documented cross-phase deferrals.
 
 | Phase | Scope | Entry criteria | Implementation exit criteria |
 |---|---|---|---|

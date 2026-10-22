@@ -8,6 +8,7 @@
 - Implement an authorized phase only on its `phase/NN-short-description` branch created from the latest verified `main`; never implement feature tasks directly on `main`, and keep only one phase branch active.
 - Complete each task with its focused verification and one or more cohesive Conventional Commits that reference the task ID. Do not mark a task complete without traceable commit history or create commits without explicit authorization.
 - A phase section's Exit statement defines implementation-complete only. Run full quality gates, capability acceptance review, and complete diff review before its branch is pushed and a PR to `main` is opened with explicit authorization.
+- **Documented cross-phase deferrals:** A phase may be pushed, reviewed, and integrated while its Exit statement is not fully satisfied only when all independently implementable requirements are complete and verified; every unfinished requirement has an explicit dependency on a later phase; deferred tasks remain unchecked; each dependency is recorded in `docs/PROJECT_STATUS.md` with a named future completion checkpoint; and the user explicitly authorizes integration and progression. Such a phase is **foundation-complete** and **integration-eligible**, not fully implementation-complete. Its PR must list the deferrals, and integration does not authorize the next phase or mark deferred tasks complete. Deferred work is completed at its named checkpoint before the change is archived.
 - Wait for configured CI checks and review before marking the phase review-complete. If CI is not configured, record that fact and use full local quality-gate evidence; unverified remote state blocks review completion unless the user explicitly confirms it.
 - Obtain separate explicit user approval before merge. Prefer a merge commit, synchronize local `main`, update `docs/PROJECT_STATUS.md`, and reset authorization to `NONE`; only then is the phase integrated.
 - Later-phase prerequisites require earlier phases to be integrated. An implementation-complete, review-complete, or integrated phase does not authorize the next phase; stop and wait for explicit user approval.
@@ -46,11 +47,11 @@ There are no implementation tasks in Phase 0.
 
 **Entry:** Phase 1 is complete and `docs/PROJECT_STATUS.md` explicitly authorizes Phase 2.
 
-- [ ] 2.1 Add Hall and Block migrations, models, relationships, and factories; verify relationship and persistence tests pass.
-- [ ] 2.2 Add Room and Seat migrations, models, relationships, factories, capacity validation, foreign keys, and indexes; verify room/seat relationship and capacity tests pass on SQLite.
-- [ ] 2.3 Add Form Requests, policies, routes, and controllers for block, room, and seat management; verify Hall Office Staff and Super Admin management, Provost view-only access, and other-role `403` responses.
-- [ ] 2.4 Add block and room list/create/edit pages with occupied and free seat counts; verify Inertia props, validation feedback, and occupancy calculations.
-- [ ] 2.5 Add explicit seat management and safe room-capacity reconciliation; verify seat creation/editing cannot invalidate occupancy or allocation history.
+- [x] 2.1 Add Hall and Block migrations, models, relationships, and factories; verify relationship and persistence tests pass.
+- [x] 2.2 Add Room and Seat migrations, models, relationships, factories, capacity validation, foreign keys, and indexes; verify room/seat relationship and capacity tests pass on SQLite.
+- [x] 2.3 Add Form Requests, policies, routes, and controllers for block, room, and seat management; verify Hall Office Staff and Super Admin management, Provost view-only access, and other-role `403` responses.
+- [x] 2.4 Add block and room list/create/edit pages with occupied and free seat counts; verify Inertia props, validation feedback, and occupancy calculations.
+- [x] 2.5 Add explicit seat management and safe room-capacity reconciliation; verify seat creation/editing cannot invalidate occupancy or allocation history.
 - [ ] 2.6 Add the eager-loaded paginated student directory with name/registration search and block/department/session/status filters; verify own-only, all-record, combined-filter, pagination, and bounded-query behavior. Tutor assigned-block scope is completed in task 4.4 after tutor assignments exist.
 - [ ] 2.7 Add the student profile page with personal details, current room, and allocation history; verify authorized visibility and student self-record access.
 
