@@ -47,6 +47,7 @@ const mainNavItems: NavItem[] = [
             'super_admin',
             'provost',
             'hall_office_staff',
+            'house_tutor',
             'student',
             'club_admin',
         ],

@@ -1,13 +1,13 @@
 # Project Status
 
 - Current phase: Phase 4 - House Tutors on `phase/04-house-tutors`.
-- Implementation authorization: Phase 4 tasks 4.1-4.4 (4.1-4.3 complete); task 4.5 and later phases are not authorized.
+- Implementation authorization: Phase 4 tasks 4.1-4.4 (now complete); task 4.5 and later phases are not authorized.
 - Phase branch creation authorization: Granted for `phase/04-house-tutors`, created from the Phase 3 integration merge.
 - Task-commit authorization: Granted for tasks 4.1-4.4. Push/PR/merge authorization: NONE.
 - Integration branch: `main` at `b4efe2f`, the Phase 3 integration merge.
 - Active phase branch: `phase/04-house-tutors`; no remote tracking is configured and remote PR state is unverified because GitHub CLI/API authentication is unavailable.
-- Active specification/change: `deliver-assessment-core` (30/81 tasks complete; Phase 1 tasks 1.1-1.14, Phase 2 tasks 2.1-2.7, Phase 3 tasks 3.1-3.6, and Phase 4 tasks 4.1-4.3 complete).
-- Phase 4 authorization: The user explicitly authorized Phase 4 tasks 4.1-4.4 only. Task 4.5 remains unauthorized, and C8 remains unresolved for tutor account onboarding.
+- Active specification/change: `deliver-assessment-core` (31/81 tasks complete; Phase 1 tasks 1.1-1.14, Phase 2 tasks 2.1-2.7, Phase 3 tasks 3.1-3.6, and Phase 4 tasks 4.1-4.4 complete).
+- Phase 4 authorization: The user explicitly authorized Phase 4 tasks 4.1-4.4 only, now complete. Task 4.5 remains unauthorized, and C8 remains unresolved for tutor account onboarding.
 - Phase 2 documented deferrals: House Tutor block-scoped access → task 4.4. The task 2.6 block-filter and task 2.7 current-room/allocation-history checkpoints are completed. The existing occupancy and capacity connections remain at their recorded Phase 3 checkpoint (task 3.5).
 - Phase 2 task 2.1 implementation: Added `halls` and `blocks` migrations, `Hall` and `Block` Eloquent models with `Hall hasMany Block` / `Block belongsTo Hall` relationships, and factories. Blocks reference their hall with a cascading foreign key.
 - Phase 2 task 2.2 implementation: Added `rooms` and `seats` migrations, `Room` and `Seat` Eloquent models with `Block hasMany Room`, `Room belongsTo Block`, `Room hasMany Seat`, and `Seat belongsTo Room` relationships, plus factories. Room numbers are unique within a block and seat labels within a room; both use cascading foreign keys. Room capacity is guarded as a positive integer on SQLite and MySQL.
@@ -45,6 +45,9 @@
 - Phase 4 task 4.2 verification: Focused `TutorManagementTest` passes (12 tests, 75 assertions); the focused tutor tests together pass (18 tests, 88 assertions).
 - Phase 4 task 4.3 implementation: Tutor create and edit requests now accept optional `block_ids`, validate that each block exists, assign blocks on creation, and replace assignments on edit only when `block_ids` is supplied. Multiple blocks per tutor and multiple tutors per block are retained through the existing many-to-many pivot.
 - Phase 4 task 4.3 verification: Focused `TutorManagementTest` passes (16 tests, 95 assertions).
+- Phase 4 task 4.4 implementation: House Tutor student access now requires an active tutor profile with at least one assigned block. The directory includes only students whose current active allocation is in an assigned block, direct profile access outside those blocks returns `403`, and a crafted block filter cannot widen the scope. Unassigned, inactive, and profile-less tutors receive `403`; staff, Student, and Club Admin behavior is unchanged. The sidebar exposes the Students link to House Tutors.
+- Phase 4 task 4.4 verification: Focused `TutorStudentScopeTest` passes (11 tests, 90 assertions); the wider tutor and student-access focused suite passes (64 tests, 643 assertions).
+- Phase 4 tasks 4.3-4.4 batch verification: `composer ci:check` passes (308 tests, 1981 assertions; npm formatting/lint, TypeScript, Pint, and PHPStan with 0 errors). `npm run build`, `openspec validate deliver-assessment-core --strict`, and `git diff --check` pass. The known non-fatal PHPStan turbo-extension warning remains.
 - Task 3.1 commit mapping: The task 3.1 Conventional Commit contains its implementation, focused tests, task checkbox, and status update.
 - Task 3.2 commit mapping: The task 3.2 Conventional Commit contains its implementation, focused tests, task checkbox, and status update.
 - Task 3.3 commit mapping: The task 3.3 Conventional Commit contains its implementation, focused tests, task checkbox, authorization-ledger update, and status update.
@@ -54,6 +57,7 @@
 - Task 4.1 commit mapping: The task 4.1 Conventional Commit contains its implementation, focused tests, task checkbox, and status update.
 - Task 4.2 commit mapping: The task 4.2 Conventional Commit contains its implementation, focused tests, task checkbox, and status update.
 - Task 4.3 commit mapping: The task 4.3 Conventional Commit contains its implementation, focused tests, task checkbox, and status update.
+- Task 4.4 commit mapping: The task 4.4 Conventional Commit contains its implementation, focused tests, task checkbox, and status update.
 - Task 2.1 commit mapping: The task 2.1 Conventional Commit contains its implementation, focused test, task checkbox, and status update.
 - Task 2.2 commit mapping: The task 2.2 Conventional Commit contains its implementation, focused test, task checkbox, and status update.
 - Task 2.3 commit mapping: The task 2.3 Conventional Commit contains its implementation, focused test, task checkbox, and status update.
@@ -66,6 +70,6 @@
 - Framework decision: Laravel 13 is approved by the assessment authority according to user-confirmed communication. Approval evidence is user-reported; no written evidence is claimed.
 - Phase 3 tasks 3.1-3.2 batch verification: `composer ci:check` passes (257 tests, 1536 assertions; npm formatting/lint, TypeScript, Pint, and PHPStan with 0 errors). `npm run build`, `openspec validate deliver-assessment-core --strict`, and `git diff --check` pass. The known non-fatal PHPStan turbo-extension warning remains.
 - Phase 4 tasks 4.1-4.2 batch verification: `composer ci:check` passes (293 tests, 1871 assertions; npm formatting/lint, TypeScript, Pint, and PHPStan with 0 errors). `npm run build`, `openspec validate deliver-assessment-core --strict`, and `git diff --check` pass. The known non-fatal PHPStan turbo-extension warning remains.
-- Last committed checkpoint: tasks 4.1-4.3 are committed on `phase/04-house-tutors`; each task commit contains its implementation, focused tests, task checkbox, and status update.
-- Uncommitted work: None expected after the task 4.3 commit. Do not push, open a PR, or merge without explicit authorization.
-- Next recommended action: Implement authorized task 4.4 (tutor-scoped student list/profile access), then stop before task 4.5. Resolve C8 before tutor account onboarding.
+- Last committed checkpoint: tasks 4.1-4.4 are committed on `phase/04-house-tutors`; each task commit contains its implementation, focused tests, task checkbox, and status update.
+- Uncommitted work: None expected after the task 4.4 commit. Do not push, open a PR, or merge without explicit authorization.
+- Next recommended action: Tasks 4.1-4.4 are implementation-complete on `phase/04-house-tutors`. Stop for explicit authorization before task 4.5, and resolve C8 before tutor account onboarding.
