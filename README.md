@@ -8,15 +8,15 @@ A hall-management application for a fictional public university residential hall
 
 ## Tech Stack
 
-| Area | Technology |
-| --- | --- |
-| Backend | PHP 8.3+ (CI uses PHP 8.3), Laravel 13.38 |
-| Frontend | React 19.2, TypeScript 5.7, Inertia.js 3.0 |
-| Styling | Tailwind CSS 4.1, Radix/shadcn-style components |
-| Build | Vite 8 via vite-plus, Wayfinder typed routes |
-| Auth | Laravel Fortify 1.37 (login, registration, password reset, email verification, 2FA/passkeys) |
-| Database | MySQL 8 or SQLite (the test suite uses in-memory SQLite) |
-| Testing / quality | Pest 5.3, Pint, Larastan/PHPStan, TypeScript, GitHub Actions |
+| Area              | Technology                                                                                   |
+| ----------------- | -------------------------------------------------------------------------------------------- |
+| Backend           | PHP 8.3+ (CI uses PHP 8.3), Laravel 13.38                                                    |
+| Frontend          | React 19.2, TypeScript 5.7, Inertia.js 3.0                                                   |
+| Styling           | Tailwind CSS 4.1, Radix/shadcn-style components                                              |
+| Build             | Vite 8 via vite-plus, Wayfinder typed routes                                                 |
+| Auth              | Laravel Fortify 1.37 (login, registration, password reset, email verification, 2FA/passkeys) |
+| Database          | MySQL 8 or SQLite (the test suite uses in-memory SQLite)                                     |
+| Testing / quality | Pest 5.3, Pint, Larastan/PHPStan, TypeScript, GitHub Actions                                 |
 
 **Laravel version note:** Laravel 13 is recorded in this repository as a user-confirmed deviation from the brief's Laravel 11/12 wording. No written approval evidence is claimed.
 
@@ -73,27 +73,27 @@ A hall-management application for a fictional public university residential hall
 
 ## Roles & Permissions
 
-| Role | Main capabilities |
-| --- | --- |
-| Super Admin | User/role administration, activation/deactivation; full access to registrations, structure, allocations, tutors, students, and complaints. |
-| Provost | Review registrations; view structure; allocate/vacate seats; manage tutors; view all students; assign, comment on, transition, and close complaints. |
-| Hall Office Staff | Review registrations; manage blocks/rooms/seats; allocate/vacate seats; view all students; assign, comment on, transition, and close complaints. |
-| House Tutor | View students in assigned blocks; view/comment on assigned complaints; move assigned complaints Submitted → Under Review → In Progress → Resolved. Cannot reject or close. |
-| Club Admin | Student-level access to own profile and own complaints. Club features are not implemented. |
-| Student | Own profile; submit/list/detail/comment on own complaints; reopen own resolved complaint within 7 days. |
+| Role              | Main capabilities                                                                                                                                                          |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Super Admin       | User/role administration, activation/deactivation; full access to registrations, structure, allocations, tutors, students, and complaints.                                 |
+| Provost           | Review registrations; view structure; allocate/vacate seats; manage tutors; view all students; assign, comment on, transition, and close complaints.                       |
+| Hall Office Staff | Review registrations; manage blocks/rooms/seats; allocate/vacate seats; view all students; assign, comment on, transition, and close complaints.                           |
+| House Tutor       | View students in assigned blocks; view/comment on assigned complaints; move assigned complaints Submitted → Under Review → In Progress → Resolved. Cannot reject or close. |
+| Club Admin        | Student-level access to own profile and own complaints. Club features are not implemented.                                                                                 |
+| Student           | Own profile; submit/list/detail/comment on own complaints; reopen own resolved complaint within 7 days.                                                                    |
 
 ## Demo Accounts
 
 All accounts use password `password`.
 
-| Role | Email | Password |
-| --- | --- | --- |
-| Super Admin | admin@kjh.test | password |
-| Provost | provost@kjh.test | password |
-| Hall Office Staff | office@kjh.test | password |
-| House Tutor (North Block) | tutor@kjh.test | password |
+| Role                      | Email                     | Password |
+| ------------------------- | ------------------------- | -------- |
+| Super Admin               | admin@kjh.test            | password |
+| Provost                   | provost@kjh.test          | password |
+| Hall Office Staff         | office@kjh.test           | password |
+| House Tutor (North Block) | tutor@kjh.test            | password |
 | Club Admin (also Student) | clubadmin@student.du.test | password |
-| Student (Resident) | student@student.du.test | password |
+| Student (Resident)        | student@student.du.test   | password |
 
 ## Quick Setup
 
@@ -144,23 +144,23 @@ Optional: use **Register** to create a pending student with an `@student.du.test
 
 ## Implementation Status
 
-| Area | Status | Notes |
-| --- | --- | --- |
-| Authentication, roles, demo accounts | ✅ Complete | Six demo accounts, login/logout, password reset, and role-aware server authorization. |
-| Student registration & approval | ⚠️ Partial | Pending by default, with approve/reject/reconsider and retained history. Pending accounts can authenticate after email verification but are denied approved-student actions; the brief's stricter "cannot log in to protected areas" wording is not fully matched. |
-| User/role administration | ✅ Complete | Super Admin search/filter, role assignment, activate/deactivate. |
-| Student directory/profile | ✅ Complete | Search, filters, pagination, current room, allocation history, and role scoping. |
-| Hall structure | ✅ Complete | Blocks, rooms, seats, capacity and occupancy rules; create/edit/list. |
-| Seat allocation/vacancy | ✅ Complete | Transactional, history retained, one active allocation per student/seat. |
-| House tutors | ✅ Complete | Create/edit/deactivate, multi-block assignment, block-scoped student access. New tutor accounts receive a random credential with no delivery workflow; the seeded tutor works. |
-| Complaints (M4) | ✅ Complete | Submission, private images, tracking IDs, scoping, assignment, comments, transitions, reopening, overdue, and audit history. |
-| Dashboard (M7) | ❌ Not implemented | `/dashboard` is still a placeholder; no metric cards or seeded metrics. |
-| Notice board (M5) | ❌ Not implemented | No notice model, admin editor, public list, PDF upload, or draft isolation. |
-| Clubs (M6) | ❌ Not implemented | No club directory or membership workflow. |
-| Assessment seed dataset | ❌ Not implemented | Minimal seed only; no 3 blocks/30 rooms/60 students/5 tutors/4 clubs/20 complaints/10 notices. |
-| Track C REST API + separate SPA | ❌ Not implemented | React is integrated via Inertia; no `/api/v1`, Sanctum tokens, CORS, or separate frontend deployment. |
-| Responsive/mobile review | ⚠️ Partial | Responsive Tailwind layouts exist; the formal 375 px/keyboard audit is not completed. |
-| Bonus items | ❌ Not implemented | No anonymous complaints, events, polls, notifications, Bangla/English toggle, CSV export, activity log, Docker, or live deployment. CI is present. |
+| Area                                 | Status             | Notes                                                                                                                                                                                                                                                              |
+| ------------------------------------ | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Authentication, roles, demo accounts | ✅ Complete        | Six demo accounts, login/logout, password reset, and role-aware server authorization.                                                                                                                                                                              |
+| Student registration & approval      | ⚠️ Partial         | Pending by default, with approve/reject/reconsider and retained history. Pending accounts can authenticate after email verification but are denied approved-student actions; the brief's stricter "cannot log in to protected areas" wording is not fully matched. |
+| User/role administration             | ✅ Complete        | Super Admin search/filter, role assignment, activate/deactivate.                                                                                                                                                                                                   |
+| Student directory/profile            | ✅ Complete        | Search, filters, pagination, current room, allocation history, and role scoping.                                                                                                                                                                                   |
+| Hall structure                       | ✅ Complete        | Blocks, rooms, seats, capacity and occupancy rules; create/edit/list.                                                                                                                                                                                              |
+| Seat allocation/vacancy              | ✅ Complete        | Transactional, history retained, one active allocation per student/seat.                                                                                                                                                                                           |
+| House tutors                         | ✅ Complete        | Create/edit/deactivate, multi-block assignment, block-scoped student access. New tutor accounts receive a random credential with no delivery workflow; the seeded tutor works.                                                                                     |
+| Complaints (M4)                      | ✅ Complete        | Submission, private images, tracking IDs, scoping, assignment, comments, transitions, reopening, overdue, and audit history.                                                                                                                                       |
+| Dashboard (M7)                       | ❌ Not implemented | `/dashboard` is still a placeholder; no metric cards or seeded metrics.                                                                                                                                                                                            |
+| Notice board (M5)                    | ❌ Not implemented | No notice model, admin editor, public list, PDF upload, or draft isolation.                                                                                                                                                                                        |
+| Clubs (M6)                           | ❌ Not implemented | No club directory or membership workflow.                                                                                                                                                                                                                          |
+| Assessment seed dataset              | ❌ Not implemented | Minimal seed only; no 3 blocks/30 rooms/60 students/5 tutors/4 clubs/20 complaints/10 notices.                                                                                                                                                                     |
+| Track C REST API + separate SPA      | ❌ Not implemented | React is integrated via Inertia; no `/api/v1`, Sanctum tokens, CORS, or separate frontend deployment.                                                                                                                                                              |
+| Responsive/mobile review             | ⚠️ Partial         | Responsive Tailwind layouts exist; the formal 375 px/keyboard audit is not completed.                                                                                                                                                                              |
+| Bonus items                          | ❌ Not implemented | No anonymous complaints, events, polls, notifications, Bangla/English toggle, CSV export, activity log, Docker, or live deployment. CI is present.                                                                                                                 |
 
 ## Assumptions
 

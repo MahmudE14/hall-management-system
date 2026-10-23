@@ -6,6 +6,7 @@ import {
     FolderGit2,
     GraduationCap,
     LayoutGrid,
+    Megaphone,
     MessageSquare,
     Users,
 } from 'lucide-react';
@@ -23,6 +24,7 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import { index as notices } from '@/routes/admin/notices';
 import { index as blocks } from '@/routes/blocks';
 import { index as complaints } from '@/routes/complaints';
 import { index as houseTutors } from '@/routes/house-tutors';
@@ -49,6 +51,12 @@ const mainNavItems: NavItem[] = [
             'student',
             'club_admin',
         ],
+    },
+    {
+        title: 'Notices',
+        href: notices(),
+        icon: Megaphone,
+        roles: ['super_admin', 'provost', 'hall_office_staff', 'club_admin'],
     },
     {
         title: 'Registrations',

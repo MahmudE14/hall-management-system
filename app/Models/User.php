@@ -68,6 +68,12 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
         return $this->hasMany(ComplaintComment::class, 'author_id');
     }
 
+    /** @return HasMany<Notice, $this> */
+    public function createdNotices(): HasMany
+    {
+        return $this->hasMany(Notice::class, 'created_by');
+    }
+
     public function hasRole(string $role): bool
     {
         return $this->hasAnyRole($role);
